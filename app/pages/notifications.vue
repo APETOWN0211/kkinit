@@ -166,13 +166,17 @@ const goBack = () => {
 </template>
 
 <style scoped>
-/* Page container: full viewport height, flex column */
+/* Page container: fills parent height */
 .notifications-page {
   display: flex;
   flex-direction: column;
+
   width: 100%;
-  height: 100dvh;
+  height: 100%;
+  min-height: 0;
+
   overflow: hidden;
+
   background: var(--color-notifications-background);
 }
 

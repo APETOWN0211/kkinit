@@ -22,18 +22,12 @@ const isNotificationsPage = computed(() =>
   <div class="app-wrapper">
     <div
       class="app-shell"
-      :class="{
-        'app-shell--notifications': isNotificationsPage,
-        'app-shell--no-scroll': isNotificationsPage
-      }"
+      :class="{ 'app-shell--notifications': isNotificationsPage }"
     >
       <NuxtRouteAnnouncer />
       <div
         class="app-content"
-        :class="{
-          'app-content--with-bottom-nav': showBottomNavigation,
-          'app-content--no-scroll': isNotificationsPage
-        }"
+        :class="{ 'app-content--with-bottom-nav': showBottomNavigation }"
       >
         <NuxtPage />
       </div>
@@ -46,30 +40,46 @@ const isNotificationsPage = computed(() =>
 /* Mobile default */
 .app-wrapper {
   width: 100%;
-  min-height: 100dvh;
+  height: 100dvh;
+  min-height: 0;
+
   display: flex;
-  justify-content: flex-start; /* default: left/top aligned */
+  justify-content: flex-start;
+
+  overflow: hidden;
 }
 
 .app-shell {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
   width: 100%;
   max-width: 390px;
-  min-height: 100dvh;
+
+  height: 100%;
+  min-height: 0;
+
   background: var(--color-background);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+
+  overflow: hidden;
 }
 
-/* .app-content is the scroll container: fills remaining height below header */
+/* .app-content is the scroll container for regular pages */
 .app-content {
-  flex: 1;
+  position: relative;
+
+  flex: 1 1 auto;
   min-height: 0;
-  overflow: hidden;
+
   display: flex;
   flex-direction: column;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Bottom nav takes space at the bottom */
@@ -77,49 +87,41 @@ const isNotificationsPage = computed(() =>
   padding-bottom: 0;
 }
 
-/* Notifications page: no external scroll, page handles its own scroll */
-.app-content--no-scroll {
-  overflow: hidden;
-}
-
 .app-shell--notifications {
   background: var(--color-notifications-background);
-  height: 100dvh;
-}
-
-.app-shell--no-scroll {
-  overflow: hidden;
 }
 
 /* Desktop preview */
 @media (min-width: 768px) {
   .app-wrapper {
-    align-items: flex-start;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    justify-content: center; /* desktop에서만 중앙 정렬 */
+    height: auto;
+    min-height: calc(844px + 40px);
+    overflow: visible;
+    justify-content: center;
   }
 
   .app-shell {
     width: 390px;
     height: 844px;
     max-width: 390px;
-    min-height: 844px;
+    min-height: 0;
     max-height: 844px;
     flex-shrink: 0;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     border-radius: 40px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
   }
 
   /* Same .app-content behavior on desktop */
   .app-content {
-    flex: 1;
+    position: relative;
+    flex: 1 1 auto;
     min-height: 0;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .app-content--with-bottom-nav {
