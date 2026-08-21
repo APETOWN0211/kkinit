@@ -20,6 +20,9 @@ export default defineNuxtConfig({
         { name: 'apple-mobile-web-app-status-bar-style', content: 'default' },
         { name: 'apple-mobile-web-app-title', content: '끼닛' },
       ],
+      link: [
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+      ],
     },
   },
 
@@ -36,6 +39,13 @@ export default defineNuxtConfig({
       scope: '/',
       background_color: '#FAFAFA',
       theme_color: '#FAFAFA',
+    },
+    workbox: {
+      // iOS PWA standalone 유지: navigation 시 SW가 모든 요청을 "/"로
+      // fallback 하지 않도록 설정. 매 navigation 마다 SW가 개입하면
+      // iOS WebKit이 standalone 컨텍스트를 재평가하며 URL 바가 노출됨.
+      navigateFallback: null,
+      navigateFallbackDenylist: [/^\/api\//, /^\/_nuxt\//, /^\/sw\.js$/],
     },
     devOptions: {
       enabled: false,
