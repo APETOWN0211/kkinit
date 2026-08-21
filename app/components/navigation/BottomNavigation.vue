@@ -37,11 +37,10 @@ const setActive = (id: string) => {
 
 <style scoped>
 .bottom-navigation {
-  position: fixed;
+  position: absolute;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: var(--app-width);
+  left: 0;
+  width: 100%;
   background: var(--color-nav-background);
   border-radius: 28px 28px 0 0;
   padding: 12px 40px calc(12px + env(safe-area-inset-bottom));

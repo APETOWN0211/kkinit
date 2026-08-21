@@ -16,6 +16,7 @@ select {
     "Apple SD Gothic Neo",
     "Segoe UI",
     sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* App UI: prevent text selection for native app feel */

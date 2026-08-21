@@ -18,7 +18,12 @@ const showBottomNavigation = computed(() =>
   <div class="app-wrapper">
     <div class="app-shell">
       <NuxtRouteAnnouncer />
-      <NuxtPage />
+      <div
+        class="app-content"
+        :class="{ 'app-content--with-bottom-nav': showBottomNavigation }"
+      >
+        <NuxtPage />
+      </div>
       <NavigationBottomNavigation v-if="showBottomNavigation" />
     </div>
   </div>

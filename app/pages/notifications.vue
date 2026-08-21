@@ -43,120 +43,122 @@ const goBack = () => {
       <div class="header-right" />
     </header>
 
-    <div class="notifications-list">
-      <!-- 첫 번째 알림: 배지 잠금 해제 -->
-      <div class="notification-card">
-        <span class="unread-dot" />
+    <div class="notifications-scroll-area">
+      <div class="notifications-list">
+        <!-- 첫 번째 알림: 배지 잠금 해제 -->
+        <div class="notification-card">
+          <span class="unread-dot" />
 
-        <div class="notification-main">
-          <div class="notification-icon">
-            <span
-              class="badge-icon"
-              v-html="badgeUnlockIcon"
-            />
-          </div>
-
-          <div class="notification-content">
-            <div class="notification-meta">
-              <span class="notification-title">
-                배지 잠금 해제!
-              </span>
-
-              <span class="notification-time">
-                1일 전
-              </span>
+          <div class="notification-main">
+            <div class="notification-icon">
+              <span
+                class="badge-icon"
+                v-html="badgeUnlockIcon"
+              />
             </div>
 
-            <p class="notification-message">
-              '야식 출동' 배지를 받았어요.
-            </p>
-          </div>
-        </div>
+            <div class="notification-content">
+              <div class="notification-meta">
+                <span class="notification-title">
+                  배지 잠금 해제!
+                </span>
 
-        <button
-          type="button"
-          class="notification-detail"
-        >
-          <span class="detail-text">
-            자세히 보기
-          </span>
+                <span class="notification-time">
+                  1일 전
+                </span>
+              </div>
 
-          <span
-            class="detail-icon"
-            v-html="chevronRightIcon"
-          />
-        </button>
-      </div>
-
-      <!-- 두 번째 알림: 로그인 알림 -->
-      <div class="notification-card">
-        <div class="notification-main">
-          <div class="notification-icon">
-            <span
-              class="badge-icon"
-              v-html="noticeIcon"
-            />
-          </div>
-
-          <div class="notification-content">
-            <div class="notification-meta">
-              <span class="notification-title">
-                새로운 기기에서 로그인 되었어요.
-              </span>
-
-              <span class="notification-time">
-                4일 전
-              </span>
+              <p class="notification-message">
+                '야식 출동' 배지를 받았어요.
+              </p>
             </div>
-
-            <p class="notification-message">
-              이전 기기에서는 로그아웃 됩니다.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 세 번째 알림: 회원가입 완료 -->
-      <div class="notification-card">
-        <div class="notification-main">
-          <div class="notification-icon">
-            <span
-              class="badge-icon"
-              v-html="signUpIcon"
-            />
           </div>
 
-          <div class="notification-content">
-            <div class="notification-meta">
-              <span class="notification-title">
-                회원가입이 완료되었어요.
-              </span>
-
-              <span class="notification-time">
-                7일 전
-              </span>
-            </div>
-
-            <p class="notification-message">
-              닮은살걀님, 가입을 축하해요!
-            </p>
-          </div>
-        </div>
-
-        <div class="notification-action">
-          <NuxtLink
-            to="/"
-            class="action-link"
+          <button
+            type="button"
+            class="notification-detail"
           >
             <span class="detail-text">
-              홈으로
+              자세히 보기
             </span>
 
             <span
               class="detail-icon"
               v-html="chevronRightIcon"
             />
-          </NuxtLink>
+          </button>
+        </div>
+
+        <!-- 두 번째 알림: 로그인 알림 -->
+        <div class="notification-card">
+          <div class="notification-main">
+            <div class="notification-icon">
+              <span
+                class="badge-icon"
+                v-html="noticeIcon"
+              />
+            </div>
+
+            <div class="notification-content">
+              <div class="notification-meta">
+                <span class="notification-title">
+                  새로운 기기에서 로그인 되었어요.
+                </span>
+
+                <span class="notification-time">
+                  4일 전
+                </span>
+              </div>
+
+              <p class="notification-message">
+                이전 기기에서는 로그아웃 됩니다.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 세 번째 알림: 회원가입 완료 -->
+        <div class="notification-card">
+          <div class="notification-main">
+            <div class="notification-icon">
+              <span
+                class="badge-icon"
+                v-html="signUpIcon"
+              />
+            </div>
+
+            <div class="notification-content">
+              <div class="notification-meta">
+                <span class="notification-title">
+                  회원가입이 완료되었어요.
+                </span>
+
+                <span class="notification-time">
+                  7일 전
+                </span>
+              </div>
+
+              <p class="notification-message">
+                닮은살걀님, 가입을 축하해요!
+              </p>
+            </div>
+          </div>
+
+          <div class="notification-action">
+            <NuxtLink
+              to="/"
+              class="action-link"
+            >
+              <span class="detail-text">
+                홈으로
+              </span>
+
+              <span
+                class="detail-icon"
+                v-html="chevronRightIcon"
+              />
+            </NuxtLink>
+          </div>
         </div>
       </div>
     </div>
@@ -164,18 +166,18 @@ const goBack = () => {
 </template>
 
 <style scoped>
+/* Page container */
 .notifications-page {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  min-height: 100dvh;
-
+  height: 100%;
   background: var(--color-notifications-background);
 }
 
-/* Header */
-
+/* Header: fixed outside scroll flow */
 .notifications-header {
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 10;
 
   display: grid;
@@ -234,8 +236,20 @@ const goBack = () => {
   width: 100%;
 }
 
-/* Notification List */
+/* Scroll area: fills remaining space below header */
+.notifications-scroll-area {
+  position: absolute;
+  top: calc(26px + env(safe-area-inset-top));
+  right: 0;
+  bottom: 0;
+  left: 0;
 
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Notification List */
 .notifications-list {
   display: flex;
   flex-direction: column;
@@ -247,7 +261,6 @@ const goBack = () => {
 }
 
 /* Notification Card */
-
 .notification-card {
   position: relative;
 
@@ -275,7 +288,6 @@ const goBack = () => {
 }
 
 /* Main */
-
 .notification-main {
   display: flex;
   align-items: flex-start;
@@ -350,7 +362,6 @@ const goBack = () => {
 }
 
 /* Detail / Action */
-
 .notification-detail {
   display: flex;
   align-items: center;
