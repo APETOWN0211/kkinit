@@ -6,7 +6,6 @@ import signUpIcon from '~/assets/icons/notifications/sign_up.svg?raw'
 import chevronRightIcon from '~/assets/icons/common/chevron-right.svg?raw'
 
 const router = useRouter()
-const route = useRoute()
 
 useHead({
   meta: [
@@ -20,64 +19,6 @@ useHead({
 const goBack = () => {
   router.back()
 }
-
-// DEBUG: PWA standalone 진단용 (임시)
-interface DebugInfo {
-  ready: boolean
-  href: string
-  origin: string
-  pathname: string
-  displayModeStandalone: string
-  navigatorStandalone: string
-  referrer: string
-  routerFullPath: string
-  navigationType: string
-  perfNavigationType: string
-  perfEntryCount: string
-  serviceWorkerController: string
-  manifestHref: string
-  isSecureContext: string
-  userAgent: string
-}
-
-const debug = ref<DebugInfo>({
-  ready: false,
-  href: '',
-  origin: '',
-  pathname: '',
-  displayModeStandalone: '',
-  navigatorStandalone: '',
-  referrer: '',
-  routerFullPath: '',
-  navigationType: '',
-  perfNavigationType: '',
-  perfEntryCount: '',
-  serviceWorkerController: '',
-  manifestHref: '',
-  isSecureContext: '',
-  userAgent: ''
-})
-
-onMounted(() => {
-  const navAny = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined
-  debug.value = {
-    ready: true,
-    href: window.location.href,
-    origin: window.location.origin,
-    pathname: window.location.pathname,
-    displayModeStandalone: window.matchMedia('(display-mode: standalone)').matches ? 'true' : 'false',
-    navigatorStandalone: ((window.navigator as any).standalone === true) ? 'true' : 'false',
-    referrer: document.referrer || '(empty)',
-    routerFullPath: route.fullPath,
-    navigationType: navAny?.type ?? '(unknown)',
-    perfNavigationType: navAny ? `${navAny.type} (redirectCount=${navAny.redirectCount})` : '(no perf entry)',
-    perfEntryCount: String(performance.getEntriesByType('navigation').length),
-    serviceWorkerController: navigator.serviceWorker?.controller ? 'yes' : 'no',
-    manifestHref: document.querySelector('link[rel="manifest"]')?.getAttribute('href') ?? '(none)',
-    isSecureContext: window.isSecureContext ? 'true' : 'false',
-    userAgent: navigator.userAgent
-  }
-})
 </script>
 
 <template>
@@ -218,24 +159,6 @@ onMounted(() => {
           </NuxtLink>
         </div>
       </div>
-    </div>
-
-    <!-- DEBUG: PWA standalone 진단용 임시 박스 -->
-    <div v-if="debug.ready" class="pwa-debug-box">
-      <div class="pwa-debug-box__title">PWA DEBUG (임시)</div>
-      <div class="pwa-debug-row"><span>href</span><b>{{ debug.href }}</b></div>
-      <div class="pwa-debug-row"><span>origin</span><b>{{ debug.origin }}</b></div>
-      <div class="pwa-debug-row"><span>pathname</span><b>{{ debug.pathname }}</b></div>
-      <div class="pwa-debug-row"><span>display-mode standalone</span><b>{{ debug.displayModeStandalone }}</b></div>
-      <div class="pwa-debug-row"><span>navigator.standalone</span><b>{{ debug.navigatorStandalone }}</b></div>
-      <div class="pwa-debug-row"><span>referrer</span><b>{{ debug.referrer }}</b></div>
-      <div class="pwa-debug-row"><span>router fullPath</span><b>{{ debug.routerFullPath }}</b></div>
-      <div class="pwa-debug-row"><span>perf navigation</span><b>{{ debug.perfNavigationType }}</b></div>
-      <div class="pwa-debug-row"><span>navigation entries</span><b>{{ debug.perfEntryCount }}</b></div>
-      <div class="pwa-debug-row"><span>SW controller</span><b>{{ debug.serviceWorkerController }}</b></div>
-      <div class="pwa-debug-row"><span>manifest href</span><b>{{ debug.manifestHref }}</b></div>
-      <div class="pwa-debug-row"><span>isSecureContext</span><b>{{ debug.isSecureContext }}</b></div>
-      <div class="pwa-debug-row"><span>UA</span><b>{{ debug.userAgent }}</b></div>
     </div>
   </div>
 </template>
@@ -487,43 +410,5 @@ onMounted(() => {
 
   width: 6px;
   height: 11px;
-}
-
-/* DEBUG: PWA 진단용 임시 박스 */
-.pwa-debug-box {
-  margin: 12px var(--page-padding) 24px;
-  padding: 12px;
-  background: #111827;
-  color: #F9FAFB;
-  border-radius: 8px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 11px;
-  line-height: 1.5;
-  word-break: break-all;
-  opacity: 0.9;
-}
-
-.pwa-debug-box__title {
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #FDE68A;
-}
-
-.pwa-debug-row {
-  display: flex;
-  gap: 8px;
-  padding: 2px 0;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-}
-
-.pwa-debug-row span {
-  flex-shrink: 0;
-  color: #93C5FD;
-  min-width: 130px;
-}
-
-.pwa-debug-row b {
-  font-weight: 400;
-  color: #F9FAFB;
 }
 </style>
