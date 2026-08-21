@@ -171,7 +171,7 @@ const goBack = () => {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  height: 100dvh;
   overflow: hidden;
   background: var(--color-notifications-background);
 }
@@ -241,7 +241,6 @@ const goBack = () => {
 .notifications-scroll-area {
   flex: 1;
   min-height: 0;
-  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;

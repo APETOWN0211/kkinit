@@ -48,7 +48,7 @@ const isNotificationsPage = computed(() =>
   width: 100%;
   min-height: 100dvh;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; /* default: left/top aligned */
 }
 
 .app-shell {
@@ -84,6 +84,7 @@ const isNotificationsPage = computed(() =>
 
 .app-shell--notifications {
   background: var(--color-notifications-background);
+  height: 100dvh;
 }
 
 .app-shell--no-scroll {
@@ -96,6 +97,7 @@ const isNotificationsPage = computed(() =>
     align-items: flex-start;
     padding-top: 20px;
     padding-bottom: 20px;
+    justify-content: center; /* desktop에서만 중앙 정렬 */
   }
 
   .app-shell {
