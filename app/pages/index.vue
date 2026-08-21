@@ -13,5 +13,6 @@ import HomeHeader from '~/components/home/HomeHeader.vue'
   width: 100%;
   min-height: 100%;
   background: var(--color-background);
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
 }
 </style>

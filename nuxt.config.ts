@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       charset: 'utf-8',
-      viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
+      viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover',
       title: '끼닛',
       meta: [
         { name: 'description', content: '끼닛 - 맛집 SNS' },

@@ -1,11 +1,25 @@
+<script setup lang="ts">
+const route = useRoute()
+
+const mainTabRoutes = [
+  '/',
+  '/explore',
+  '/map',
+  '/chat',
+  '/my'
+]
+
+const showBottomNavigation = computed(() =>
+  mainTabRoutes.includes(route.path)
+)
+</script>
+
 <template>
   <div class="app-wrapper">
     <div class="app-shell">
       <NuxtRouteAnnouncer />
-      <div class="app-content">
-        <NuxtPage />
-      </div>
-      <NavigationBottomNavigation />
+      <NuxtPage />
+      <NavigationBottomNavigation v-if="showBottomNavigation" />
     </div>
   </div>
 </template>
@@ -27,12 +41,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-}
-
-.app-content {
-  flex: 1;
   overflow-y: auto;
-  padding-bottom: env(safe-area-inset-bottom);
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Desktop preview */
@@ -52,14 +62,8 @@
     flex-shrink: 0;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     border-radius: 40px;
-    overflow: hidden;
-  }
-
-  .app-content {
-    flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    max-height: calc(844px - env(safe-area-inset-bottom));
   }
 }
 

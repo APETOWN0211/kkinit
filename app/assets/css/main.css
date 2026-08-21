@@ -18,4 +18,19 @@ select {
     sans-serif;
 }
 
-/* Global styles can be added here */
+/* App UI: prevent text selection for native app feel */
+#__nuxt {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Exception: allow text selection in input/textarea/select/contenteditable */
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}

@@ -37,10 +37,11 @@ const setActive = (id: string) => {
 
 <style scoped>
 .bottom-navigation {
-  position: absolute;
+  position: fixed;
   bottom: 0;
-  left: 0;
-  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--app-width);
   background: var(--color-nav-background);
   border-radius: 28px 28px 0 0;
   padding: 12px 40px calc(12px + env(safe-area-inset-bottom));
@@ -48,12 +49,7 @@ const setActive = (id: string) => {
   align-items: center;
   justify-content: space-between;
   box-shadow: var(--shadow-bottom-navigation);
-}
-
-@media (max-width: 389px) {
-  .bottom-navigation {
-    position: fixed;
-  }
+  z-index: 20;
 }
 
 .nav-item {

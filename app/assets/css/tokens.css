@@ -41,6 +41,8 @@
 
   /* Layout */
   --page-padding: 20px;
+  --app-width: 390px;
+  --bottom-nav-height: 72px;
 
   /* Radius */
   --radius-sm: 8px;
