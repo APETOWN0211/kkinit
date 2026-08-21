@@ -12,11 +12,18 @@ const mainTabRoutes = [
 const showBottomNavigation = computed(() =>
   mainTabRoutes.includes(route.path)
 )
+
+const isNotificationsPage = computed(() =>
+  route.path.startsWith('/notifications')
+)
 </script>
 
 <template>
   <div class="app-wrapper">
-    <div class="app-shell">
+    <div
+      class="app-shell"
+      :class="{ 'app-shell--notifications': isNotificationsPage }"
+    >
       <NuxtRouteAnnouncer />
       <div
         class="app-content"
@@ -48,6 +55,10 @@ const showBottomNavigation = computed(() =>
   flex-direction: column;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.app-shell--notifications {
+  background: var(--color-notifications-background);
 }
 
 /* Desktop preview */

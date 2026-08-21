@@ -166,16 +166,17 @@ const goBack = () => {
 </template>
 
 <style scoped>
-/* Page container */
+/* Page container: full viewport height, flex column */
 .notifications-page {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
+  overflow: hidden;
   background: var(--color-notifications-background);
 }
 
-/* Header: fixed outside scroll flow */
+/* Header: fixed height item, NOT in scroll area */
 .notifications-header {
   flex-shrink: 0;
   z-index: 10;
@@ -236,14 +237,10 @@ const goBack = () => {
   width: 100%;
 }
 
-/* Scroll area: fills remaining space below header */
+/* Scroll area: fills remaining height below header */
 .notifications-scroll-area {
-  position: absolute;
-  top: calc(26px + env(safe-area-inset-top));
-  right: 0;
-  bottom: 0;
-  left: 0;
-
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -254,8 +251,6 @@ const goBack = () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-
-  width: 100%;
 
   padding: 16px var(--page-padding) 20px;
 }
