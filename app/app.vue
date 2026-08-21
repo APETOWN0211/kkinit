@@ -22,12 +22,18 @@ const isNotificationsPage = computed(() =>
   <div class="app-wrapper">
     <div
       class="app-shell"
-      :class="{ 'app-shell--notifications': isNotificationsPage }"
+      :class="{
+        'app-shell--notifications': isNotificationsPage,
+        'app-shell--no-scroll': isNotificationsPage
+      }"
     >
       <NuxtRouteAnnouncer />
       <div
         class="app-content"
-        :class="{ 'app-content--with-bottom-nav': showBottomNavigation }"
+        :class="{
+          'app-content--with-bottom-nav': showBottomNavigation,
+          'app-content--no-scroll': isNotificationsPage
+        }"
       >
         <NuxtPage />
       </div>
@@ -57,8 +63,31 @@ const isNotificationsPage = computed(() =>
   -webkit-overflow-scrolling: touch;
 }
 
+/* .app-content is the scroll container: fills remaining height below header */
+.app-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bottom nav takes space at the bottom */
+.app-content--with-bottom-nav {
+  padding-bottom: 0;
+}
+
+/* Notifications page: no external scroll, page handles its own scroll */
+.app-content--no-scroll {
+  overflow: hidden;
+}
+
 .app-shell--notifications {
   background: var(--color-notifications-background);
+}
+
+.app-shell--no-scroll {
+  overflow: hidden;
 }
 
 /* Desktop preview */
@@ -80,6 +109,19 @@ const isNotificationsPage = computed(() =>
     border-radius: 40px;
     overflow-y: auto;
     overflow-x: hidden;
+  }
+
+  /* Same .app-content behavior on desktop */
+  .app-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app-content--with-bottom-nav {
+    padding-bottom: 0;
   }
 }
 

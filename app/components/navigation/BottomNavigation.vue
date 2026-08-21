@@ -36,10 +36,12 @@ const setActive = (id: string) => {
 </template>
 
 <style scoped>
+/* Mobile: fixed to viewport bottom */
 .bottom-navigation {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
+  right: 0;
   width: 100%;
   background: var(--color-nav-background);
   border-radius: 28px 28px 0 0;
@@ -49,6 +51,15 @@ const setActive = (id: string) => {
   justify-content: space-between;
   box-shadow: var(--shadow-bottom-navigation);
   z-index: 20;
+}
+
+/* Desktop preview: within app-shell */
+@media (min-width: 768px) {
+  .bottom-navigation {
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
 }
 
 .nav-item {
