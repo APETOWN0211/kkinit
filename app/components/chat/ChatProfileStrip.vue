@@ -161,8 +161,8 @@ defineProps<{
 
 .profile-follow-badge {
   position: absolute;
-  right: 0;
-  bottom: 12px; /* name row 위에 걸치도록 */
+  right: 2px;
+  bottom: 2px; /* name row 위에 걸치도록 */
   width: 16px;
   height: 16px;
   display: flex;

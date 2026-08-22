@@ -333,7 +333,7 @@ const filteredConversations = computed(() => {
           :group-count="groupCount"
         />
       </div>
-      <ChatList :items="filteredConversations" />
+      <ChatList :items="filteredConversations" :filter="activeFilter" />
     </div>
   </div>
 </template>

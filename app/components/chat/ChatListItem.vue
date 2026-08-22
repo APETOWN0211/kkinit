@@ -217,7 +217,7 @@ defineProps<{
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 10px 0 0 10px;
+  padding: 10px 10px 0 10px;
 }
 
 .chat-row__inner {
