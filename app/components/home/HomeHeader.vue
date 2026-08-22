@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import notificationIcon from '~/assets/icons/notification.svg?raw'
 
-const activeTab = ref<'nearby' | 'following'>('nearby')
+const props = defineProps<{
+  activeTab?: 'nearby' | 'following'
+}>()
+
+const emit = defineEmits<{
+  (e: 'tabChange', tab: 'nearby' | 'following'): void
+}>()
 
 const setTab = (tab: 'nearby' | 'following') => {
-  activeTab.value = tab
+  emit('tabChange', tab)
 }
 </script>
 

@@ -27,7 +27,10 @@ const isNotificationsPage = computed(() =>
       <NuxtRouteAnnouncer />
       <div
         class="app-content"
-        :class="{ 'app-content--with-bottom-nav': showBottomNavigation }"
+        :class="{
+          'app-content--with-bottom-nav': showBottomNavigation,
+          'app-content--no-scroll': isNotificationsPage
+        }"
       >
         <NuxtPage />
       </div>
@@ -80,11 +83,22 @@ const isNotificationsPage = computed(() =>
   overflow-y: auto;
 
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.app-content::-webkit-scrollbar {
+  display: none;
 }
 
 /* Bottom nav takes space at the bottom */
 .app-content--with-bottom-nav {
   padding-bottom: 0;
+}
+
+/* Notifications page: disable app-content scroll */
+.app-content--no-scroll {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
 }
 
 .app-shell--notifications {
@@ -122,6 +136,11 @@ const isNotificationsPage = computed(() =>
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .app-content::-webkit-scrollbar {
+    display: none;
   }
 
   .app-content--with-bottom-nav {

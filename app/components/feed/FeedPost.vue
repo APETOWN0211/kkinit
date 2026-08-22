@@ -1,0 +1,415 @@
+<script setup lang="ts">
+import heartIcon from '~/assets/icons/feed/heart.svg?raw'
+import commentIcon from '~/assets/icons/feed/comment.svg?raw'
+import repostIcon from '~/assets/icons/feed/repost.svg?raw'
+import bookmarkIcon from '~/assets/icons/feed/bookmark.svg?raw'
+import moreIcon from '~/assets/icons/feed/more.svg?raw'
+import followPlusIcon from '~/assets/icons/feed/follow-plus.svg?raw'
+
+interface ContentLine {
+  text: string
+  isChip?: boolean
+  chipType?: 'lime' | 'orange' | 'gray'
+}
+
+interface FeedPost {
+  id: number
+  author: {
+    name: string
+    avatar: string
+    isFollowing?: boolean
+  }
+  time: string
+  content: ContentLine[][]
+  images: string[]
+  likes: number
+  comments: number
+  reposts: number
+  isLiked?: boolean
+  isBookmarked?: boolean
+}
+
+const props = defineProps<{
+  post: FeedPost
+}>()
+
+const isLiked = ref(props.post.isLiked ?? false)
+const isBookmarked = ref(props.post.isBookmarked ?? false)
+
+const toggleLike = () => {
+  isLiked.value = !isLiked.value
+}
+
+const toggleBookmark = () => {
+  isBookmarked.value = !isBookmarked.value
+}
+
+const formatCount = (count: number): string => {
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}k`
+  }
+  return count.toString()
+}
+</script>
+
+<template>
+  <article class="feed-post">
+    <div class="post-left">
+      <div class="avatar-wrapper">
+        <div class="avatar">
+          <img
+            :src="post.author.avatar"
+            :alt="post.author.name"
+            class="avatar-image"
+          />
+        </div>
+        <button
+          v-if="!post.author.isFollowing"
+          type="button"
+          class="follow-button"
+          aria-label="팔로우"
+        >
+          <span class="follow-icon" v-html="followPlusIcon" />
+        </button>
+      </div>
+    </div>
+
+    <div class="post-content">
+      <header class="post-header">
+        <div class="header-left">
+          <span class="author-name">{{ post.author.name }}</span>
+          <span class="post-time">{{ post.time }}</span>
+        </div>
+        <button type="button" class="more-button" aria-label="더보기">
+          <span class="more-icon" v-html="moreIcon" />
+        </button>
+      </header>
+
+      <div class="post-body">
+        <div class="content-lines">
+          <p
+            v-for="(line, lineIndex) in post.content"
+            :key="lineIndex"
+            class="content-line"
+          >
+            <template v-for="(segment, segIndex) in line" :key="segIndex">
+              <span
+                v-if="segment.isChip"
+                class="chip"
+                :class="`chip--${segment.chipType}`"
+              >
+                {{ segment.text }}
+              </span>
+              <span v-else>{{ segment.text }}</span>
+            </template>
+          </p>
+        </div>
+      </div>
+
+      <div v-if="post.images.length > 0" class="post-media">
+        <div class="media-scroll">
+          <div
+            v-for="(image, imgIndex) in post.images"
+            :key="imgIndex"
+            class="media-item"
+          >
+            <img
+              :src="image"
+              :alt="`게시물 사진 ${imgIndex + 1}`"
+              class="media-image"
+            />
+          </div>
+        </div>
+      </div>
+
+      <footer class="post-actions">
+        <button
+          type="button"
+          class="action-button"
+          :class="{ 'action-button--active': isLiked }"
+          @click="toggleLike"
+        >
+          <span class="action-icon" v-html="heartIcon" />
+          <span class="action-count">{{ formatCount(post.likes) }}</span>
+        </button>
+
+        <button type="button" class="action-button">
+          <span class="action-icon" v-html="commentIcon" />
+          <span class="action-count">{{ formatCount(post.comments) }}</span>
+        </button>
+
+        <button type="button" class="action-button">
+          <span class="action-icon" v-html="repostIcon" />
+          <span class="action-count">{{ formatCount(post.reposts) }}</span>
+        </button>
+
+        <button
+          type="button"
+          class="action-button"
+          :class="{ 'action-button--active': isBookmarked }"
+          @click="toggleBookmark"
+        >
+          <span class="action-icon" v-html="bookmarkIcon" />
+        </button>
+      </footer>
+    </div>
+  </article>
+</template>
+
+<style scoped>
+.feed-post {
+  display: flex;
+  gap: 14px;
+  padding: 20px;
+  padding-right: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.post-left {
+  flex-shrink: 0;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 47px;
+  height: 47px;
+}
+
+.avatar {
+  width: 47px;
+  height: 47px;
+  border-radius: 999px;
+  border: 1px solid var(--color-chip-gray);
+  overflow: hidden;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.follow-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 2px solid var(--color-background);
+  border-radius: 20px;
+  background: #699df9;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.follow-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 8px;
+  height: 8px;
+}
+
+.follow-icon :deep(svg) {
+  width: 8px;
+  height: 8px;
+  color: white;
+}
+
+.post-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.author-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.post-time {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: -0.28px;
+}
+
+.more-button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.more-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.more-icon :deep(svg) {
+  width: 24px;
+  height: 24px;
+  color: var(--color-icon-muted);
+}
+
+.post-body {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.content-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.content-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.chip {
+  padding: 2px 7px;
+  border-radius: 7px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.chip--lime {
+  background: var(--color-chip-lime);
+  color: var(--color-text-primary);
+}
+
+.chip--orange {
+  background: var(--color-chip-orange);
+  color: var(--color-text-on-primary);
+}
+
+.chip--gray {
+  background: var(--color-chip-gray);
+  color: var(--color-chip-gray-text);
+}
+
+.post-media {
+  width: calc(100% + var(--page-padding));
+  margin-left: 0;
+  margin-right: calc(var(--page-padding) * -1);
+}
+
+.media-scroll {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.media-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.media-scroll::after {
+  content: '';
+  flex: 0 0 var(--page-padding);
+}
+
+.media-item {
+  flex: 0 0 180px;
+  width: 180px;
+  height: 240px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.media-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.action-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22.5px;
+  height: 22.5px;
+}
+
+.action-icon :deep(svg) {
+  width: 100%;
+  height: 100%;
+  color: var(--color-action-icon);
+}
+
+.action-button--active .action-icon :deep(svg) {
+  color: var(--color-primary);
+}
+
+.action-count {
+  width: 24px;
+  min-width: 24px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-action-text);
+  text-align: left;
+}
+</style>
