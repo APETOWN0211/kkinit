@@ -35,6 +35,7 @@ interface FeedPost {
 const props = defineProps<{
   post: FeedPost
   activeTab?: 'nearby' | 'following'
+  isOwnPost?: boolean
 }>()
 
 const isLiked = ref(props.post.isLiked ?? false)
@@ -109,7 +110,7 @@ const formatCount = (count: number): string => {
           />
         </div>
         <button
-          v-if="!isFollowing && activeTab !== 'following'"
+          v-if="!isFollowing && activeTab !== 'following' && !isOwnPost"
           type="button"
           class="follow-button"
           :class="{ 'follow-button--animating': isFollowAnimating }"
@@ -119,7 +120,7 @@ const formatCount = (count: number): string => {
           <span class="follow-icon" v-html="followPlusIcon" />
         </button>
         <button
-          v-else-if="isFollowing && activeTab !== 'following'"
+          v-else-if="isFollowing && activeTab !== 'following' && !isOwnPost"
           type="button"
           class="follow-button follow-button--followed"
           :class="{ 'follow-button--animating': isFollowAnimating }"
