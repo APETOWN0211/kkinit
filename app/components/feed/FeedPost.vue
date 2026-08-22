@@ -41,6 +41,7 @@ const likeCount = ref(props.post.likes)
 
 // 좋아요 애니메이션 상태
 const isAnimating = ref(false)
+const isBookmarkAnimating = ref(false)
 
 const toggleLike = () => {
   isLiked.value = !isLiked.value
@@ -56,6 +57,13 @@ const toggleLike = () => {
 
 const toggleBookmark = () => {
   isBookmarked.value = !isBookmarked.value
+
+  if (isBookmarked.value) {
+    isBookmarkAnimating.value = true
+    setTimeout(() => {
+      isBookmarkAnimating.value = false
+    }, 300)
+  }
 }
 
 const formatCount = (count: number): string => {
@@ -167,10 +175,14 @@ const formatCount = (count: number): string => {
         <button
           type="button"
           class="action-button"
-          :class="{ 'action-button--active': isBookmarked }"
+          :class="{ 'action-button--active': isBookmarked, 'is-bookmark-animating': isBookmarkAnimating }"
+          :aria-pressed="isBookmarked"
+          :aria-label="isBookmarked ? '저장 취소' : '저장'"
           @click="toggleBookmark"
         >
-          <span class="action-icon" v-html="bookmarkIcon" />
+          <span class="action-icon">
+            <span class="bookmark-icon-wrapper" v-html="bookmarkIcon" />
+          </span>
         </button>
       </footer>
     </div>
@@ -253,9 +265,14 @@ const formatCount = (count: number): string => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  padding-right: var(--page-padding);
+  box-sizing: border-box;
 }
 
 .header-left {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -275,6 +292,7 @@ const formatCount = (count: number): string => {
 }
 
 .more-button {
+  flex-shrink: 0;
   width: 24px;
   height: 24px;
   padding: 0;
@@ -496,13 +514,81 @@ const formatCount = (count: number): string => {
   transition: transform 180ms ease;
 }
 
+/* Bookmark Icon Animations */
+.bookmark-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 140ms ease;
+}
+
+.action-button:active .bookmark-icon-wrapper {
+  transform: scale(0.94);
+}
+
+@keyframes bookmark-pop {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(0.90);
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  80% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes bookmark-unlike {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.92);
+  }
+}
+
+/* Save animation - pop effect */
+.action-button.is-bookmark-animating .bookmark-icon-wrapper {
+  animation: bookmark-pop 280ms ease forwards;
+}
+
+/* Unsave animation - subtle shrink */
+.action-button:not(.is-bookmark-animating) .bookmark-icon-wrapper {
+  transition: transform 160ms ease;
+}
+
+/* Bookmark saved state */
+.action-button--active .action-icon :deep(svg) {
+  color: var(--color-save-stroke);
+  fill: var(--color-save-fill);
+}
+
+.action-button--active .action-icon :deep(path) {
+  stroke: var(--color-save-stroke);
+  fill: var(--color-save-fill);
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .action-button.is-animating .heart-icon-wrapper {
     animation: none;
   }
 
+  .action-button.is-bookmark-animating .bookmark-icon-wrapper {
+    animation: none;
+  }
+
   .heart-icon-wrapper {
+    transition: none;
+  }
+
+  .bookmark-icon-wrapper {
     transition: none;
   }
 

@@ -16,6 +16,51 @@ const showBottomNavigation = computed(() =>
 const isNotificationsPage = computed(() =>
   route.path.startsWith('/notifications')
 )
+
+// Page transition state
+const isTransitioning = ref(false)
+const transitionDirection = ref<'forward' | 'back'>('forward')
+const isTabSwitch = ref(false)
+
+// Track navigation for transitions
+const router = useRouter()
+let lastPath = route.path
+
+router.afterEach((to, from) => {
+  const toDepth = to.path.split('/').filter(Boolean).length
+  const fromDepth = from.path.split('/').filter(Boolean).length
+
+  // Check if moving between main tabs
+  const fromIsTab = mainTabRoutes.includes(from.path)
+  const toIsTab = mainTabRoutes.includes(to.path)
+  isTabSwitch.value = fromIsTab && toIsTab && from.path !== to.path
+
+  if (toDepth > fromDepth || (toDepth === fromDepth && to.path !== lastPath)) {
+    transitionDirection.value = 'forward'
+  } else {
+    transitionDirection.value = 'back'
+  }
+
+  lastPath = to.path
+})
+
+// Page transition props for NuxtPage
+const pageTransition = computed(() => ({
+  name: isTabSwitch.value ? 'tab-fade' : 'page-slide',
+  mode: 'out-in',
+  onBeforeEnter: () => {
+    isTransitioning.value = true
+  },
+  onAfterEnter: () => {
+    isTransitioning.value = false
+  },
+  onBeforeLeave: () => {
+    isTransitioning.value = true
+  },
+  onAfterLeave: () => {
+    isTransitioning.value = false
+  }
+}))
 </script>
 
 <template>
@@ -32,7 +77,7 @@ const isNotificationsPage = computed(() =>
           'app-content--no-scroll': isNotificationsPage
         }"
       >
-        <NuxtPage />
+        <NuxtPage :transition="pageTransition" />
       </div>
       <NavigationBottomNavigation v-if="showBottomNavigation" />
     </div>
@@ -105,6 +150,42 @@ const isNotificationsPage = computed(() =>
   background: var(--color-notifications-background);
 }
 
+/* ========================================
+   Page Transition Styles
+   ======================================== */
+
+/* Tab switch - fade only (between main nav tabs) */
+.tab-fade-enter-active,
+.tab-fade-leave-active {
+  transition: opacity 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tab-fade-enter-from,
+.tab-fade-leave-to {
+  opacity: 0;
+}
+
+/* Page slide - hierarchical navigation */
+.page-slide-enter-active {
+  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-slide-leave-active {
+  transition: opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-slide-enter-from {
+  opacity: 0;
+  transform: translate3d(16px, 0, 0);
+}
+
+.page-slide-leave-to {
+  opacity: 0;
+  transform: translate3d(-8px, 0, 0);
+}
+
 /* Desktop preview */
 @media (min-width: 768px) {
   html,
@@ -163,6 +244,25 @@ const isNotificationsPage = computed(() =>
 @media (max-width: 389px) {
   .app-shell {
     max-width: 100%;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .tab-fade-enter-active,
+  .tab-fade-leave-active,
+  .page-slide-enter-active,
+  .page-slide-leave-active {
+    transition: none;
+    transform: none;
+  }
+
+  .tab-fade-enter-from,
+  .tab-fade-leave-to,
+  .page-slide-enter-from,
+  .page-slide-leave-to {
+    opacity: 1;
+    transform: none;
   }
 }
 </style>

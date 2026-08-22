@@ -39,6 +39,10 @@
   /* Notifications */
   --color-notifications-background: #F3F4F6;
 
+  /* Save (Bookmark) */
+  --color-save-stroke: #BAE38D;
+  --color-save-fill: #C1F785;
+
   /* Layout */
   --page-padding: 20px;
   --app-width: 390px;
