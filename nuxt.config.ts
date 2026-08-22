@@ -17,7 +17,7 @@ export default defineNuxtConfig({
         { name: 'description', content: '끼닛 - 맛집 SNS' },
         // iOS PWA
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
-        { name: 'apple-mobile-web-app-status-bar-style', content: 'default' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
         { name: 'apple-mobile-web-app-title', content: '끼닛' },
       ],
       link: [
