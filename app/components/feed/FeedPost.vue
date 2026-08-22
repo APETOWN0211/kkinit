@@ -36,8 +36,22 @@ const props = defineProps<{
 const isLiked = ref(props.post.isLiked ?? false)
 const isBookmarked = ref(props.post.isBookmarked ?? false)
 
+// 좋아요 수 local state
+const likeCount = ref(props.post.likes)
+
+// 좋아요 애니메이션 상태
+const isAnimating = ref(false)
+
 const toggleLike = () => {
   isLiked.value = !isLiked.value
+  likeCount.value += isLiked.value ? 1 : -1
+
+  if (isLiked.value) {
+    isAnimating.value = true
+    setTimeout(() => {
+      isAnimating.value = false
+    }, 360)
+  }
 }
 
 const toggleBookmark = () => {
@@ -126,11 +140,18 @@ const formatCount = (count: number): string => {
         <button
           type="button"
           class="action-button"
-          :class="{ 'action-button--active': isLiked }"
+          :class="{
+            'action-button--active': isLiked,
+            'is-animating': isAnimating
+          }"
+          :aria-pressed="isLiked"
+          :aria-label="isLiked ? '좋아요 취소' : '좋아요'"
           @click="toggleLike"
         >
-          <span class="action-icon" v-html="heartIcon" />
-          <span class="action-count">{{ formatCount(post.likes) }}</span>
+          <span class="action-icon">
+            <span class="heart-icon-wrapper" v-html="heartIcon" />
+          </span>
+          <span class="action-count">{{ formatCount(likeCount) }}</span>
         </button>
 
         <button type="button" class="action-button">
@@ -397,10 +418,23 @@ const formatCount = (count: number): string => {
   width: 100%;
   height: 100%;
   color: var(--color-action-icon);
+  fill: none;
+}
+
+.action-icon :deep(path) {
+  stroke: currentColor;
+  fill: inherit;
+  transition: stroke 140ms ease, fill 140ms ease;
 }
 
 .action-button--active .action-icon :deep(svg) {
   color: var(--color-primary);
+  fill: var(--color-primary);
+}
+
+.action-button--active .action-icon :deep(path) {
+  stroke: var(--color-primary);
+  fill: var(--color-primary);
 }
 
 .action-count {
@@ -411,5 +445,69 @@ const formatCount = (count: number): string => {
   font-weight: 500;
   color: var(--color-action-text);
   text-align: left;
+}
+
+/* Heart Icon Animations */
+.heart-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 140ms ease;
+}
+
+.action-button:active .heart-icon-wrapper {
+  transform: scale(0.92);
+}
+
+@keyframes heart-pop {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(0.88);
+  }
+  55% {
+    transform: scale(1.18);
+  }
+  75% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes heart-unlike {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.9);
+  }
+}
+
+/* Like animation - pop effect */
+.action-button.is-animating .heart-icon-wrapper {
+  animation: heart-pop 360ms ease forwards;
+}
+
+/* Unlike animation - subtle shrink */
+.action-button:not(.is-animating) .heart-icon-wrapper {
+  transition: transform 180ms ease;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .action-button.is-animating .heart-icon-wrapper {
+    animation: none;
+  }
+
+  .heart-icon-wrapper {
+    transition: none;
+  }
+
+  .action-icon :deep(path) {
+    transition: none;
+  }
 }
 </style>

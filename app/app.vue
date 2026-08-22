@@ -107,7 +107,13 @@ const isNotificationsPage = computed(() =>
 
 /* Desktop preview */
 @media (min-width: 768px) {
+  html,
+  body {
+    overflow: auto;
+  }
+
   .app-wrapper {
+    width: 100%;
     height: auto;
     min-height: calc(844px + 40px);
     overflow: visible;
@@ -145,6 +151,11 @@ const isNotificationsPage = computed(() =>
 
   .app-content--with-bottom-nav {
     padding-bottom: 0;
+  }
+
+  .app-content--no-scroll {
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
   }
 }
 
