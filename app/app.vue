@@ -1,6 +1,26 @@
 <script setup lang="ts">
 const route = useRoute()
 
+// Route-specific theme colors
+const themeColor = computed(() => {
+  if (route.path === '/my') {
+    return '#FF6940'
+  }
+  if (route.path.startsWith('/notifications')) {
+    return '#F3F4F6'
+  }
+  return '#FAFAFA'
+})
+
+useHead({
+  meta: [
+    {
+      name: 'theme-color',
+      content: themeColor.value
+    }
+  ]
+})
+
 const mainTabRoutes = [
   '/',
   '/explore',

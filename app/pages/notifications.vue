@@ -7,15 +7,6 @@ import chevronRightIcon from '~/assets/icons/common/chevron-right.svg?raw'
 
 const router = useRouter()
 
-useHead({
-  meta: [
-    {
-      name: 'theme-color',
-      content: '#F3F4F6'
-    }
-  ]
-})
-
 const goBack = () => {
   router.back()
 }

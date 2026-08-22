@@ -116,6 +116,9 @@ const onSettings = () => emit('settings')
   width: 100%;
   height: 100px;
 
+  padding-top: env(safe-area-inset-top);
+  margin-top: calc(-1 * env(safe-area-inset-top));
+
   background: var(--color-chip-orange, #ff6940);
 }
 
