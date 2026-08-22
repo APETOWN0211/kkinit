@@ -83,7 +83,7 @@ const badges = [
 
 const onEdit = () => {}
 const onShare = () => {}
-const onSettings = () => {}
+const onSettings = () => navigateTo('/settings')
 </script>
 
 <template>
