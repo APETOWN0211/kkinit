@@ -145,17 +145,30 @@ const feedPosts: FeedPost[] = [
     reposts: 2
   }
 ]
+
+// Filter posts based on active tab
+const visiblePosts = computed(() => {
+  if (activeTab.value === 'following') {
+    return feedPosts.filter(post => post.author.isFollowing === true)
+  }
+  return feedPosts
+})
 </script>
 
 <template>
   <div class="home-page">
     <HomeHeader @tab-change="setTab" :active-tab="activeTab" />
     <div class="feed-list">
-      <FeedPost
-        v-for="post in feedPosts"
-        :key="post.id"
-        :post="post"
-      />
+      <Transition name="feed-fade" mode="out-in">
+        <div :key="activeTab" class="feed-posts-wrapper">
+          <FeedPost
+            v-for="post in visiblePosts"
+            :key="post.id"
+            :post="post"
+            :active-tab="activeTab"
+          />
+        </div>
+      </Transition>
     </div>
   </div>
 </template>
@@ -171,5 +184,21 @@ const feedPosts: FeedPost[] = [
 .feed-list {
   display: flex;
   flex-direction: column;
+}
+
+.feed-posts-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Feed tab transition */
+.feed-fade-enter-active,
+.feed-fade-leave-active {
+  transition: opacity 150ms ease;
+}
+
+.feed-fade-enter-from,
+.feed-fade-leave-to {
+  opacity: 0;
 }
 </style>

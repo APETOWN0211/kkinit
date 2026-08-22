@@ -194,22 +194,23 @@ const pageTransition = computed(() => ({
   }
 
   .app-wrapper {
-    width: 100%;
-    height: auto;
-    min-height: calc(844px + 40px);
-    overflow: visible;
+    display: flex;
+    align-items: center;
     justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+    overflow: visible;
+    background: var(--color-text-secondary);
   }
 
   .app-shell {
     width: 390px;
     height: 844px;
     max-width: 390px;
-    min-height: 0;
     max-height: 844px;
     flex-shrink: 0;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    border-radius: 40px;
+    border-radius: 0;
     overflow: hidden;
   }
 

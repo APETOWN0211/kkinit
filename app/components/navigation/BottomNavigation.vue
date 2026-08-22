@@ -5,18 +5,26 @@ import mapIcon from '~/assets/icons/navicgation/map.svg?raw'
 import chatIcon from '~/assets/icons/navicgation/chat.svg?raw'
 import myIcon from '~/assets/icons/navicgation/my.svg?raw'
 
+const route = useRoute()
+
 const menuItems = [
-  { id: 'home', label: '홈', icon: homeIcon },
-  { id: 'explore', label: '탐색', icon: exploreIcon },
-  { id: 'map', label: '지도', icon: mapIcon },
-  { id: 'chat', label: '채팅', icon: chatIcon },
-  { id: 'my', label: '마이', icon: myIcon },
+  { id: 'home', label: '홈', icon: homeIcon, route: '/' },
+  { id: 'explore', label: '탐색', icon: exploreIcon, route: '/explore' },
+  { id: 'map', label: '지도', icon: mapIcon, route: '/map' },
+  { id: 'chat', label: '채팅', icon: chatIcon, route: '/chat' },
+  { id: 'my', label: '마이', icon: myIcon, route: '/my' },
 ]
 
-const activeMenu = ref('home')
+const activeMenu = computed(() => {
+  const match = menuItems.find(item => item.route === route.path)
+  return match ? match.id : 'home'
+})
 
 const setActive = (id: string) => {
-  activeMenu.value = id
+  const item = menuItems.find(m => m.id === id)
+  if (item) {
+    navigateTo(item.route)
+  }
 }
 </script>
 

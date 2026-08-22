@@ -2,9 +2,11 @@
 import heartIcon from '~/assets/icons/feed/heart.svg?raw'
 import commentIcon from '~/assets/icons/feed/comment.svg?raw'
 import repostIcon from '~/assets/icons/feed/repost.svg?raw'
+import repostIconAction from '~/assets/icons/feed/repost-action.svg?raw'
 import bookmarkIcon from '~/assets/icons/feed/bookmark.svg?raw'
 import moreIcon from '~/assets/icons/feed/more.svg?raw'
 import followPlusIcon from '~/assets/icons/feed/follow-plus.svg?raw'
+import followedIcon from '~/assets/icons/feed/followed.svg?raw'
 
 interface ContentLine {
   text: string
@@ -27,44 +29,65 @@ interface FeedPost {
   reposts: number
   isLiked?: boolean
   isBookmarked?: boolean
+  isReposted?: boolean
 }
 
 const props = defineProps<{
   post: FeedPost
+  activeTab?: 'nearby' | 'following'
 }>()
 
 const isLiked = ref(props.post.isLiked ?? false)
 const isBookmarked = ref(props.post.isBookmarked ?? false)
+const isReposted = ref(props.post.isReposted ?? false)
+const isFollowing = ref(props.post.author.isFollowing ?? false)
+const isFollowAnimating = ref(false)
 
-// 좋아요 수 local state
-const likeCount = ref(props.post.likes)
-
-// 좋아요 애니메이션 상태
-const isAnimating = ref(false)
+// Animation states
+const isLikeAnimating = ref(false)
 const isBookmarkAnimating = ref(false)
 
+// Media scroll reset ref
+const mediaScrollRef = ref<HTMLElement | null>(null)
+
+// Toggle functions
 const toggleLike = () => {
   isLiked.value = !isLiked.value
-  likeCount.value += isLiked.value ? 1 : -1
-
   if (isLiked.value) {
-    isAnimating.value = true
+    isLikeAnimating.value = true
     setTimeout(() => {
-      isAnimating.value = false
-    }, 360)
+      isLikeAnimating.value = false
+    }, 320)
   }
 }
 
 const toggleBookmark = () => {
   isBookmarked.value = !isBookmarked.value
-
   if (isBookmarked.value) {
     isBookmarkAnimating.value = true
     setTimeout(() => {
       isBookmarkAnimating.value = false
-    }, 300)
+    }, 280)
   }
 }
+
+const toggleRepost = () => {
+  isReposted.value = !isReposted.value
+}
+
+const toggleFollow = () => {
+  isFollowing.value = !isFollowing.value
+  if (isFollowing.value) {
+    isFollowAnimating.value = true
+    setTimeout(() => {
+      isFollowAnimating.value = false
+    }, 280)
+  }
+}
+
+const displayedReposts = computed(() => {
+  return props.post.reposts + (isReposted.value ? 1 : 0)
+})
 
 const formatCount = (count: number): string => {
   if (count >= 1000) {
@@ -86,12 +109,24 @@ const formatCount = (count: number): string => {
           />
         </div>
         <button
-          v-if="!post.author.isFollowing"
+          v-if="!isFollowing && activeTab !== 'following'"
           type="button"
           class="follow-button"
+          :class="{ 'follow-button--animating': isFollowAnimating }"
           aria-label="팔로우"
+          @click="toggleFollow"
         >
           <span class="follow-icon" v-html="followPlusIcon" />
+        </button>
+        <button
+          v-else-if="isFollowing && activeTab !== 'following'"
+          type="button"
+          class="follow-button follow-button--followed"
+          :class="{ 'follow-button--animating': isFollowAnimating }"
+          aria-label="팔로잉"
+          @click="toggleFollow"
+        >
+          <span class="follow-icon" v-html="followedIcon" />
         </button>
       </div>
     </div>
@@ -130,6 +165,7 @@ const formatCount = (count: number): string => {
 
       <div v-if="post.images.length > 0" class="post-media">
         <div class="media-scroll">
+          <div class="media-leading-spacer" aria-hidden="true" />
           <div
             v-for="(image, imgIndex) in post.images"
             :key="imgIndex"
@@ -141,25 +177,23 @@ const formatCount = (count: number): string => {
               class="media-image"
             />
           </div>
+          <div class="media-trailing-spacer" aria-hidden="true" />
         </div>
       </div>
 
       <footer class="post-actions">
         <button
           type="button"
-          class="action-button"
-          :class="{
-            'action-button--active': isLiked,
-            'is-animating': isAnimating
-          }"
+          class="action-button like-button"
+          :class="{ 'like-button--active': isLiked, 'is-like-animating': isLikeAnimating }"
           :aria-pressed="isLiked"
           :aria-label="isLiked ? '좋아요 취소' : '좋아요'"
           @click="toggleLike"
         >
-          <span class="action-icon">
-            <span class="heart-icon-wrapper" v-html="heartIcon" />
+          <span class="like-icon-wrapper">
+            <span class="like-icon" v-html="heartIcon" />
           </span>
-          <span class="action-count">{{ formatCount(likeCount) }}</span>
+          <span class="action-count">{{ formatCount(post.likes + (isLiked ? 1 : 0)) }}</span>
         </button>
 
         <button type="button" class="action-button">
@@ -167,21 +201,32 @@ const formatCount = (count: number): string => {
           <span class="action-count">{{ formatCount(post.comments) }}</span>
         </button>
 
-        <button type="button" class="action-button">
-          <span class="action-icon" v-html="repostIcon" />
-          <span class="action-count">{{ formatCount(post.reposts) }}</span>
+        <button
+          type="button"
+          class="action-button repost-button"
+          :class="{ 'repost-button--active': isReposted }"
+          :aria-pressed="isReposted"
+          :aria-label="isReposted ? '리포스트 취소' : '리포스트'"
+          @click="toggleRepost"
+        >
+          <span
+            class="repost-icon"
+            :class="{ 'repost-icon--active': isReposted }"
+            v-html="isReposted ? repostIconAction : repostIcon"
+          />
+          <span class="action-count">{{ formatCount(displayedReposts) }}</span>
         </button>
 
         <button
           type="button"
-          class="action-button"
-          :class="{ 'action-button--active': isBookmarked, 'is-bookmark-animating': isBookmarkAnimating }"
+          class="action-button save-button"
+          :class="{ 'save-button--active': isBookmarked, 'is-bookmark-animating': isBookmarkAnimating }"
           :aria-pressed="isBookmarked"
           :aria-label="isBookmarked ? '저장 취소' : '저장'"
           @click="toggleBookmark"
         >
-          <span class="action-icon">
-            <span class="bookmark-icon-wrapper" v-html="bookmarkIcon" />
+          <span class="save-icon-wrapper">
+            <span class="save-icon" v-html="bookmarkIcon" />
           </span>
         </button>
       </footer>
@@ -237,6 +282,19 @@ const formatCount = (count: number): string => {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  transition: background-color 140ms ease, transform 120ms ease;
+}
+
+.follow-button:active {
+  transform: scale(0.9);
+}
+
+.follow-button--animating {
+  animation: follow-pop 280ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.follow-button--followed {
+  background: #C1F785;
 }
 
 .follow-icon {
@@ -250,7 +308,23 @@ const formatCount = (count: number): string => {
 .follow-icon :deep(svg) {
   width: 8px;
   height: 8px;
+}
+
+.follow-button:not(.follow-button--followed) .follow-icon :deep(svg) {
   color: white;
+}
+
+.follow-button--followed .follow-icon :deep(path) {
+  fill: #191919 !important;
+}
+
+/* Follow animation */
+@keyframes follow-pop {
+  0% { transform: scale(1); }
+  25% { transform: scale(0.88); }
+  50% { transform: scale(1.08); }
+  75% { transform: scale(0.97); }
+  100% { transform: scale(1); }
 }
 
 .post-content {
@@ -366,9 +440,9 @@ const formatCount = (count: number): string => {
 }
 
 .post-media {
-  width: calc(100% + var(--page-padding));
-  margin-left: 0;
-  margin-right: calc(var(--page-padding) * -1);
+  width: calc(100% + 61px);
+  margin-left: -61px;
+  margin-right: 0;
 }
 
 .media-scroll {
@@ -380,6 +454,7 @@ const formatCount = (count: number): string => {
   margin: 0;
   overflow-x: auto;
   overflow-y: hidden;
+  scroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -388,15 +463,19 @@ const formatCount = (count: number): string => {
   display: none;
 }
 
-.media-scroll::after {
-  content: '';
-  flex: 0 0 var(--page-padding);
+.media-leading-spacer {
+  flex: 0 0 51px;
+}
+
+.media-trailing-spacer {
+  flex: 0 0 10px;
 }
 
 .media-item {
   flex: 0 0 180px;
   width: 180px;
   height: 240px;
+  margin-left: 0;
   border-radius: var(--radius-md);
   overflow: hidden;
 }
@@ -432,27 +511,126 @@ const formatCount = (count: number): string => {
   height: 22.5px;
 }
 
-.action-icon :deep(svg) {
+/* Like Icon */
+.like-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
-  color: var(--color-action-icon);
-  fill: none;
 }
 
-.action-icon :deep(path) {
-  stroke: currentColor;
-  fill: inherit;
+.like-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.like-icon :deep(svg) {
+  width: 100%;
+  height: 100%;
+}
+
+.like-icon :deep(path) {
+  stroke: var(--color-action-icon);
+  fill: none;
   transition: stroke 140ms ease, fill 140ms ease;
 }
 
-.action-button--active .action-icon :deep(svg) {
-  color: var(--color-primary);
-  fill: var(--color-primary);
+.like-button--active .like-icon :deep(path) {
+  stroke: var(--color-primary) !important;
+  fill: var(--color-primary) !important;
 }
 
-.action-button--active .action-icon :deep(path) {
-  stroke: var(--color-primary);
-  fill: var(--color-primary);
+.like-button:active .like-icon-wrapper {
+  transform: scale(0.92);
+  transition: transform 120ms ease;
+}
+
+/* Like animation - pop effect */
+@keyframes like-pop {
+  0% { transform: scale(1); }
+  25% { transform: scale(0.88); }
+  55% { transform: scale(1.18); }
+  75% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+.like-button.is-like-animating .like-icon-wrapper {
+  animation: like-pop 320ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Unlike animation */
+@keyframes like-unlike {
+  0% { transform: scale(1); }
+  100% { transform: scale(0.9); }
+}
+
+.like-button:not(.is-like-animating):active .like-icon-wrapper {
+  animation: like-unlike 180ms ease forwards;
+}
+
+/* Save Icon */
+.save-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.save-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.save-icon :deep(svg) {
+  width: 100%;
+  height: 100%;
+}
+
+.save-icon :deep(path) {
+  stroke: var(--color-action-icon);
+  fill: none;
+  transition: stroke 140ms ease, fill 140ms ease;
+}
+
+.save-button--active .save-icon :deep(path) {
+  stroke: var(--color-save-stroke) !important;
+  fill: var(--color-save-fill) !important;
+}
+
+.save-button:active .save-icon-wrapper {
+  transform: scale(0.92);
+  transition: transform 120ms ease;
+}
+
+/* Bookmark animation - pop effect */
+@keyframes bookmark-pop {
+  0% { transform: scale(1); }
+  30% { transform: scale(0.90); }
+  60% { transform: scale(1.12); }
+  80% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+.save-button.is-bookmark-animating .save-icon-wrapper {
+  animation: bookmark-pop 280ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Unsave animation */
+@keyframes bookmark-unlike {
+  0% { transform: scale(1); }
+  100% { transform: scale(0.92); }
+}
+
+.save-button:not(.is-bookmark-animating):active .save-icon-wrapper {
+  animation: bookmark-unlike 180ms ease forwards;
 }
 
 .action-count {
@@ -465,135 +643,29 @@ const formatCount = (count: number): string => {
   text-align: left;
 }
 
-/* Heart Icon Animations */
-.heart-icon-wrapper {
+/* ============================================
+   Repost Button Styles
+   ============================================ */
+.repost-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 140ms ease;
+  width: 100%;
+  height: 100%;
 }
 
-.action-button:active .heart-icon-wrapper {
+.repost-icon :deep(svg) {
+  width: 100%;
+  height: 100%;
+  stroke: var(--color-action-icon);
+}
+
+.repost-icon--active :deep(svg) {
+  stroke: var(--color-text-primary);
+}
+
+.repost-button:active .repost-icon {
   transform: scale(0.92);
-}
-
-@keyframes heart-pop {
-  0% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(0.88);
-  }
-  55% {
-    transform: scale(1.18);
-  }
-  75% {
-    transform: scale(0.96);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes heart-unlike {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(0.9);
-  }
-}
-
-/* Like animation - pop effect */
-.action-button.is-animating .heart-icon-wrapper {
-  animation: heart-pop 360ms ease forwards;
-}
-
-/* Unlike animation - subtle shrink */
-.action-button:not(.is-animating) .heart-icon-wrapper {
-  transition: transform 180ms ease;
-}
-
-/* Bookmark Icon Animations */
-.bookmark-icon-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 140ms ease;
-}
-
-.action-button:active .bookmark-icon-wrapper {
-  transform: scale(0.94);
-}
-
-@keyframes bookmark-pop {
-  0% {
-    transform: scale(1);
-  }
-  30% {
-    transform: scale(0.90);
-  }
-  60% {
-    transform: scale(1.12);
-  }
-  80% {
-    transform: scale(0.98);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes bookmark-unlike {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(0.92);
-  }
-}
-
-/* Save animation - pop effect */
-.action-button.is-bookmark-animating .bookmark-icon-wrapper {
-  animation: bookmark-pop 280ms ease forwards;
-}
-
-/* Unsave animation - subtle shrink */
-.action-button:not(.is-bookmark-animating) .bookmark-icon-wrapper {
-  transition: transform 160ms ease;
-}
-
-/* Bookmark saved state */
-.action-button--active .action-icon :deep(svg) {
-  color: var(--color-save-stroke);
-  fill: var(--color-save-fill);
-}
-
-.action-button--active .action-icon :deep(path) {
-  stroke: var(--color-save-stroke);
-  fill: var(--color-save-fill);
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .action-button.is-animating .heart-icon-wrapper {
-    animation: none;
-  }
-
-  .action-button.is-bookmark-animating .bookmark-icon-wrapper {
-    animation: none;
-  }
-
-  .heart-icon-wrapper {
-    transition: none;
-  }
-
-  .bookmark-icon-wrapper {
-    transition: none;
-  }
-
-  .action-icon :deep(path) {
-    transition: none;
-  }
+  transition: transform 120ms ease;
 }
 </style>
