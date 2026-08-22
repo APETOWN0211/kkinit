@@ -510,6 +510,7 @@ const formatCount = (count: number): string => {
   justify-content: center;
   width: 22.5px;
   height: 22.5px;
+  color: #A8A4A4;
 }
 
 /* Like Icon */

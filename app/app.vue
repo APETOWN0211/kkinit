@@ -12,6 +12,17 @@ const themeColor = computed(() => {
   return '#FAFAFA'
 })
 
+// Update theme-color when route changes
+watchEffect(() => {
+  if (import.meta.client) {
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', themeColor.value)
+    }
+  }
+})
+
+// Initial set
 useHead({
   meta: [
     {
