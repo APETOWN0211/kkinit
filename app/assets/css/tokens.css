@@ -26,8 +26,15 @@
   /* Chips */
   --color-chip-lime: #C1F785;
   --color-chip-orange: #FF6940;
+  --color-chip-teal: #55C7AE;
   --color-chip-gray: #E9E9E9;
   --color-chip-gray-text: #4D5160;
+
+  /* Feed action pill (Figma 41:1897) */
+  --color-pill-background: #F5F6F8;
+  --color-pill-text: #73787E;
+  --color-divider: #E2E2E2;
+  --color-like-active-bg: rgba(235, 73, 64, 0.1);
 
   /* Border */
   --color-border: #DBDBDB;

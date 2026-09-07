@@ -1,88 +1,68 @@
 <script setup lang="ts">
-import HomeHeader from '~/components/home/HomeHeader.vue'
-import FeedPost from '~/components/feed/FeedPost.vue'
+import HomeTopBar from '~/components/home/HomeTopBar.vue'
+import FeedPost, { type FeedPost as FeedPostType } from '~/components/feed/FeedPost.vue'
 
-const activeTab = ref<'nearby' | 'following'>('nearby')
+/*
+ * Figma 1:261 / 1:538 기반 Home.
+ *
+ *  - drawer state는 app.vue에서 provide/inject로 공유
+ *  - main content slide animation은 index.vue에서 직접 관리
+ *  - overlay는 app.vue에서 fixed로 렌더링
+ *  - app-content scroll은 그대로 유지
+ */
+interface FeedPostItem extends FeedPostType {}
 
-const setTab = (tab: 'nearby' | 'following') => {
-  activeTab.value = tab
-}
-
-interface ContentLine {
-  text: string
-  isChip?: boolean
-  chipType?: 'lime' | 'orange' | 'gray'
-}
-
-interface FeedPost {
-  id: number
-  author: {
-    name: string
-    avatar: string
-    isFollowing?: boolean
-  }
-  time: string
-  content: ContentLine[][]
-  images: string[]
-  likes: number
-  comments: number
-  reposts: number
-}
-
-const feedPosts: FeedPost[] = [
+const feedPosts: FeedPostItem[] = [
   {
     id: 1,
     author: {
-      name: '죠니월드',
-      avatar: '/images/feed/profile-johnny.png',
+      name: '쿠루미',
+      avatar: '/images/feed/profile-kurumi.png',
       isFollowing: false
     },
-    time: '방금',
+    time: '1분 전',
     content: [
       [
-        { text: '맵지 않은 ', isChip: true, chipType: 'lime' },
-        { text: '동네 ' },
-        { text: '닭발', isChip: true, chipType: 'orange' },
-        { text: ' 맛집이야.' }
+        { text: '우리 동네 유명한 ' },
+        { text: '삼겹살', isChip: true, chipType: 'orange' },
+        { text: ' 집인데' }
       ],
       [
-        { text: '저녁에도 '},
-        { text: '자리 ', isChip: true, chipType: 'gray' },
-        { text: '넉넉해서 좋았어.' }
+        { text: '저녁에는 ' },
+        { text: '웨이팅', isChip: true, chipType: 'teal' },
+        { text: ' 30분 정도 걸림..' }
       ]
     ],
     images: [
       '/images/feed/post1-food1.png',
       '/images/feed/post1-food2.png'
     ],
-    likes: 14,
+    likes: 149,
     comments: 2,
     reposts: 2
   },
   {
     id: 2,
     author: {
-      name: '쿠루미',
-      avatar: '/images/feed/profile-kurumi.png',
+      name: '티라노리',
+      avatar: '/images/feed/profile-tiranori.png',
       isFollowing: false
     },
-    time: '12분 전',
+    time: '2시간 전',
     content: [
       [
-        { text: '여기 진짜 ' },
-        { text: '분위기 좋은데' }
+        { text: '유명한 빵집 줄 서기 싫어서 들어갔는데 ' }
       ],
       [
-        { text: '웨이팅', isChip: true, chipType: 'gray' },
-        { text: ' 1시간은 심했다.' }
+        { text: '오히려 여기가 좋았음.' }
       ],
       [
-        { text: '다시 올지는 고민됨.' }
+        { text: '소금빵', isChip: true, chipType: 'orange' },
+        { text: ' 은 포장하고 바로드셈' }
       ]
     ],
     images: [
-      '/images/feed/post2-food1.png',
-      '/images/feed/post2-food2.png'
+      '/images/feed/post2-food1.png'
     ],
     likes: 14,
     comments: 2,
@@ -91,20 +71,21 @@ const feedPosts: FeedPost[] = [
   {
     id: 3,
     author: {
-      name: '덕덕고',
-      avatar: '/images/feed/profile-deokdeokgo.png',
-      isFollowing: true
+      name: '쿠루미',
+      avatar: '/images/feed/profile-kurumi.png',
+      isFollowing: false
     },
-    time: '12분 전',
+    time: '1분 전',
     content: [
       [
-        { text: '다들 밤에 배고플 때' }
+        { text: '우리 동네 유명한 ' },
+        { text: '삼겹살', isChip: true, chipType: 'orange' },
+        { text: ' 집인데' }
       ],
       [
-        { text: '웨이팅', isChip: true, chipType: 'gray' }
-      ],
-      [
-        { text: '다시 올지는 고민됨.' }
+        { text: '저녁에는 ' },
+        { text: '웨이팅', isChip: true, chipType: 'teal' },
+        { text: ' 30분 정도 걸림..' }
       ]
     ],
     images: [
@@ -114,91 +95,56 @@ const feedPosts: FeedPost[] = [
     likes: 14,
     comments: 2,
     reposts: 2
-  },
-  {
-    id: 4,
-    author: {
-      name: '쿠루미',
-      avatar: '/images/feed/profile-kurumi.png',
-      isFollowing: true
-    },
-    time: '12분 전',
-    content: [
-      [
-        { text: '여기 진짜 ' },
-        { text: '맛은 있는데' }
-      ],
-      [
-        { text: '웨이팅', isChip: true, chipType: 'gray' },
-        { text: ' 1시간은 심했다.' }
-      ],
-      [
-        { text: '다시 올지는 고민됨.' }
-      ]
-    ],
-    images: [
-      '/images/feed/post2-food1.png',
-      '/images/feed/post2-food2.png'
-    ],
-    likes: 14,
-    comments: 2,
-    reposts: 2
   }
 ]
 
-// Filter posts based on active tab
-const visiblePosts = computed(() => {
-  if (activeTab.value === 'following') {
-    return feedPosts.filter(post => post.author.isFollowing === true)
-  }
-  return feedPosts
-})
+// Get drawer state from app.vue provide/inject
+const drawerState = inject<{ isOpen: Ref<boolean>; open: () => void; close: () => void; toggle: () => void }>('drawer')
+
+const onAvatarClick = () => {
+  drawerState?.toggle()
+}
 </script>
 
 <template>
   <div class="home-page">
-    <HomeHeader @tab-change="setTab" :active-tab="activeTab" />
+    <HomeTopBar @avatar-click="onAvatarClick" />
     <div class="feed-list">
-      <Transition name="feed-fade" mode="out-in">
-        <div :key="activeTab" class="feed-posts-wrapper">
-          <FeedPost
-            v-for="post in visiblePosts"
-            :key="post.id"
-            :post="post"
-            :active-tab="activeTab"
-          />
-        </div>
-      </Transition>
+      <FeedPost
+        v-for="post in feedPosts"
+        :key="post.id"
+        :post="post"
+      />
     </div>
   </div>
 </template>
 
 <style scoped>
+/*
+ * Home page: fills .app-content scroll container.
+ * app-content is the scroll container (overflow-y:auto).
+ * .home-page is flex-col, height:100% so it fills app-content.
+ * .feed-list has its own scroll.
+ */
 .home-page {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   min-height: 100%;
-  background: var(--color-background);
-  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+  background: #FFFFFF;
 }
 
 .feed-list {
-  display: flex;
-  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  background: #FFFFFF;
 }
 
-.feed-posts-wrapper {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Feed tab transition */
-.feed-fade-enter-active,
-.feed-fade-leave-active {
-  transition: opacity 150ms ease;
-}
-
-.feed-fade-enter-from,
-.feed-fade-leave-to {
-  opacity: 0;
+.feed-list::-webkit-scrollbar {
+  display: none;
 }
 </style>

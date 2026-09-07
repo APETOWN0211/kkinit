@@ -129,7 +129,6 @@ const onSettings = () => emit('settings')
 .my-profile-settings {
   position: absolute;
 
-  top: 10px;
   right: 20px;
 
   display: flex;

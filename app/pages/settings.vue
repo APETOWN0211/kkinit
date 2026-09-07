@@ -167,6 +167,7 @@ const goBack = () => router.back()
   display: flex;
   flex-direction: column;
   background-color: #F3F4F6;
+  background: var(--color-notifications-background);
 }
 
 /* Header */

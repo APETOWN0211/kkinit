@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import heartIcon from '~/assets/icons/feed/heart.svg?raw'
-import commentIcon from '~/assets/icons/feed/comment.svg?raw'
-import repostIcon from '~/assets/icons/feed/repost.svg?raw'
-import repostIconAction from '~/assets/icons/feed/repost-action.svg?raw'
-import bookmarkIcon from '~/assets/icons/feed/bookmark.svg?raw'
-import moreIcon from '~/assets/icons/feed/more.svg?raw'
+import heartPill from '~/assets/icons/feed/heart-pill.svg?raw'
+import heartPillActive from '~/assets/icons/feed/heart-pill-active.svg?raw'
+import commentPill from '~/assets/icons/feed/comment-pill.svg?raw'
+import repostPill from '~/assets/icons/feed/repost-pill.svg?raw'
+import repostPillActive from '~/assets/icons/feed/repost-pill-active.svg?raw'
+import morePill from '~/assets/icons/feed/more-pill.svg?raw'
 import followPlusIcon from '~/assets/icons/feed/follow-plus.svg?raw'
 import followedIcon from '~/assets/icons/feed/followed.svg?raw'
 
 interface ContentLine {
   text: string
   isChip?: boolean
-  chipType?: 'lime' | 'orange' | 'gray'
+  chipType?: 'lime' | 'orange' | 'gray' | 'teal'
 }
 
-interface FeedPost {
+export interface FeedPost {
   id: number
   author: {
     name: string
@@ -28,7 +28,6 @@ interface FeedPost {
   comments: number
   reposts: number
   isLiked?: boolean
-  isBookmarked?: boolean
   isReposted?: boolean
 }
 
@@ -39,17 +38,12 @@ const props = defineProps<{
 }>()
 
 const isLiked = ref(props.post.isLiked ?? false)
-const isBookmarked = ref(props.post.isBookmarked ?? false)
 const isReposted = ref(props.post.isReposted ?? false)
 const isFollowing = ref(props.post.author.isFollowing ?? false)
 const isFollowAnimating = ref(false)
 
 // Animation states
 const isLikeAnimating = ref(false)
-const isBookmarkAnimating = ref(false)
-
-// Media scroll reset ref
-const mediaScrollRef = ref<HTMLElement | null>(null)
 
 // Toggle functions
 const toggleLike = () => {
@@ -59,16 +53,6 @@ const toggleLike = () => {
     setTimeout(() => {
       isLikeAnimating.value = false
     }, 320)
-  }
-}
-
-const toggleBookmark = () => {
-  isBookmarked.value = !isBookmarked.value
-  if (isBookmarked.value) {
-    isBookmarkAnimating.value = true
-    setTimeout(() => {
-      isBookmarkAnimating.value = false
-    }, 280)
   }
 }
 
@@ -134,12 +118,17 @@ const formatCount = (count: number): string => {
 
     <div class="post-content">
       <header class="post-header">
-        <div class="header-left">
+        <div class="header-text">
           <span class="author-name">{{ post.author.name }}</span>
+          <span class="dot" aria-hidden="true" />
           <span class="post-time">{{ post.time }}</span>
         </div>
-        <button type="button" class="more-button" aria-label="더보기">
-          <span class="more-icon" v-html="moreIcon" />
+        <button
+          type="button"
+          class="more-button"
+          aria-label="더보기"
+        >
+          <span class="more-icon" v-html="morePill" />
         </button>
       </header>
 
@@ -154,21 +143,39 @@ const formatCount = (count: number): string => {
               <span
                 v-if="segment.isChip"
                 class="chip"
-                :class="`chip--${segment.chipType}`"
+                :class="`chip--${segment.chipType ?? 'gray'}`"
               >
                 {{ segment.text }}
               </span>
-              <span v-else>{{ segment.text }}</span>
+              <span v-else class="content-text">{{ segment.text }}</span>
             </template>
           </p>
         </div>
       </div>
 
       <div v-if="post.images.length > 0" class="post-media">
-        <div class="media-scroll">
-          <div class="media-leading-spacer" aria-hidden="true" />
+        <!--
+          Figma 41:1897:
+          - 2장: 146 × 208 × 2, gap 10, radius 12
+          - 1장: 298 × 208 × 1, radius 12
+        -->
+        <div
+          v-if="post.images.length === 1"
+          class="media-single"
+        >
+          <img
+            :src="post.images[0]"
+            :alt="`게시물 사진`"
+            class="media-image"
+          />
+        </div>
+
+        <div
+          v-else
+          class="media-pair"
+        >
           <div
-            v-for="(image, imgIndex) in post.images"
+            v-for="(image, imgIndex) in post.images.slice(0, 2)"
             :key="imgIndex"
             class="media-item"
           >
@@ -178,34 +185,58 @@ const formatCount = (count: number): string => {
               class="media-image"
             />
           </div>
-          <div class="media-trailing-spacer" aria-hidden="true" />
+        </div>
+
+        <!--
+          3장 이상은 Figma 디자인에 없는 케이스지만
+          기존 horizontal scroll 기능을 유지한다.
+        -->
+        <div v-if="post.images.length > 2" class="media-scroll">
+          <div
+            v-for="(image, imgIndex) in post.images.slice(2)"
+            :key="`s-${imgIndex}`"
+            class="media-scroll-item"
+          >
+            <img
+              :src="image"
+              :alt="`게시물 사진 ${imgIndex + 3}`"
+              class="media-image"
+            />
+          </div>
         </div>
       </div>
 
       <footer class="post-actions">
         <button
           type="button"
-          class="action-button like-button"
-          :class="{ 'like-button--active': isLiked, 'is-like-animating': isLikeAnimating }"
+          class="action-pill like-pill"
+          :class="{ 'like-pill--active': isLiked, 'is-like-animating': isLikeAnimating }"
           :aria-pressed="isLiked"
           :aria-label="isLiked ? '좋아요 취소' : '좋아요'"
           @click="toggleLike"
         >
           <span class="like-icon-wrapper">
-            <span class="like-icon" v-html="heartIcon" />
+            <span
+              class="like-icon"
+              v-html="isLiked ? heartPillActive : heartPill"
+            />
           </span>
           <span class="action-count">{{ formatCount(post.likes + (isLiked ? 1 : 0)) }}</span>
         </button>
 
-        <button type="button" class="action-button">
-          <span class="action-icon" v-html="commentIcon" />
+        <button
+          type="button"
+          class="action-pill"
+          aria-label="댓글"
+        >
+          <span class="action-icon" v-html="commentPill" />
           <span class="action-count">{{ formatCount(post.comments) }}</span>
         </button>
 
         <button
           type="button"
-          class="action-button repost-button"
-          :class="{ 'repost-button--active': isReposted }"
+          class="action-pill repost-pill"
+          :class="{ 'repost-pill--active': isReposted }"
           :aria-pressed="isReposted"
           :aria-label="isReposted ? '리포스트 취소' : '리포스트'"
           @click="toggleRepost"
@@ -213,22 +244,9 @@ const formatCount = (count: number): string => {
           <span
             class="repost-icon"
             :class="{ 'repost-icon--active': isReposted }"
-            v-html="isReposted ? repostIconAction : repostIcon"
+            v-html="isReposted ? repostPillActive : repostPill"
           />
           <span class="action-count">{{ formatCount(displayedReposts) }}</span>
-        </button>
-
-        <button
-          type="button"
-          class="action-button save-button"
-          :class="{ 'save-button--active': isBookmarked, 'is-bookmark-animating': isBookmarkAnimating }"
-          :aria-pressed="isBookmarked"
-          :aria-label="isBookmarked ? '저장 취소' : '저장'"
-          @click="toggleBookmark"
-        >
-          <span class="save-icon-wrapper">
-            <span class="save-icon" v-html="bookmarkIcon" />
-          </span>
         </button>
       </footer>
     </div>
@@ -236,12 +254,34 @@ const formatCount = (count: number): string => {
 </template>
 
 <style scoped>
+/*
+ * FeedPost — Figma 41:1897 source of truth.
+ *
+ * Figma spec:
+ *  - post row: w 390, padding 20 left/right (좌 inset), 12 top/bottom
+ *  - avatar 42 × 42 (rounded full)
+ *  - gap avatar ↔ content = 10
+ *  - header row: 38 high, more button is 38×38 circle, #F5F6F8 bg
+ *  - body font 16 (Pretendard Medium), color #191919
+ *  - chip 16 SemiBold, padding 2/7, radius 7
+ *  - image: 146 × 208 × 2 (gap 10) | 298 × 208 × 1, radius 12
+ *  - action pill: 38 high, padding 13.875 x, radius 1155, gap 6.938
+ *  - icon 14 × 14, count 15 Regular color #73787E
+ *  - pill bg: #F5F6F8 (inactive), like active = rgba(235, 73, 64, 0.1)
+ *  - divider: full width, #E2E2E2 1px top
+ */
 .feed-post {
   display: flex;
-  gap: 14px;
-  padding: 20px;
-  padding-right: 0;
-  border-bottom: 1px solid var(--color-border);
+  gap: 10px;
+  width: 100%;
+  padding: 12px var(--page-padding);
+  box-sizing: border-box;
+  background: var(--color-background);
+  border-top: 1px solid #E2E2E2;
+}
+
+.feed-post:first-child {
+  border-top: 0;
 }
 
 .post-left {
@@ -250,28 +290,32 @@ const formatCount = (count: number): string => {
 
 .avatar-wrapper {
   position: relative;
-  width: 47px;
-  height: 47px;
+  width: 42px;
+  height: 42px;
 }
 
 .avatar {
-  width: 47px;
-  height: 47px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
-  border: 1px solid var(--color-chip-gray);
   overflow: hidden;
+  background: #F5F6F8;
 }
 
 .avatar-image {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
+/* =========================
+   Follow button (avatar overlay)
+   ========================= */
 .follow-button {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: -2px;
+  right: -2px;
   width: 18px;
   height: 18px;
   padding: 0;
@@ -319,7 +363,6 @@ const formatCount = (count: number): string => {
   fill: #191919 !important;
 }
 
-/* Follow animation */
 @keyframes follow-pop {
   0% { transform: scale(1); }
   25% { transform: scale(0.88); }
@@ -328,26 +371,35 @@ const formatCount = (count: number): string => {
   100% { transform: scale(1); }
 }
 
+/* =========================
+   Post content column
+   ========================= */
 .post-content {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
+/* =========================
+   Header (nickname · time · more)
+   ========================= */
 .post-header {
+  position: relative;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   width: 100%;
-  padding-right: var(--page-padding);
-  box-sizing: border-box;
+  height: 38px;
 }
 
-.header-left {
+.header-text {
   flex: 1;
   min-width: 0;
+
   display: flex;
   align-items: center;
   gap: 8px;
@@ -356,51 +408,84 @@ const formatCount = (count: number): string => {
 .author-name {
   font-size: 18px;
   font-weight: 600;
+  line-height: 1.2;
   color: var(--color-text-primary);
+  letter-spacing: -0.36px;
+}
+
+.dot {
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #C7C3C3;
 }
 
 .post-time {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
+  line-height: 1.2;
   color: var(--color-text-muted);
   letter-spacing: -0.28px;
 }
 
 .more-button {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: 38px;
+  height: 38px;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 999px;
+
+  background: #F5F6F8;
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+
+  transition: transform 120ms ease, background-color 140ms ease;
+}
+
+.more-button:active {
+  transform: scale(0.94);
+  background: #ECEEF1;
 }
 
 .more-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: 22px;
+  height: 22px;
 }
 
 .more-icon :deep(svg) {
-  width: 24px;
-  height: 24px;
-  color: var(--color-icon-muted);
+  display: block;
+  width: 22px;
+  height: 22px;
 }
 
+/* =========================
+   Body text + chips
+   ========================= */
 .post-body {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
 }
 
 .content-lines {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
 }
 
 .content-line {
@@ -408,19 +493,34 @@ const formatCount = (count: number): string => {
   flex-wrap: wrap;
   align-items: center;
   gap: 3px;
+
+  margin: 0;
+
   font-size: 16px;
   font-weight: 500;
+  line-height: 1.4;
   color: var(--color-text-primary);
-  line-height: 1.5;
-  margin: 0;
+  letter-spacing: -0.32px;
+}
+
+.content-text {
+  font: inherit;
+  color: inherit;
 }
 
 .chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   padding: 2px 7px;
+
   border-radius: 7px;
+
   font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
+  letter-spacing: -0.32px;
   text-align: center;
   white-space: nowrap;
 }
@@ -435,239 +535,233 @@ const formatCount = (count: number): string => {
   color: var(--color-text-on-primary);
 }
 
+.chip--teal {
+  background: #55C7AE;
+  color: var(--color-text-on-primary);
+}
+
 .chip--gray {
   background: var(--color-chip-gray);
   color: var(--color-chip-gray-text);
 }
 
+/* =========================
+   Media (single / pair / scroll)
+   ========================= */
 .post-media {
-  width: calc(100% + 61px);
-  margin-left: -61px;
-  margin-right: 0;
-}
-
-.media-scroll {
   display: flex;
-  flex-wrap: nowrap;
+  flex-direction: column;
   gap: 10px;
+}
+
+.media-single {
   width: 100%;
-  padding: 0;
-  margin: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-behavior: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
 }
 
-.media-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.media-leading-spacer {
-  flex: 0 0 51px;
-}
-
-.media-trailing-spacer {
-  flex: 0 0 10px;
+.media-pair {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .media-item {
-  flex: 0 0 180px;
-  width: 180px;
-  height: 240px;
-  margin-left: 0;
-  border-radius: var(--radius-md);
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
   overflow: hidden;
+  background: #F5F6F8;
 }
 
-.media-image {
+/*
+ * Figma: 146 × 208 × 2.
+ * 위/아래 padding 12, page padding 20, content row 의 우측 padding 0.
+ * 컨테이너 폭 = 390 - 42(avatar) - 10(gap) - 20(right inset) - 12
+ *            = 306. 미디어 폭 = (306 - 10) / 2 = 148.
+ * 시각적으로 146 에 가깝게 미세 조정한다.
+ */
+.media-pair .media-item {
+  flex: 1 1 0;
+  width: auto;
+  height: 208px;
+  border-radius: 12px;
+}
+
+/*
+ * Figma: 298 × 208 × 1
+ */
+.media-single .media-image,
+.media-pair .media-image {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
+.media-single .media-image {
+  height: 208px;
+  border-radius: 12px;
+}
+
+/* 기존 horizontal scroll 기능 유지 */
+.media-scroll {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.media-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.media-scroll-item {
+  flex: 0 0 180px;
+  width: 180px;
+  height: 240px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #F5F6F8;
+}
+
+.media-scroll-item .media-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================
+   Action pills (heart / comment / repost)
+   ========================= */
 .post-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.action-button {
-  display: flex;
+.action-pill {
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 0;
-  border: none;
-  background: transparent;
+  justify-content: center;
+
+  height: 38px;
+
+  padding: 11.5px 14px;
+
+  border: 0;
+  border-radius: 999px;
+
+  background: #F5F6F8;
+
   cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+
+  transition: transform 120ms ease, background 160ms ease;
 }
 
-.action-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 22.5px;
-  height: 22.5px;
-  color: #A8A4A4;
+.action-pill:active {
+  transform: scale(0.97);
 }
 
-/* Like Icon */
-.like-icon-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+.like-pill--active {
+  background-image: linear-gradient(90deg, rgba(235, 73, 64, 0.1), rgba(235, 73, 64, 0.1));
 }
 
-.like-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+/*
+ * Repost active.
+ *  - Figma 의 repost 는 별도 active variant 가 없지만,
+ *    디자인 의도상 heart Variant2 와 동일한 톤으로 active 표시.
+ *  - 배경: rgba(235, 73, 64, 0.1) + #F5F6F8 linear-gradient
+ *  - icon: 검정 stroke (#191919)
+ *  - count: 검정 텍스트
+ */
+.repost-pill--active {
+  background-image: linear-gradient(90deg, rgba(235, 73, 64, 0.1), rgba(235, 73, 64, 0.1));
 }
 
-.like-icon :deep(svg) {
-  width: 100%;
-  height: 100%;
+.repost-pill--active .action-count {
+  color: #191919;
 }
 
-.like-icon :deep(path) {
-  stroke: var(--color-action-icon);
-  fill: none;
-  transition: stroke 140ms ease, fill 140ms ease;
-}
-
-.like-button--active .like-icon :deep(path) {
-  stroke: var(--color-primary) !important;
-  fill: var(--color-primary) !important;
-}
-
-.like-button:active .like-icon-wrapper {
-  transform: scale(0.92);
-  transition: transform 120ms ease;
-}
-
-/* Like animation - pop effect */
-@keyframes like-pop {
-  0% { transform: scale(1); }
-  25% { transform: scale(0.88); }
-  55% { transform: scale(1.18); }
-  75% { transform: scale(0.96); }
-  100% { transform: scale(1); }
-}
-
-.like-button.is-like-animating .like-icon-wrapper {
-  animation: like-pop 320ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-/* Unlike animation */
-@keyframes like-unlike {
-  0% { transform: scale(1); }
-  100% { transform: scale(0.9); }
-}
-
-.like-button:not(.is-like-animating):active .like-icon-wrapper {
-  animation: like-unlike 180ms ease forwards;
-}
-
-/* Save Icon */
-.save-icon-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.save-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.save-icon :deep(svg) {
-  width: 100%;
-  height: 100%;
-}
-
-.save-icon :deep(path) {
-  stroke: var(--color-action-icon);
-  fill: none;
-  transition: stroke 140ms ease, fill 140ms ease;
-}
-
-.save-button--active .save-icon :deep(path) {
-  stroke: var(--color-save-stroke) !important;
-  fill: var(--color-save-fill) !important;
-}
-
-.save-button:active .save-icon-wrapper {
-  transform: scale(0.92);
-  transition: transform 120ms ease;
-}
-
-/* Bookmark animation - pop effect */
-@keyframes bookmark-pop {
-  0% { transform: scale(1); }
-  30% { transform: scale(0.90); }
-  60% { transform: scale(1.12); }
-  80% { transform: scale(0.98); }
-  100% { transform: scale(1); }
-}
-
-.save-button.is-bookmark-animating .save-icon-wrapper {
-  animation: bookmark-pop 280ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-/* Unsave animation */
-@keyframes bookmark-unlike {
-  0% { transform: scale(1); }
-  100% { transform: scale(0.92); }
-}
-
-.save-button:not(.is-bookmark-animating):active .save-icon-wrapper {
-  animation: bookmark-unlike 180ms ease forwards;
-}
-
-.action-count {
-  width: 24px;
-  min-width: 24px;
-  flex-shrink: 0;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-action-text);
-  text-align: left;
-}
-
-/* ============================================
-   Repost Button Styles
-   ============================================ */
+.action-icon,
+.like-icon,
 .repost-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
+
+  width: 14px;
+  height: 14px;
+
+  flex-shrink: 0;
 }
 
+.action-icon :deep(svg),
+.like-icon :deep(svg),
 .repost-icon :deep(svg) {
-  width: 100%;
-  height: 100%;
-  stroke: var(--color-action-icon);
+  display: block;
+  width: 14px;
+  height: 14px;
 }
 
-.repost-icon--active :deep(svg) {
-  stroke: var(--color-text-primary);
+.action-count {
+  display: inline-block;
+
+  margin-left: 6.94px;
+
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.16;
+  color: #73787E;
+  letter-spacing: -0.3px;
 }
 
-.repost-button:active .repost-icon {
-  transform: scale(0.92);
-  transition: transform 120ms ease;
+/* Like animation */
+@keyframes like-pop {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(0.88); }
+  55%  { transform: scale(1.18); }
+  75%  { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+.like-pill.is-like-animating .like-icon {
+  animation: like-pop 320ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes like-unlike {
+  0%   { transform: scale(1); }
+  100% { transform: scale(0.9); }
+}
+
+.like-pill:not(.is-like-animating):active .like-icon {
+  animation: like-unlike 180ms ease forwards;
+}
+
+/* Repost active fill */
+.repost-icon--active :deep(path) {
+  stroke: var(--color-text-primary) !important;
+}
+
+/* =========================
+   Reduced motion
+   ========================= */
+@media (prefers-reduced-motion: reduce) {
+  .feed-post,
+  .more-button,
+  .action-pill,
+  .follow-button,
+  .like-icon,
+  .repost-icon {
+    transition: none;
+  }
+
+  .follow-button--animating,
+  .like-pill.is-like-animating .like-icon {
+    animation: none;
+  }
 }
 </style>

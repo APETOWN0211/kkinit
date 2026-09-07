@@ -350,7 +350,6 @@ const filteredConversations = computed(() => {
   min-height: 100%;
   background: var(--color-background);
   padding-top: 0;
-  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
 }
 
 .chat-scroll {
