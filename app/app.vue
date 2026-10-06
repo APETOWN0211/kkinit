@@ -33,7 +33,14 @@ const themeColor = computed(() => {
     return '#FAFAFA'
   }
   if (route.path === '/my') {
-    return '#FF6940'
+    // Figma 18:553 — 최상단 background = #FFFFFF
+    return '#FFFFFF'
+  }
+  if (route.path === '/archive') {
+    // Figma 21:556 (이야기) / 21:667 (장소) 의 상단 149px band (header + tabs)
+    // 는 두 frame 모두 white. 상태바는 이 band 위에 덮이므로
+    // theme-color 도 white 가 맞다.
+    return '#FFFFFF'
   }
   if (route.path.startsWith('/notifications')) {
     return '#F3F4F6'

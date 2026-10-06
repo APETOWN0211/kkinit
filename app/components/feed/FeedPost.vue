@@ -585,7 +585,13 @@ const hasOverflowMedia = computed(() => props.post.images.length > 2)
 
   font-size: 16px;
   font-weight: 600;
-  line-height: 1.4;
+  /*
+   * chip 안의 텍스트를 chip 의 padding-box 정중앙에 위치시키기 위해
+   * line-height 를 chip padding-box height (padding-top + line-box + padding-bottom)
+   * 와 같게 둔다. (Pretendard ascent 가 line 외부로 나가서 line-height 1.4
+   * 그대로 두면 텍스트가 chip 가운데보다 살짝 위에 보이는 문제 해결)
+   */
+  line-height: 22px;
 
   letter-spacing: -0.32px;
 

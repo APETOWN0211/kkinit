@@ -1,16 +1,19 @@
 <script setup lang="ts">
 /*
  * Home Side Drawer
- * Figma node 1:538 (마이탭 - 메인) actual values
+ * Figma node 16:301 (마이탭 - 메인) actual values
  *
  * Layout:
  *   - drawer width : 300px
- *   - padding      : 30px x / 68px y
- *   - profile area : avatar 48px + handle 30px (top gap 18px from avatar)
- *   - gap profile -> main menu : 80px
- *   - main menu    : 4 items, item gap 24px, icon 32px, label 24px Medium
- *   - gap main menu -> bottom  : flex 1
- *   - bottom menu  : 2 items, item gap 34px, icon 24px, label 20px Medium
+ *   - padding      : 68px top/bottom, 30px left/right
+ *   - profile area : top inner flex column gap 20 (avatar 48 -> handle 30 -> stats 18)
+ *   - avatar        : 48 x 48, rounded full
+ *   - handle        : @boiled_egg, SemiBold 30, #191919
+ *   - stats         : 팔로워 701 · 팔로잉 142, Medium 18, #73787e, dot separator 3x3
+ *   - top inner -> main menu : space-between (top block height 221, justify-between)
+ *   - main menu     : 4 items, item gap 24px, icon 32x32, label 24 Medium #191919
+ *   - bottom menu   : 2 items, item gap 34px, icon 24x24, label 20 Medium #4D5160
+ *   - main menu <-> bottom : justify-between (drawer height 844, content 708)
  */
 
 import profileIcon from '~/assets/icons/drawer/profile.svg?raw'
@@ -33,17 +36,17 @@ const handleProfile = () => {
 
 const handleMeeting = () => {
   emit('close')
-  // TODO: 모임 라우트 결정 시 router.push('/meetings') 등
+  // 모임 라우트 결정 시 router.push('/meetings') 등
 }
 
 const handleArchive = () => {
   emit('close')
-  // TODO: 보관함 라우트
+  router.push('/archive')
 }
 
 const handleHistory = () => {
   emit('close')
-  // TODO: 방문기록 라우트
+  // 방문기록 라우트
 }
 
 const handleSettings = () => {
@@ -52,69 +55,105 @@ const handleSettings = () => {
 }
 
 const handleLogout = () => {
-  // TODO: 실제 auth logout 연결
+  // 실제 auth logout 연결
   emit('close')
 }
 </script>
 
 <template>
   <nav class="side-drawer" role="navigation" aria-label="사이드 메뉴">
-    <!-- Top profile -->
-    <div class="side-drawer__profile">
-      <div class="side-drawer__avatar">
-        <img
-          src="/images/my/avatar.png"
-          alt="내 프로필"
-          class="side-drawer__avatar-img"
-        />
+    <!--
+      Figma 16:303 (top block, height 221)
+      flex column justify-between
+        - 16:304 (top inner, flex col gap 20)
+            - avatar 48
+            - @boiled_egg SemiBold 30 #191919
+            - 팔로워 701 · 팔로잉 142 (Medium 18 #73787e)
+        - 16:311 (menu block) - menu 시작 위치
+    -->
+    <div class="side-drawer__top">
+      <!--
+        Figma 16:304 (top inner, profile)
+        flex col gap 20
+          - avatar 48 x 48 (button → /my)
+          - @boiled_egg SemiBold 30 #191919
+          - 팔로워 701 · 팔로잉 142 (Medium 18 #73787e)
+      -->
+      <div class="side-drawer__profile">
+        <button
+          type="button"
+          class="side-drawer__profile-button"
+          aria-label="프로필 화면으로 이동"
+          @click="handleProfile"
+        >
+          <div class="side-drawer__avatar">
+            <img
+              src="/images/my/avatar.png"
+              alt="내 프로필"
+              class="side-drawer__avatar-img"
+            />
+          </div>
+        </button>
+        <p class="side-drawer__handle">@boiled_egg</p>
+        <div class="side-drawer__stats" aria-label="팔로워/팔로잉">
+          <span class="side-drawer__stats-item">팔로워 701</span>
+          <span class="side-drawer__stats-dot" aria-hidden="true" />
+          <span class="side-drawer__stats-item">팔로잉 142</span>
+        </div>
       </div>
-      <p class="side-drawer__handle">@boiled_egg</p>
+
+      <!--
+        Figma 16:311 (menu block) - 16:303 안에서 justify-between 으로
+        16:304 아래쪽 끝에 배치되며, 실제 menu items (16:312) 는
+        absolute left 0 top 0 으로 menu block 의 시작부터 펼쳐진다.
+      -->
+      <div class="side-drawer__menu">
+        <button
+          type="button"
+          class="side-drawer__menu-item"
+          aria-label="프로필"
+          @click="handleProfile"
+        >
+          <span class="side-drawer__menu-icon" v-html="profileIcon" />
+          <span class="side-drawer__menu-label">프로필</span>
+        </button>
+
+        <button
+          type="button"
+          class="side-drawer__menu-item"
+          aria-label="모임"
+          @click="handleMeeting"
+        >
+          <span class="side-drawer__menu-icon" v-html="meetingIcon" />
+          <span class="side-drawer__menu-label">모임</span>
+        </button>
+
+        <button
+          type="button"
+          class="side-drawer__menu-item"
+          aria-label="보관함"
+          @click="handleArchive"
+        >
+          <span class="side-drawer__menu-icon" v-html="archiveIcon" />
+          <span class="side-drawer__menu-label">보관함</span>
+        </button>
+
+        <button
+          type="button"
+          class="side-drawer__menu-item"
+          aria-label="방문기록"
+          @click="handleHistory"
+        >
+          <span class="side-drawer__menu-icon" v-html="historyIcon" />
+          <span class="side-drawer__menu-label">방문기록</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Main menu -->
-    <div class="side-drawer__menu">
-      <button
-        type="button"
-        class="side-drawer__menu-item"
-        aria-label="프로필"
-        @click="handleProfile"
-      >
-        <span class="side-drawer__menu-icon" v-html="profileIcon" />
-        <span class="side-drawer__menu-label">프로필</span>
-      </button>
-
-      <button
-        type="button"
-        class="side-drawer__menu-item"
-        aria-label="모임"
-        @click="handleMeeting"
-      >
-        <span class="side-drawer__menu-icon" v-html="meetingIcon" />
-        <span class="side-drawer__menu-label">모임</span>
-      </button>
-
-      <button
-        type="button"
-        class="side-drawer__menu-item"
-        aria-label="보관함"
-        @click="handleArchive"
-      >
-        <span class="side-drawer__menu-icon" v-html="archiveIcon" />
-        <span class="side-drawer__menu-label">보관함</span>
-      </button>
-
-      <button
-        type="button"
-        class="side-drawer__menu-item"
-        aria-label="방문기록"
-        @click="handleHistory"
-      >
-        <span class="side-drawer__menu-icon" v-html="historyIcon" />
-        <span class="side-drawer__menu-label">방문기록</span>
-      </button>
-    </div>
-
-    <!-- Bottom menu -->
+    <!--
+      Figma 16:330 (bottom block, flex col gap 34)
+      drawer 의 justify-between 으로 화면 하단에 위치.
+    -->
     <div class="side-drawer__bottom">
       <button
         type="button"
@@ -141,30 +180,79 @@ const handleLogout = () => {
 
 <style scoped>
 /*
- * SideDrawer — Figma 1:538 actual
+ * SideDrawer — Figma 16:301 actual
  *  width: 300px
- *  padding: 68px 30px 0
- *  gap profile -> menu: 80px
- *  menu item gap: 24px (between rows)
- *  menu icon: 32, label 24 / Medium
- *  bottom item gap: 34px
- *  bottom icon: 24, label 20 / Medium
+ *  height: 844px (full app height)
+ *  padding: 68px (top/bottom) 30px (left/right)
+ *  background: #FFFFFF
+ *  layout: flex column justify-between
+ *    - top block (profile + main menu) — Figma 16:303 (height 221)
+ *    - bottom block (settings + logout) — Figma 16:330 (flex col gap 34)
  */
 .side-drawer {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  justify-content: space-between;
+
+  width: 100%;
   height: 100%;
-  padding: 68px 30px 0;
+  padding: 68px 30px calc(68px + env(safe-area-inset-bottom, 0px));
+
   background: #FFFFFF;
+  box-sizing: border-box;
 }
 
-/* Profile (top): avatar 48 + handle 30 (top gap 18) */
+/*
+ * Top block — Figma 16:303
+ *  height: 221px
+ *  flex column, gap 42
+ *    - top inner (profile) — 16:304, flex col gap 20
+ *    - main menu          — 16:311, flex col gap 24
+ */
+.side-drawer__top {
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+  flex: 0 0 auto;
+}
+
+/*
+ * Profile (top inner) — Figma 16:304
+ *  flex col gap 20
+ *    - avatar 48 x 48 (button → /my)
+ *    - handle SemiBold 30 #191919
+ *    - stats (Medium 18 #73787e)
+ */
 .side-drawer__profile {
   display: flex;
   flex-direction: column;
+  gap: 20px;
   flex-shrink: 0;
-  margin-bottom: 80px;
+}
+
+/*
+ * Profile avatar button (Figma 16:305)
+ * avatar 자체 (48x48) 만 clickable, 누르면 /my 로 이동.
+ * button의 default style 제거.
+ */
+.side-drawer__profile-button {
+  display: block;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.side-drawer__profile-button:active {
+  transform: scale(0.94);
+  opacity: 0.85;
 }
 
 .side-drawer__avatar {
@@ -183,20 +271,61 @@ const handleLogout = () => {
 }
 
 .side-drawer__handle {
-  margin: 18px 0 0;
+  margin: 0;
   font-size: 30px;
   font-weight: 600;
   line-height: 1;
-  color: #000000;
+  letter-spacing: -0.43px;
+  color: #191919;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Main menu: pushes bottom menu to screen bottom */
+/*
+ * Stats — Figma 16:307
+ *  flex row gap 8, items center
+ *    - 팔로워 701 (Medium 18 #73787e)
+ *    - separator dot 3 x 3
+ *    - 팔로잉 142 (Medium 18 #73787e)
+ */
+.side-drawer__stats {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.side-drawer__stats-item {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.43px;
+  color: #73787e;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  white-space: nowrap;
+}
+
+.side-drawer__stats-dot {
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: #73787e;
+  flex-shrink: 0;
+}
+
+/*
+ * Main menu — Figma 16:311 / 16:312
+ *  flex col, gap 24
+ *  item: flex row gap 16, items center
+ *    - icon 32 x 32
+ *    - label Medium 24 #191919
+ */
 .side-drawer__menu {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  flex: 1;
+  flex-shrink: 0;
 }
 
 .side-drawer__menu-item {
@@ -231,17 +360,24 @@ const handleLogout = () => {
   font-size: 24px;
   font-weight: 500;
   line-height: 1;
+  letter-spacing: -0.43px;
   color: #191919;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  white-space: nowrap;
 }
 
-/* Bottom: settings + logout */
+/*
+ * Bottom — Figma 16:330
+ *  flex col, gap 34
+ *  item: flex row gap 16, items center
+ *    - icon 24 x 24 (color baked-in #4D5160 in asset)
+ *    - label Medium 20 #4D5160
+ */
 .side-drawer__bottom {
   display: flex;
   flex-direction: column;
   gap: 34px;
   flex-shrink: 0;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .side-drawer__bottom-item {
@@ -276,7 +412,9 @@ const handleLogout = () => {
   font-size: 20px;
   font-weight: 500;
   line-height: 1;
+  letter-spacing: -0.43px;
   color: #4D5160;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  white-space: nowrap;
 }
 </style>

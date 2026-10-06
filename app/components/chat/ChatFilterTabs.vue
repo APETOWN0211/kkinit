@@ -249,4 +249,14 @@ const select = (value: ChatFilter) => {
   background: var(--color-chip-teal);
   color: #FFFFFF;
 }
+
+/*
+ * 모임 tab 이 active 일 때 (mint 배경 pill) 에는 mark 배경을 흰색으로,
+ * 글자 색은 이전 배경색인 chip-teal 로 두어 mint 배경 pill 위에서도 가독성을 유지.
+ * (Figma 11:304 active 모임 기준)
+ */
+.filter-tab--active .filter-tab__mark--teal {
+  background: #FFFFFF;
+  color: var(--color-chip-teal);
+}
 </style>

@@ -300,7 +300,7 @@ const goBack = () => router.back()
 }
 
 .row-value--active {
-  color: #699DF9;
+  color: #55C7AE;
 }
 
 .row-value--muted {
@@ -362,6 +362,10 @@ const goBack = () => router.back()
   font-weight: 500;
   color: #4D5160;
   letter-spacing: 0.5px;
+}
+
+.settings-action-btn--withdraw .settings-action-title {
+  color: #FF6940;
 }
 
 /* Press feedback */

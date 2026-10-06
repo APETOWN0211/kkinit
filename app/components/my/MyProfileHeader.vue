@@ -1,443 +1,298 @@
 <script setup lang="ts">
-import gearIcon from '~/assets/icons/feed/gear.svg?raw'
-import shareIcon from '~/assets/icons/feed/share.svg?raw'
+import backIcon from '~/assets/icons/my/back.svg?raw'
+import moreIcon from '~/assets/icons/my/more.svg?raw'
 
-const emit = defineEmits<{
-  (e: 'edit'): void
-  (e: 'share'): void
-  (e: 'settings'): void
-}>()
+const router = useRouter()
 
-const onEdit = () => emit('edit')
-const onShare = () => emit('share')
-const onSettings = () => emit('settings')
+const onBack = () => {
+  if (import.meta.client) {
+    router.back()
+  }
+}
+
+const onMore = () => {
+  // Press feedback only — actual menu implementation out of scope.
+}
 </script>
 
 <template>
   <header class="my-profile">
-    <!-- Orange Cover -->
-    <div class="my-profile-cover">
+    <!--
+      Figma 18:631 / 18:750 / 18:905
+        top: 47, h: 50, px: 20, py: 3, justify-between
+        - left  : back 44x44 white circle + shadow
+        - right : more 44x44 white circle + shadow
+      Note: top: 47 is for an iPhone whose status bar height = 47. Project
+      treats safe-area via the existing wrapper; we use the same value Figma
+      shows so the top bar lines up with the avatar and profile text below.
+    -->
+    <div class="my-profile__topbar">
       <button
         type="button"
-        class="my-profile-settings"
-        aria-label="설정"
-        @click="onSettings"
+        class="my-profile__icon-button"
+        aria-label="뒤로 가기"
+        @click="onBack"
       >
-        <span
-          class="my-profile-settings__icon"
-          v-html="gearIcon"
-        />
+        <span class="my-profile__icon" v-html="backIcon" />
+      </button>
+      <button
+        type="button"
+        class="my-profile__icon-button"
+        aria-label="더보기"
+        @click="onMore"
+      >
+        <span class="my-profile__icon" v-html="moreIcon" />
       </button>
     </div>
 
-    <!-- White Profile Content -->
-    <div class="my-profile-content">
-      <!-- Avatar -->
-      <div class="my-profile-avatar">
-        <img
-          src="/images/my/avatar.png"
-          alt="닮은살걀 프로필"
-          class="my-profile-avatar__image"
-        />
-      </div>
-
-      <!-- Stats -->
-      <div class="my-profile-stats">
-        <div class="my-profile-stat">
-          <strong class="my-profile-stat__value">10</strong>
-          <span class="my-profile-stat__label">게시글</span>
+    <!--
+      Figma 18:554 / 18:637 / 18:759 (Profile header)
+        top: 96, h: 163, pt: 10, px: 20
+        - 18:555 flex col gap 6
+            - 18:556 row justify-between
+                - left  (18:557) col gap 4 (w 111)
+                    - 닉네임 24 Bold #191919
+                    - 핸들   16 Medium #73787E
+                - right (18:560 / 18:643) 68x68 circular avatar
+            - 18:562 bio 15 Medium #191919 line-height 1.6
+        - 18:563 row gap 8 (followers/following)
+            - Regular 16 #73787E
+            - separator dot 3x3
+    -->
+    <div class="my-profile__info">
+      <div class="my-profile__info-top">
+        <div class="my-profile__text">
+          <p class="my-profile__name">닮은살걀</p>
+          <p class="my-profile__handle">@boiled_egg</p>
         </div>
-
-        <div class="my-profile-stat">
-          <strong class="my-profile-stat__value">209</strong>
-          <span class="my-profile-stat__label">팔로워</span>
-        </div>
-
-        <div class="my-profile-stat">
-          <strong class="my-profile-stat__value">51</strong>
-          <span class="my-profile-stat__label">팔로잉</span>
-        </div>
-      </div>
-
-      <!-- Profile Text -->
-      <div class="my-profile-text">
-        <h2 class="my-profile-nickname">
-          닮은살걀
-        </h2>
-
-        <div class="my-profile-bio">
-          <p>맛집 탐방을 좋아하는 30대 직장인 😋</p>
-          <p>좋은 사람들과 나누는 걸 더 좋아해요.</p>
-        </div>
-      </div>
-
-      <!-- Actions -->
-      <div class="my-profile-actions">
-        <button
-          type="button"
-          class="my-profile-btn my-profile-btn--edit"
-          @click="onEdit"
-        >
-          프로필 편집
-        </button>
-
-        <button
-          type="button"
-          class="my-profile-btn my-profile-btn--share"
-          aria-label="공유"
-          @click="onShare"
-        >
-          <span
-            class="my-profile-btn__icon"
-            v-html="shareIcon"
+        <div class="my-profile__avatar">
+          <img
+            src="/images/my/avatar.png"
+            alt="내 프로필"
+            class="my-profile__avatar-img"
           />
-        </button>
+        </div>
       </div>
+      <p class="my-profile__bio">
+        맛있는 음식만 먹고싶은<br />
+        고등학생
+      </p>
+    </div>
+
+    <div class="my-profile__stats">
+      <span class="my-profile__stats-item">팔로워 701</span>
+      <span class="my-profile__stats-dot" aria-hidden="true" />
+      <span class="my-profile__stats-item">팔로잉 142</span>
     </div>
   </header>
 </template>
 
 <style scoped>
+/*
+ * My profile header — Figma 18:553 / 18:636 / 18:758 (Profile area).
+ *  - top bar  : top 47, h 50, px 20, py 3
+ *  - info gap : name-row ↔ bio = 6px
+ *  - bio ↔ stats = 12px
+ *  - stats ↔ 프로필 편집 (다음 컴포넌트) = 20px
+ *  - name 24 Bold #191919
+ *  - handle 16 Medium #73787E
+ *  - bio 15 Medium #191919 line-height 1.6 (2-line break)
+ *  - avatar 68x68 circle
+ *  - stats 16 Regular #73787E, separator dot 3x3
+ */
 .my-profile {
   position: relative;
+
+  display: flex;
+  flex-direction: column;
 
   width: 100%;
 
   background: #ffffff;
 }
 
-/* =========================
-   Orange Cover
-   ========================= */
-
-.my-profile-cover {
+/* =========================================
+   Top bar (back / more)
+   ========================================= */
+.my-profile__topbar {
   position: relative;
 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
   width: 100%;
-  height: 100px;
-
-  padding-top: env(safe-area-inset-top);
-  margin-top: calc(-1 * env(safe-area-inset-top));
-
-  background: var(--color-chip-orange, #ff6940);
+  height: 50px;
+  padding: 3px 20px;
 }
 
-/* =========================
-   Settings
-   ========================= */
-
-.my-profile-settings {
-  position: absolute;
-
-  right: 20px;
-
+.my-profile__icon-button {
   display: flex;
   align-items: center;
   justify-content: center;
 
   width: 44px;
   height: 44px;
-
   padding: 0;
 
   border: 0;
-  border-radius: 18px;
+  border-radius: 999px;
 
   background: #ffffff;
-
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.09);
+  box-shadow: 0 2.316px 8.916px rgba(0, 0, 0, 0.09);
 
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 
-  transition:
-    transform 120ms ease,
-    opacity 120ms ease;
+  transition: transform 120ms ease, opacity 120ms ease;
 }
 
-.my-profile-settings:active {
-  transform: scale(0.95);
-  opacity: 0.88;
+.my-profile__icon-button:active {
+  transform: scale(0.94);
+  opacity: 0.85;
 }
 
-.my-profile-settings__icon {
+.my-profile__icon {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
 
-  color: #4d5160;
+  color: #73787e;
 }
 
-.my-profile-settings__icon :deep(svg) {
+.my-profile__icon :deep(svg) {
   display: block;
-
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
 }
 
-/* =========================
-   White Content
-   ========================= */
-
-.my-profile-content {
-  position: relative;
-  z-index: 1;
-
-  width: 100%;
-
-  padding:
-    0
-    var(--page-padding, 20px)
-    12px;
-
-  background: #fafafa;
-}
-
-/* =========================
-   Avatar
-   ========================= */
-
-.my-profile-avatar {
-  position: absolute;
-  z-index: 2;
-
-  top: -32px;
-  left: 20px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 82px;
-  height: 82px;
-
-  border-radius: 50%;
-
-  overflow: hidden;
-
-  /*
-    기존 흰색 원형 backdrop 제거.
-    프로필 이미지 자체에 4px 흰색 outline만 적용.
-  */
-  box-shadow: 0 0 0 8px #fafafa;
-}
-
-.my-profile-avatar__image {
-  display: block;
-
-  width: 100%;
-  height: 100%;
-
-  border-radius: 50%;
-
-  object-fit: cover;
-}
-
-/* =========================
-   Stats
-   ========================= */
-
-.my-profile-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  /*
-    Avatar 영역을 비우고
-    오른쪽에서 stats 시작
-  */
-  margin-left: 108px;
-
-  /*
-    avatar bottom = 40px
-    stats 영역 bottom = 52px
-    nickname margin-top = 12px
-    nickname top = 64px
-
-    따라서:
-    avatar bottom → nickname = 24px
-  */
-  min-height: 52px;
-
-  padding-top: 14px;
-}
-
-.my-profile-stat {
+/* =========================================
+   Profile info (name / handle / bio / avatar)
+   ========================================= */
+.my-profile__info {
   display: flex;
   flex-direction: column;
+  gap: 6px;
 
-  /* 숫자 / 라벨 좌정렬 */
+  width: 100%;
+  padding: 10px 20px 0;
+  box-sizing: border-box;
+}
+
+.my-profile__info-top {
+  display: flex;
   align-items: flex-start;
-
-  min-width: 0;
+  justify-content: space-between;
+  width: 100%;
 }
 
-.my-profile-stat__value {
-  display: block;
-
-  margin: 0;
-
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 1;
-
-  color: #191919;
-}
-
-.my-profile-stat__label {
-  display: block;
-
-  /*
-    숫자 ↔ 게시글/팔로워/팔로잉
-    정확히 2px
-  */
-  margin-top: 6px;
-
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1;
-
-  color: #4d5160;
-
-  white-space: nowrap;
-}
-
-/* =========================
-   Nickname / Bio
-   ========================= */
-
-.my-profile-text {
+.my-profile__text {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 
-  /*
-    Stats 영역 ↔ 닉네임
-    정확히 12px
-  */
-  margin-top: 12px;
+  width: 111px;
+  flex-shrink: 0;
 }
 
-.my-profile-nickname {
+.my-profile__name {
   margin: 0;
 
   font-size: 24px;
   font-weight: 700;
   line-height: 1.2;
-
   letter-spacing: -0.5px;
 
   color: #191919;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.my-profile-bio {
-  display: flex;
-  flex-direction: column;
-
-  gap: 3px;
-
-  margin-top: 10px;
-
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.45;
-
-  letter-spacing: -0.2px;
-
-  color: #191919;
-}
-
-.my-profile-bio p {
+.my-profile__handle {
   margin: 0;
-}
-
-/* =========================
-   Actions
-   ========================= */
-
-.my-profile-actions {
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-
-  margin-top: 12px;
-}
-
-.my-profile-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  height: 40px;
-
-  padding: 0;
-
-  border: 0;
-
-  background: #e9e9e9;
-  color: #191919;
-
-  font: inherit;
-
-  cursor: pointer;
-
-  transition:
-    transform 110ms ease,
-    opacity 110ms ease;
-}
-
-.my-profile-btn:active {
-  transform: scale(0.97);
-  opacity: 0.88;
-}
-
-.my-profile-btn--edit {
-  min-width: 126px;
-
-  padding: 0 22px;
-
-  border-radius: 12px;
 
   font-size: 16px;
   font-weight: 500;
-  line-height: 1;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+
+  color: #73787e;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.my-profile-btn--share {
-  flex: 0 0 40px;
+.my-profile__avatar {
+  flex-shrink: 0;
 
-  width: 40px;
-  height: 40px;
+  width: 68px;
+  height: 68px;
 
-  border-radius: 50%;
+  border-radius: 999px;
+  overflow: hidden;
+
+  background: #f5f6f8;
 }
 
-.my-profile-btn__icon {
+.my-profile__avatar-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.my-profile__bio {
+  margin: 0;
+
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: -0.3px;
+
+  color: #191919;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* =========================================
+   Followers / Following stats
+   bio 와의 거리는 12px (Figma 18:553/636/758).
+   ========================================= */
+.my-profile__stats {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
 
-  width: 22px;
-  height: auto;
-
-  color: #4d5160;
+  width: 100%;
+  margin-top: 12px;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
-.my-profile-btn__icon :deep(svg) {
+.my-profile__stats-item {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+
+  color: #73787e;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  white-space: nowrap;
+}
+
+.my-profile__stats-dot {
   display: block;
-
-  width: 22px;
-  height: 22px;
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: #73787e;
+  flex-shrink: 0;
 }
 
-/* =========================
-   Reduced Motion
-   ========================= */
-
+/* =========================================
+   Reduced motion
+   ========================================= */
 @media (prefers-reduced-motion: reduce) {
-  .my-profile-settings,
-  .my-profile-btn {
+  .my-profile__icon-button {
     transition: none;
   }
 }
