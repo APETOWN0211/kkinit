@@ -1,14 +1,36 @@
 <script setup lang="ts">
+import AppSplash from '~/components/common/AppSplash.vue'
 import SideDrawer from '~/components/navigation/SideDrawer.vue'
 
 const route = useRoute()
+
+/*
+ * App launch splash (Figma 1:178).
+ * Rendered inside `.app-shell` so it covers exactly the app viewport
+ * (390 × 844 on desktop, 100% × 100dvh on mobile) without covering the
+ * surrounding desktop background.
+ */
+const { isSplashVisible } = useAppSplash()
+
+/*
+ * iPhone 11 (414 × 896) 등 Figma 390 × 844 보다 큰 viewport 에서 wrapper 자체를
+ * viewport_width / 390 배 만큼 비례 확대한다.
+ *
+ * scale 만 적용하면 document layout 의 width/height 가 그대로 390 × 844 이라
+ * wrapper 의 부모 (.app-wrapper) 에 빈 자리가 생기고, fixed element 가 그만큼
+ * 어긋난다. 따라서 wrapper 자체의 width/height 를 1/scale 로 줄여 시각 영역을
+ * 정확히 viewport 와 일치시킨다.
+ */
+const { scale, wrapperScale } = useAppScale()
+
+const SPLASH_THEME_COLOR = '#FF6940'
 
 /*
  * Route-specific theme colors.
  */
 const themeColor = computed(() => {
   if (route.path === '/') {
-    return '#FFFFFF'
+    return '#FAFAFA'
   }
   if (route.path === '/my') {
     return '#FF6940'
@@ -16,15 +38,28 @@ const themeColor = computed(() => {
   if (route.path.startsWith('/notifications')) {
     return '#F3F4F6'
   }
+  if (route.path === '/chat') {
+    // Figma 11:244 — 최상단 background = --color-background
+    return '#FAFAFA'
+  }
   return '#FAFAFA'
 })
 
-// Update theme-color when route changes
+/*
+ * While the splash is up, the whole app is one orange surface, including the
+ * iOS/PWA status-bar area — so theme-color must be the splash orange.
+ * As soon as the splash is gone, the route's own theme-color takes over again.
+ */
+const effectiveThemeColor = computed(() =>
+  isSplashVisible.value ? SPLASH_THEME_COLOR : themeColor.value
+)
+
+// Update theme-color when route changes (or when the splash goes away)
 watchEffect(() => {
   if (import.meta.client) {
     const metaThemeColor = document.querySelector('meta[name="theme-color"]')
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', themeColor.value)
+      metaThemeColor.setAttribute('content', effectiveThemeColor.value)
     }
   }
 })
@@ -33,7 +68,11 @@ useHead({
   meta: [
     {
       name: 'theme-color',
-      content: themeColor.value
+      /*
+       * Wrapped in a computed so Unhead re-renders the tag when the splash
+       * hides and the route color takes back over (and on route changes).
+       */
+      content: effectiveThemeColor
     }
   ]
 })
@@ -47,10 +86,12 @@ const showBottomNavigation = computed(() =>
 /*
  * FAB는 Figma 1:1639 (탐색 - 메인) 기준,
  * 탐색 화면에는 보이지 않는다.
- * 다른 메인 탭 (Home/Map/Chat) 에서만 노출.
+ * 또한 /chat 화면 (Figma 11:244) 에는 FAB 가 없다.
+ * Home/Map 에서만 노출.
  */
 const showCreatePostFab = computed(() => {
   if (route.path === '/explore') return false
+  if (route.path === '/chat') return false
   return mainTabRoutes.includes(route.path)
 })
 
@@ -229,25 +270,42 @@ const drawerVisible = computed(() => isDrawerOpen.value || isDragging.value)
   >
     <!-- App shell: slides right when drawer open -->
     <div
-      class="app-shell"
-      :class="[shellClass, { 'app-shell--notifications': isNotificationsPage }]"
+      class="app-shell-clip"
       :style="{
-        transform: mainTransform,
-        transition: mainTransition
+        transform: scale > 1 ? `scale(${scale})` : undefined,
+        transformOrigin: 'top left',
+        width: wrapperScale < 1 ? `${(wrapperScale) * 100}%` : '100%',
+        height: wrapperScale < 1 ? `${(wrapperScale) * 100}%` : '100%'
       }"
     >
-      <NuxtRouteAnnouncer />
       <div
-        class="app-content"
-        :class="{
-          'app-content--with-bottom-nav': showBottomNavigation,
-          'app-content--no-scroll': isNotificationsPage
+        class="app-shell"
+        :class="[shellClass, { 'app-shell--notifications': isNotificationsPage }]"
+        :style="{
+          transform: mainTransform,
+          transition: mainTransition
         }"
       >
-        <NuxtPage :transition="pageTransition" />
+        <NuxtRouteAnnouncer />
+        <div
+          class="app-content"
+          :class="{
+            'app-content--with-bottom-nav': showBottomNavigation,
+            'app-content--no-scroll': isNotificationsPage
+          }"
+        >
+          <NuxtPage :transition="pageTransition" />
+        </div>
+        <NavigationBottomNavigation v-if="showBottomNavigation" />
+        <NavigationCreatePostFab v-if="showCreatePostFab" />
+
+        <!--
+          App launch splash (Figma 1:178).
+          Mounted inside .app-shell so it covers only the app viewport, and it is
+          the last child so it paints above the bottom nav / FAB.
+        -->
+        <AppSplash />
       </div>
-      <NavigationBottomNavigation v-if="showBottomNavigation" />
-      <NavigationCreatePostFab v-if="showCreatePostFab" />
     </div>
 
     <!-- Drawer overlay (sits inside app-wrapper so desktop preview aligns with 390px shell) -->
@@ -269,10 +327,41 @@ const drawerVisible = computed(() => isDrawerOpen.value || isDragging.value)
   height: 100dvh;
   min-height: 0;
   display: flex;
+  /*
+   * Mobile: iPhone 11 등 viewport 가 390 보다 큰 경우 wrapper 와 같은
+   * 시각 영역의 scaled clip 이 wrapper 의 (0,0) 에서 wrapper 전체를 채우도록
+   * flex-start 로 둔다. wrapper 자체가 viewport 와 같은 크기이므로
+   * flex-start 가 곧 wrapper 의 (0,0) = viewport 의 (0,0).
+   */
   justify-content: flex-start;
+  align-items: stretch;
   overflow: hidden;
   /* Prevent browser overscroll */
   overscroll-behavior: none;
+}
+
+/*
+ * App-shell-clip:
+ *  - 모바일 (≤ 767px): .app-wrapper 가 viewport 와 같은 크기이고
+ *    .app-shell 은 wrapper 와 같은 크기(= viewport). 그 위에 scale 만 걸면
+ *    wrapper 의 width/height 가 그대로 390×844 로 남아 viewport 와 어긋난다.
+ *    → wrapper 외곽 (여기) 에서 width/height 를 1/scale 로 줄이고
+ *      transform: scale(scale) 로 시각 영역을 viewport 와 정확히 맞춘다.
+ *
+ *  - 데스크탑 (≥ 768px): 영향 없도록 width/height 100% 유지 (390×844 fixed
+ *     shell 이 wrapper 안에서 중앙 정렬되는 현재 동작 보존).
+ */
+.app-shell-clip {
+  position: relative;
+  flex-shrink: 0;
+  /*
+   * 데스크탑 preview: 100%/100% 인 clip 안의 shell(390×844) 을 clip 중앙에
+   * 배치해 wrapper(=viewport 전체)의 정중앙에 shell 이 위치하도록 한다.
+   * 모바일: wrapper 와 같은 크기이므로 align/justify center 는 영향 없음.
+   */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .app-shell {
@@ -391,6 +480,18 @@ const drawerVisible = computed(() => isDrawerOpen.value || isDragging.value)
     min-height: 100vh;
     overflow: visible;
     background: var(--color-text-secondary);
+  }
+
+  /*
+   * Desktop preview: clip 은 wrapper 와 같은 100%/100% 영역을 차지하고
+   * 가운데 정렬 flex container 로서 shell 을 viewport 정중앙에 둔다.
+   */
+  .app-shell-clip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
   }
 
   .app-shell {

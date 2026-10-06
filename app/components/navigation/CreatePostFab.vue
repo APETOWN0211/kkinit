@@ -31,19 +31,27 @@ const onClick = () => {
  *  - 위치: nav 의 우측에 독립 (Figma left:306, top:762)
  *  - shadow: SVG 자체에 포함된 drop-shadow filter 활용.
  */
+/*
+ * Figma 3:267: 58 × 58 circle, left 306, top 762
+ *   (390 - 306 - 58 = 26 → right 26,  844 - 762 - 58 = 24 → bottom 24)
+ *
+ * 이 wrapper 는 90 × 90 asset 안의 원(58)을 그대로 받쳐주기 위한
+ * hit area 이다. 원의 중심이 wrapper 정중앙이 되도록
+ * 아래 offset 을 준다 (asset 의 원 위치 (16, 12) 를 반전).
+ */
 .create-post-fab {
   position: fixed;
   z-index: 31;
 
-  right: 22px;
-  bottom: calc(env(safe-area-inset-bottom) + 8px);
+  right: 10px;
+  bottom: calc(env(safe-area-inset-bottom) + 4px);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 58px;
-  height: 58px;
+  width: 90px;
+  height: 90px;
 
   padding: 0;
 
@@ -68,14 +76,25 @@ const onClick = () => {
   align-items: center;
   justify-content: center;
 
-  width: 58px;
-  height: 58px;
+  width: 90px;
+  height: 90px;
 }
 
+/*
+ * Figma 3:267 (네비게이션-글작성) 의 asset 은 90 × 90 이고,
+ * 그 안에 원형 버튼 58 × 58 이 (16, 12) 에 들어있다 (shadow 포함).
+ *
+ * wrapper 를 90 × 90 으로 두면
+ *   - 원 58px 가 정확히 1:1 로 그려지고
+ *   - SVG 내부 drop shadow 까지 Figma 그대로 살아난다.
+ *
+ * (이전처럼 wrapper 를 58 × 58 로 두면 90 → 58 로 눌려
+ *  원이 약 37px 로 작아지고 위치도 틀어진다.)
+ */
 .create-post-fab__icon :deep(svg) {
   display: block;
-  width: 58px;
-  height: 58px;
+  width: 90px;
+  height: 90px;
 }
 
 @media (min-width: 768px) {

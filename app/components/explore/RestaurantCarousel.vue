@@ -50,13 +50,17 @@ defineProps<{
   padding-bottom: 20px;
 
   background: #FFFFFF;
+  position: relative;
+  z-index: 0;
 }
 
 .restaurant-carousel__title {
-  width: 390px;
-  max-width: 100%;
-  padding: 20px 0 10px;
-  overflow: hidden;
+  width: 100%;
+  padding: 20px 0;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  background: #FFFFFF;
 }
 
 .restaurant-carousel__title p {
@@ -67,7 +71,7 @@ defineProps<{
   line-height: 1.2;
   color: #191919;
   white-space: nowrap;
-
+  overflow: visible;
   margin-left: 20px;
 }
 

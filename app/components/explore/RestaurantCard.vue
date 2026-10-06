@@ -1,10 +1,21 @@
 <script setup lang="ts">
 /*
- * Restaurant Card — Figma Frame616 / 1:1658 (탐색 추천 카드)
- *  - 220×270, radius 16, border 1 #DBDBDB, shadow 0 1 8.2 rgba(0,0,0,0.04)
- *  - top image 218×128
- *  - body padding 18/14/10, gap 10
- *  - badge: bg #FE5531 (or other), top 113, left 11.5, radius 8, padding 8/6, gap 6
+ * Restaurant Card — Figma 8:422 / 8:455 / 8:486 (탐색 - 메인)
+ *  - 220 × 270, radius 16, border 1 #DBDBDB, shadow 0 1 8.2 rgba(0,0,0,0.04)
+ *  - top image 218 × 128
+ *  - body 218 × 141, padding 18 / 14 / 10, gap 10
+ *  - badge 8:450 / 8:483 / 8:514: absolute left 11.5, top 113,
+ *    padding 6 / 8, radius 8, gap 6, h 25
+ *
+ * node 8:404 의 정확한 좌표:
+ *  - card  x 20,  y 0    (track 안에서)
+ *  - image  x 1,   y 1    → 218 × 128
+ *  - body   x 1,   y 129  → 218 × 141
+ *  - location row  y 18 (card 기준)  → 12px, h 20 (bookmark row height)
+ *  - name         y 41
+ *  - info row     y 72
+ *  - divider      y 98
+ *  - amenities    y 108, h 18
  */
 import bookmarkIcon from '~/assets/icons/explore/bookmark.svg?raw'
 import distanceIcon from '~/assets/icons/explore/distance.svg?raw'
@@ -199,10 +210,15 @@ const bookmarkVariant = computed(() => {
 .restaurant-card__bookmark {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 
-  width: 12px;
-  height: 14px;
+  /*
+   * Figma 8:429 Vector = 16.842 × 20 (location row 8:427 이 h 20).
+   * 이전 asset 은 13.4 × 15.4 로 더 작았고, 최신 asset 은
+   * 18.8245 × 21.9823 이라 wrapper 를 Figma vector box 에 맞춘다.
+   */
+  width: 16.842px;
+  height: 20px;
 
   padding: 0;
   border: 0;
@@ -220,8 +236,8 @@ const bookmarkVariant = computed(() => {
   align-items: center;
   justify-content: center;
 
-  width: 12px;
-  height: 14px;
+  width: 16.842px;
+  height: 20px;
 }
 
 .restaurant-card__bookmark-icon :deep(svg) {
@@ -393,9 +409,13 @@ const bookmarkVariant = computed(() => {
   color: #FFFFFF;
 }
 
+/*
+ * node 8:514 (오브테이블, 동네 인기):
+ *   bg #70DDC5, icon 8.357 × 11.62, text #4D5160 11px Medium
+ */
 .restaurant-card__badge--green {
-  background: #C1F785;
-  color: #191919;
+  background: #70DDC5;
+  color: #4D5160;
 }
 
 .restaurant-card__badge > span:last-child {

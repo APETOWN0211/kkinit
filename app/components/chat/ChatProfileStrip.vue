@@ -29,6 +29,12 @@ defineProps<{
         class="profile-item"
       >
         <span class="profile-avatar-wrap">
+          <!--
+            Ring wrapper: 62x62 (Figma 11:256).
+            내부 이미지는 padding 4 적용 → 54x54 표시.
+            ring SVG 는 Figma 의 inset -2.02% (-1.25px) 와 동일하게
+            살짝 박스 밖으로 나가게 둔다 (overflow: visible).
+          -->
           <span
             class="profile-ring"
             :class="`profile-ring--${item.ring}`"
@@ -75,6 +81,16 @@ defineProps<{
 </template>
 
 <style scoped>
+/*
+ * Figma 11:253 — Profile strip
+ *  - frame: 390 × 105
+ *  - 내부 padding 12px (top/bottom), 20px (left/right)
+ *  - inner list gap 12px
+ *  - item: 62 × 81 (avatar 62 + name row)
+ *  - name: 13px Pretendard Medium, line-height 13px
+ *      색은 active #191919 / dim #9F9A9A
+ *      top 74.5px (item 내 중앙 정렬)
+ */
 .profile-strip {
   width: 100%;
   height: 105px;
@@ -112,16 +128,12 @@ defineProps<{
   cursor: pointer;
 }
 
-/*
- * Avatar wrapper 는 Figma 와 같이 정확히 62x62.
- * box-sizing: border-box + width/height 픽스로
- * ring/absolute 자식들이 박스 밖으로 새지 않게 한다.
- */
 .profile-avatar-wrap {
   position: relative;
   width: 62px;
   height: 62px;
   flex-shrink: 0;
+  border-radius: 999px;
 }
 
 .profile-ring {
@@ -131,7 +143,7 @@ defineProps<{
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: visible; /* Figma 의 -2.02% inset (-1.25px 새나감) 표현 */
+  overflow: visible;
 }
 
 .profile-ring--none {
@@ -140,8 +152,9 @@ defineProps<{
 
 .profile-ring__svg {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: calc(100% + 2.5px);
+  height: calc(100% + 2.5px);
+  margin: -1.25px;
 }
 
 .profile-ring__svg :deep(svg) {
@@ -150,6 +163,9 @@ defineProps<{
   height: 100%;
 }
 
+/*
+ * Avatar 이미지: padding 4 → 54×54
+ */
 .profile-avatar {
   position: absolute;
   inset: 4px;
@@ -157,27 +173,36 @@ defineProps<{
   height: calc(100% - 8px);
   border-radius: 999px;
   object-fit: cover;
+  z-index: 1;
 }
 
+/*
+ * Figma 11:259 — follow button
+ *  - 닮은살걀의 우하단 + 배지
+ *  - follow button 자체 asset 크기 15.667×16, plus icon 8×8
+ *  - 배경색: Figma 의 follow button asset color (mint teal #55C7AE 계열)
+ *    첨부에서 민트로 보이는 색이므로 design token 사용.
+ */
 .profile-follow-badge {
   position: absolute;
   right: 2px;
-  bottom: 2px; /* name row 위에 걸치도록 */
+  bottom: 14px;
   width: 16px;
   height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #699DF9;
+  background: var(--color-chip-teal);
   border: 2px solid var(--color-background);
   border-radius: 999px;
   box-sizing: border-box;
+  z-index: 2;
 }
 
 .profile-name {
   position: absolute;
   left: 50%;
-  top: 74px;
+  top: 74.5px;
   transform: translate(-50%, -50%);
   font-size: 13px;
   font-weight: 500;

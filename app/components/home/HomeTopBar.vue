@@ -4,6 +4,24 @@ import kkRight from '~/assets/icons/home/kk-letter-right.svg?raw'
 import kkChevron from '~/assets/icons/home/kk-chevron.svg?raw'
 import notificationIcon from '~/assets/icons/home/notification.svg?raw'
 
+/*
+ * Home header — Figma node 3:170 › 3:269 "Frame 665".
+ *
+ *  - header frame  : 390 × 103
+ *      = status bar 47 (OS 가 그림) + row 50 + 6 breathing room
+ *  - row 3:270     : h 50, top 47, px 20, 좌 avatar / 중앙 KK / 우 notification
+ *  - avatar 3:271  : 36 × 36, rounded full, x 20, y 47 + 7
+ *  - KK    3:281   : KK wordmark 59.52 (27.884 + 3.7 gap + 27.922) + chevron 9 × 4
+ *  - chevron       : 4 × 9 vector 를 -90° 회전 → 시각상 9 × 4
+ *  - notif 3:292   : 32 × 32 (asset 안에 #FF6940 unread dot 포함)
+ *
+ * 좌우 버튼 폭과 무관하게 KK 가 항상 화면 정중앙에 오도록
+ * 중앙 블록만 absolute 로 뺀다.
+ *
+ * Status bar(9:41 / signal / wifi / battery)은 OS 가 그리므로 만들지 않는다.
+ * desktop preview 에서도 가짜 status bar 여백을 만들지 않고 env() 만 쓴다.
+ */
+
 const emit = defineEmits<{
   'avatar-click': []
 }>()
@@ -12,22 +30,17 @@ const onAvatarClick = () => {
   emit('avatar-click')
 }
 
-const onKkDropdown = () => {
-  /*
-   * 현재 단계에서는 실제 dropdown 메뉴를 만들지 않는다.
-   * Figma 41:1897 에서 dropdown interaction 이 따로 명시되어 있지 않으므로
-   * press feedback 까지만 구현한다.
-   */
-}
-
-const goToNotifications = () => {
-  router.push('/notifications')
-}
+/*
+ * 현재 단계에서는 실제 dropdown 메뉴를 만들지 않는다.
+ * Figma 3:170 에도 dropdown interaction 이 명시되어 있지 않으므로
+ * press feedback 까지만 구현한다.
+ */
+const onKkDropdown = () => {}
 </script>
 
 <template>
   <header class="home-top-bar">
-    <!-- Left: 내 프로필 avatar (drawer toggle) -->
+    <!-- Left: 내 프로필 avatar (Side Drawer toggle) -->
     <button
       type="button"
       class="home-top-bar__avatar"
@@ -37,13 +50,13 @@ const goToNotifications = () => {
     >
       <span class="home-top-bar__avatar-image">
         <img
-          src="/images/my/avatar.png"
+          src="/images/home/header-avatar.png"
           alt="내 프로필"
         />
       </span>
     </button>
 
-    <!-- Center: KK + chevron (실제 화면 중앙) -->
+    <!-- Center: KK wordmark + chevron (viewport 정중앙 고정) -->
     <div class="home-top-bar__center">
       <button
         type="button"
@@ -51,11 +64,6 @@ const goToNotifications = () => {
         aria-label="끼닛 메뉴"
         @click="onKkDropdown"
       >
-        <!--
-          Figma 41:1897 의 KK 로고는
-          두 개의 동일 K 글자 vector 를 가로로 나란히 배치.
-          width 27.88 × 2 + gap ≈ 63.6.
-        -->
         <span class="home-top-bar__kk-pair">
           <span class="home-top-bar__kk-letter" v-html="kkLeft" />
           <span class="home-top-bar__kk-letter" v-html="kkRight" />
@@ -64,7 +72,7 @@ const goToNotifications = () => {
       </button>
     </div>
 
-    <!-- Right: notification bell -->
+    <!-- Right: notification bell (unread dot 은 asset 에 포함) -->
     <NuxtLink
       to="/notifications"
       class="home-top-bar__notif"
@@ -77,16 +85,9 @@ const goToNotifications = () => {
 
 <style scoped>
 /*
- * Home Top Bar
- *  - Figma 41:1897 (헤더 frame): w 390 × h 103
- *  - 내부 row: h 50 (top 47), padding 0 20
- *  - 좌: avatar 36×36
- *  - 중: KK 로고 두 글자 ≈ 63.6 × 28 + chevron 9×4 (rotated -90)
- *  - 우: notification 32×32 + unread dot
- *
- *  실제 iPhone/PWA safe-area-inset-top 만큼 위쪽 여백을 그대로 사용.
- *  Desktop preview 에서는 env() 이 0 이라 추가 47px 같은 가짜 status bar
- *  영역을 만들지 않는다.
+ * Figma 3:269 = status bar 47 + row 50 + 6.
+ * 실제 기기에서 status bar 높이는 env(safe-area-inset-top) 이므로 그것을 쓰고,
+ * 그 아래 row 50 과 하단 여백 6 만 고정한다.
  */
 .home-top-bar {
   position: sticky;
@@ -98,7 +99,7 @@ const goToNotifications = () => {
   justify-content: space-between;
 
   width: 100%;
-  height: calc(50px + env(safe-area-inset-top));
+  height: calc(50px + 6px + env(safe-area-inset-top));
   padding-top: env(safe-area-inset-top);
   padding-left: var(--page-padding);
   padding-right: var(--page-padding);
@@ -107,26 +108,33 @@ const goToNotifications = () => {
 }
 
 /* =========================
-   Left avatar
+   Left avatar — 3:271
+   -------------------------
+   Figma 3:271: 이미지 36 × 36, stroke (outside) 4.
+   stroke 까지 합친 외곽 = 40 × 40.
+   흰 테두리는 asset 에 없으므로 CSS 레이어로 구현한다.
+     - button (흰 원) : 40 × 40, background #FFFFFF, padding 2px
+     - inner (이미지) : 36 × 36, border-radius 50% + overflow hidden
    ========================= */
 .home-top-bar__avatar {
   position: relative;
 
-  flex: 0 0 36px;
+  flex: 0 0 40px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
 
-  padding: 0;
+  /* 흰 링 두께 = 2px (총 4px = Figma stroke outside 4) */
+  padding: 2px;
 
   border: 0;
   border-radius: 50%;
 
-  background: transparent;
+  background: #FFFFFF;
 
   cursor: pointer;
 
@@ -142,6 +150,7 @@ const goToNotifications = () => {
 .home-top-bar__avatar-image {
   display: block;
 
+  /* 이미지 자체 크기 = 36 × 36 */
   width: 36px;
   height: 36px;
 
@@ -150,6 +159,10 @@ const goToNotifications = () => {
   overflow: hidden;
 }
 
+/*
+ * asset 은 정사각형이라 36px box 안에서 원형 마스크로 잘린다.
+ * (border-radius 50% + overflow hidden)
+ */
 .home-top-bar__avatar-image img {
   display: block;
   width: 100%;
@@ -159,7 +172,7 @@ const goToNotifications = () => {
 }
 
 /* =========================
-   Center (KK + chevron)
+   Center (KK + chevron) — 3:281
    ========================= */
 .home-top-bar__center {
   position: absolute;
@@ -175,7 +188,9 @@ const goToNotifications = () => {
 .home-top-bar__kk {
   display: flex;
   align-items: center;
-  gap: 6px;
+
+  /* Figma: KK 59.52 → chevron 시작까지 8 */
+  gap: 8px;
 
   padding: 6px 8px;
 
@@ -197,9 +212,7 @@ const goToNotifications = () => {
 }
 
 /*
- * KK 두 글자.
- *  - Figma 에서는 두 K vector 사이 gap 3.7px (ml 31.6 - 27.88).
- *  - 두 span 모두 width 28, height 28.
+ * KK 두 글자: 27.884 + 3.7 + 27.922 = 59.52 (Figma Group 324).
  */
 .home-top-bar__kk-pair {
   display: inline-flex;
@@ -229,29 +242,32 @@ const goToNotifications = () => {
   height: 28px;
 }
 
+/*
+ * chevron: 원본 asset 은 6 × 11 이지만 Figma 3:291 은 9 × 4
+ * (= 4 × 9 vector 를 -90° 회전). wrapper 를 9 × 4 로 잡고
+ * inner 를 4 × 9 로 회전시켜 실제 크기를 맞춘다.
+ */
 .home-top-bar__kk-chevron {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 6px;
-  height: 11px;
+  width: 9px;
+  height: 4px;
 
-  margin-left: 4px;
-
-  transform: rotate(-90deg);
-
-  color: var(--color-icon-muted);
+  flex-shrink: 0;
 }
 
 .home-top-bar__kk-chevron :deep(svg) {
   display: block;
-  width: 6px;
-  height: 11px;
+  width: 4px;
+  height: 9px;
+
+  transform: rotate(-90deg);
 }
 
 /* =========================
-   Right notification
+   Right notification — 3:292 (32 × 32)
    ========================= */
 .home-top-bar__notif {
   position: relative;
@@ -270,7 +286,6 @@ const goToNotifications = () => {
   background: transparent;
 
   text-decoration: none;
-
   cursor: pointer;
 
   -webkit-tap-highlight-color: transparent;

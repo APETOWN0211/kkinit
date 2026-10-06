@@ -29,16 +29,23 @@ export interface FeedPost {
   reposts: number
   isLiked?: boolean
   isReposted?: boolean
+  isBookmarked?: boolean
 }
 
 const props = defineProps<{
   post: FeedPost
   activeTab?: 'nearby' | 'following'
   isOwnPost?: boolean
+  /*
+   * Figma 3:170 Home 에는 action row 에 bookmark 가 없다.
+   * 다른 화면에서 재사용할 수 있도록 기본값만 켜고 Home 은 끈다.
+   */
+  showBookmark?: boolean
 }>()
 
 const isLiked = ref(props.post.isLiked ?? false)
 const isReposted = ref(props.post.isReposted ?? false)
+const isBookmarked = ref(props.post.isBookmarked ?? false)
 const isFollowing = ref(props.post.author.isFollowing ?? false)
 const isFollowAnimating = ref(false)
 
@@ -58,6 +65,10 @@ const toggleLike = () => {
 
 const toggleRepost = () => {
   isReposted.value = !isReposted.value
+}
+
+const toggleBookmark = () => {
+  isBookmarked.value = !isBookmarked.value
 }
 
 const toggleFollow = () => {
@@ -80,6 +91,12 @@ const formatCount = (count: number): string => {
   }
   return count.toString()
 }
+
+/*
+ * 3장 이상일 때만 가로 scroll 컨테이너를 쓴다.
+ * 1장 / 2장은 Figma 와 동일하게 고정 레이아웃으로 렌더링한다.
+ */
+const hasOverflowMedia = computed(() => props.post.images.length > 2)
 </script>
 
 <template>
@@ -155,23 +172,11 @@ const formatCount = (count: number): string => {
 
       <div v-if="post.images.length > 0" class="post-media">
         <!--
-          Figma 41:1897:
-          - 2장: 146 × 208 × 2, gap 10, radius 12
-          - 1장: 298 × 208 × 1, radius 12
+          Figma 3:170 › 3:197 (2장):
+          container 318 wide, pt 4, image 146 × 208, gap 10, radius 12.
         -->
         <div
-          v-if="post.images.length === 1"
-          class="media-single"
-        >
-          <img
-            :src="post.images[0]"
-            :alt="`게시물 사진`"
-            class="media-image"
-          />
-        </div>
-
-        <div
-          v-else
+          v-if="!hasOverflowMedia && post.images.length >= 2"
           class="media-pair"
         >
           <div
@@ -188,18 +193,32 @@ const formatCount = (count: number): string => {
         </div>
 
         <!--
-          3장 이상은 Figma 디자인에 없는 케이스지만
-          기존 horizontal scroll 기능을 유지한다.
+          Figma 3:170 › 3:259 (1장):
+          container 318 wide, pt 4, image 298 × 208, radius 12.
         -->
-        <div v-if="post.images.length > 2" class="media-scroll">
+        <div
+          v-else-if="!hasOverflowMedia"
+          class="media-single"
+        >
+          <img
+            :src="post.images[0]"
+            alt="게시물 사진"
+            class="media-image"
+          />
+        </div>
+
+        <!--
+          3장 이상은 Figma 에 없는 케이스지만 기존 horizontal scroll 을 유지한다.
+        -->
+        <div v-else class="media-scroll">
           <div
-            v-for="(image, imgIndex) in post.images.slice(2)"
+            v-for="(image, imgIndex) in post.images"
             :key="`s-${imgIndex}`"
             class="media-scroll-item"
           >
             <img
               :src="image"
-              :alt="`게시물 사진 ${imgIndex + 3}`"
+              :alt="`게시물 사진 ${imgIndex + 1}`"
               class="media-image"
             />
           </div>
@@ -248,6 +267,19 @@ const formatCount = (count: number): string => {
           />
           <span class="action-count">{{ formatCount(displayedReposts) }}</span>
         </button>
+
+        <button
+          v-if="showBookmark"
+          type="button"
+          class="action-pill bookmark-pill"
+          :class="{ 'bookmark-pill--active': isBookmarked }"
+          :aria-pressed="isBookmarked"
+          :aria-label="isBookmarked ? '저장 취소' : '저장'"
+          @click="toggleBookmark"
+        >
+          <span class="bookmark-icon" aria-hidden="true">★</span>
+          <span class="action-count">{{ isBookmarked ? '저장됨' : '저장' }}</span>
+        </button>
       </footer>
     </div>
   </article>
@@ -255,29 +287,38 @@ const formatCount = (count: number): string => {
 
 <style scoped>
 /*
- * FeedPost — Figma 41:1897 source of truth.
+ * FeedPost — Figma node 3:170 (홈 - 메인) source of truth.
  *
- * Figma spec:
- *  - post row: w 390, padding 20 left/right (좌 inset), 12 top/bottom
- *  - avatar 42 × 42 (rounded full)
- *  - gap avatar ↔ content = 10
- *  - header row: 38 high, more button is 38×38 circle, #F5F6F8 bg
- *  - body font 16 (Pretendard Medium), color #191919
- *  - chip 16 SemiBold, padding 2/7, radius 7
- *  - image: 146 × 208 × 2 (gap 10) | 298 × 208 × 1, radius 12
- *  - action pill: 38 high, padding 13.875 x, radius 1155, gap 6.938
- *  - icon 14 × 14, count 15 Regular color #73787E
- *  - pill bg: #F5F6F8 (inactive), like active = rgba(235, 73, 64, 0.1)
- *  - divider: full width, #E2E2E2 1px top
+ * Post 1 (3:173)
+ *  - row 3:173  : w 390, gap 10, px 20, py 12
+ *  - avatar     : 42 × 42, rounded full
+ *  - content 3:176 : x 72, w 318, py 12 → h 370
+ *      header 38 / body 58 / media pt 4 + 208 / actions 38
+ *      → 38 + 12(gap) + 58 + 12 + 212 + 12 + 38 = 382 ≈ 370 (Figma overlaps media pt)
+ *  - header 3:178 : h 38, more 38 × 38 at x 260 (right edge 298 = 318 - 20 pr)
+ *  - name 18 SemiBold #191919 / dot 3 / time 14 Regular #9F9A9A
+ *  - body 3:184 : gap 6, text 16 Medium, chip px 7 py 2 radius 7
+ *  - media 3:197: pt 4, 146 × 208, gap 10, radius 12
+ *  - actions     : gap 10, pill h 38, px 13.875, radius 1155, icon 14, gap 6.938
+ *
+ * Divider 3:204 / 3:236
+ *  - Figma 은 divider 를 post frame 자체의 border-top 으로 둔다.
+ *    첫 post 3:173 에는 border 가 없다.
+ *  - Home 은 별도 divider element 없이 이 규칙을 그대로 사용한다.
  */
 .feed-post {
   display: flex;
   gap: 10px;
+
   width: 100%;
+
   padding: 12px var(--page-padding);
+
   box-sizing: border-box;
+
   background: var(--color-background);
-  border-top: 1px solid #E2E2E2;
+
+  border-top: 1px solid var(--color-divider);
 }
 
 .feed-post:first-child {
@@ -290,6 +331,7 @@ const formatCount = (count: number): string => {
 
 .avatar-wrapper {
   position: relative;
+
   width: 42px;
   height: 42px;
 }
@@ -297,8 +339,11 @@ const formatCount = (count: number): string => {
 .avatar {
   width: 42px;
   height: 42px;
+
   border-radius: 999px;
+
   overflow: hidden;
+
   background: #F5F6F8;
 }
 
@@ -306,6 +351,7 @@ const formatCount = (count: number): string => {
   display: block;
   width: 100%;
   height: 100%;
+
   object-fit: cover;
 }
 
@@ -316,17 +362,24 @@ const formatCount = (count: number): string => {
   position: absolute;
   bottom: -2px;
   right: -2px;
+
   width: 18px;
   height: 18px;
+
   padding: 0;
+
   border: 2px solid var(--color-background);
   border-radius: 20px;
+
   background: #699df9;
+
   cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+
   transition: background-color 140ms ease, transform 120ms ease;
 }
 
@@ -346,6 +399,7 @@ const formatCount = (count: number): string => {
   display: flex;
   align-items: center;
   justify-content: center;
+
   width: 8px;
   height: 8px;
 }
@@ -372,18 +426,19 @@ const formatCount = (count: number): string => {
 }
 
 /* =========================
-   Post content column
+   Post content column — 3:176
    ========================= */
 .post-content {
   flex: 1;
   min-width: 0;
+
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
 /* =========================
-   Header (nickname · time · more)
+   Header (nickname · time · more) — 3:178
    ========================= */
 .post-header {
   position: relative;
@@ -409,26 +464,35 @@ const formatCount = (count: number): string => {
   font-size: 18px;
   font-weight: 600;
   line-height: 1.2;
+
   color: var(--color-text-primary);
+
   letter-spacing: -0.36px;
 }
 
 .dot {
   display: inline-block;
+  flex-shrink: 0;
+
   width: 3px;
   height: 3px;
+
   border-radius: 50%;
-  background: #C7C3C3;
+
+  background: var(--color-text-muted);
 }
 
 .post-time {
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
+
   color: var(--color-text-muted);
+
   letter-spacing: -0.28px;
 }
 
+/* Figma 3:41: 38 × 38 circle, #F5F6F8, ri:more-fill 22 (8px inset) */
 .more-button {
   flex-shrink: 0;
 
@@ -474,7 +538,7 @@ const formatCount = (count: number): string => {
 }
 
 /* =========================
-   Body text + chips
+   Body text + chips — 3:184
    ========================= */
 .post-body {
   display: flex;
@@ -499,7 +563,9 @@ const formatCount = (count: number): string => {
   font-size: 16px;
   font-weight: 500;
   line-height: 1.4;
+
   color: var(--color-text-primary);
+
   letter-spacing: -0.32px;
 }
 
@@ -520,7 +586,9 @@ const formatCount = (count: number): string => {
   font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
+
   letter-spacing: -0.32px;
+
   text-align: center;
   white-space: nowrap;
 }
@@ -536,7 +604,7 @@ const formatCount = (count: number): string => {
 }
 
 .chip--teal {
-  background: #55C7AE;
+  background: var(--color-chip-teal);
   color: var(--color-text-on-primary);
 }
 
@@ -546,70 +614,72 @@ const formatCount = (count: number): string => {
 }
 
 /* =========================
-   Media (single / pair / scroll)
+   Media — 3:197 / 3:259
    ========================= */
 .post-media {
   display: flex;
   flex-direction: column;
   gap: 10px;
+
+  /* Figma media row 는 pt 4 */
+  padding-top: 4px;
 }
 
-.media-single {
+.media-image {
+  display: block;
   width: 100%;
+  height: 100%;
+
+  object-fit: cover;
 }
 
+/*
+ * Figma 3:198 / 3:199: 146 × 208, gap 10, radius 12.
+ * content column 폭 = 390 - 20(px left) - 42(avatar) - 10(gap) - 20(px right) = 318.
+ * 146 + 10 + 146 = 302 → 318 - 302 = 16 이 남는다(Figma 의도, 공백 유지).
+ */
 .media-pair {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.media-item {
-  flex: 0 0 36px;
-  width: 36px;
-  height: 36px;
+.media-pair .media-item {
+  flex: 0 0 146px;
+  width: 146px;
+  height: 208px;
+
   border-radius: 12px;
+
   overflow: hidden;
+
   background: #F5F6F8;
 }
 
-/*
- * Figma: 146 × 208 × 2.
- * 위/아래 padding 12, page padding 20, content row 의 우측 padding 0.
- * 컨테이너 폭 = 390 - 42(avatar) - 10(gap) - 20(right inset) - 12
- *            = 306. 미디어 폭 = (306 - 10) / 2 = 148.
- * 시각적으로 146 에 가깝게 미세 조정한다.
- */
-.media-pair .media-item {
-  flex: 1 1 0;
-  width: auto;
+/* Figma 3:260: 298 × 208, radius 12 */
+.media-single {
+  width: 298px;
+  max-width: 100%;
+
   height: 208px;
+
   border-radius: 12px;
+
+  overflow: hidden;
+
+  background: #F5F6F8;
 }
 
-/*
- * Figma: 298 × 208 × 1
- */
-.media-single .media-image,
-.media-pair .media-image {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.media-single .media-image {
-  height: 208px;
-  border-radius: 12px;
-}
-
-/* 기존 horizontal scroll 기능 유지 */
+/* 기존 horizontal scroll 기능 유지 (3장 이상) */
 .media-scroll {
   display: flex;
   flex-wrap: nowrap;
+
   gap: 10px;
+
   overflow-x: auto;
   overflow-y: hidden;
+
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -619,21 +689,19 @@ const formatCount = (count: number): string => {
 }
 
 .media-scroll-item {
-  flex: 0 0 180px;
-  width: 180px;
-  height: 240px;
-  border-radius: var(--radius-md);
+  flex: 0 0 146px;
+  width: 146px;
+  height: 208px;
+
+  border-radius: 12px;
+
   overflow: hidden;
+
   background: #F5F6F8;
 }
 
-.media-scroll-item .media-image {
-  width: 100%;
-  height: 100%;
-}
-
 /* =========================
-   Action pills (heart / comment / repost)
+   Action pills — 3:200
    ========================= */
 .post-actions {
   display: flex;
@@ -648,7 +716,7 @@ const formatCount = (count: number): string => {
 
   height: 38px;
 
-  padding: 11.5px 14px;
+  padding: 0 13.875px;
 
   border: 0;
   border-radius: 999px;
@@ -666,29 +734,42 @@ const formatCount = (count: number): string => {
   transform: scale(0.97);
 }
 
+/* Figma 12:248 Variant2 — heart active.
+ * background = linear-gradient(rgba(235,73,64,0.1), rgba(235,73,64,0.1)) + #F5F6F8
+ * → 단색 약 0.1 alpha 의 red tint 와 시각적으로 같다.
+ */
 .like-pill--active {
-  background-image: linear-gradient(90deg, rgba(235, 73, 64, 0.1), rgba(235, 73, 64, 0.1));
+  background: rgba(235, 73, 64, 0.1);
 }
 
 /*
- * Repost active.
- *  - Figma 의 repost 는 별도 active variant 가 없지만,
- *    디자인 의도상 heart Variant2 와 동일한 톤으로 active 표시.
- *  - 배경: rgba(235, 73, 64, 0.1) + #F5F6F8 linear-gradient
- *  - icon: 검정 stroke (#191919)
- *  - count: 검정 텍스트
+ * Figma 12:268 Variant2 — repost active.
+ * background = linear-gradient(rgba(85,199,174,0.1), rgba(85,199,174,0.1)) + #F5F6F8
+ *   → 단색 약 0.1 alpha 의 mint tint.
+ * 텍스트 색도 Figma 12:286 대로 #55c7ae 로 변경한다.
  */
 .repost-pill--active {
-  background-image: linear-gradient(90deg, rgba(235, 73, 64, 0.1), rgba(235, 73, 64, 0.1));
+  background: rgba(85, 199, 174, 0.1);
 }
 
 .repost-pill--active .action-count {
-  color: #191919;
+  color: var(--color-chip-teal);
 }
 
+.bookmark-pill--active {
+  background: var(--color-chip-lime);
+}
+
+.bookmark-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* Figma: icon box 14 × 14 */
 .action-icon,
 .like-icon,
-.repost-icon {
+.repost-icon,
+.bookmark-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -707,15 +788,22 @@ const formatCount = (count: number): string => {
   height: 14px;
 }
 
+/* Figma 12:248/257/268 — count 텍스트
+ *  - font-size 15.031, line-height 1.156
+ *  - Pretendard Regular, color #73787E (default) / #55c7ae (repost active)
+ *  - gap: icon 14 → gap 6.938 → count
+ */
 .action-count {
   display: inline-block;
 
-  margin-left: 6.94px;
+  margin-left: 6.938px;
 
-  font-size: 15px;
+  font-size: 15.031px;
   font-weight: 400;
-  line-height: 1.16;
+  line-height: 1.156;
+
   color: #73787E;
+
   letter-spacing: -0.3px;
 }
 
@@ -741,9 +829,24 @@ const formatCount = (count: number): string => {
   animation: like-unlike 180ms ease forwards;
 }
 
-/* Repost active fill */
+/*
+ * Figma 12:268 Variant2 — repost active icon.
+ * active 시:
+ *  1) icon 을 horizontal flip (Figma variant2 의 좌우 반전 표현)
+ *  2) icon stroke 를 mint(#55c7ae) 로 덮어쓴다
+ *  3) flip 은 자연스러운 모션으로 부드럽게 전환 (cubic-bezier easing)
+ */
+.repost-icon {
+  transform-origin: 50% 50%;
+  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.repost-pill--active .repost-icon {
+  transform: scaleX(-1);
+}
+
 .repost-icon--active :deep(path) {
-  stroke: var(--color-text-primary) !important;
+  stroke: var(--color-chip-teal) !important;
 }
 
 /* =========================

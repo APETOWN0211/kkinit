@@ -79,7 +79,7 @@ interface Conversation {
   lastMessage: string
   time: string
   unreadCount?: number
-  badgeColor?: 'orange' | 'lime'
+  badgeColor?: 'orange' | 'teal'
   muted?: boolean
 }
 
@@ -119,7 +119,7 @@ const conversations: Conversation[] = [
     lastMessage: '오늘 모임 너무 재미있었습니다!',
     time: '어제',
     unreadCount: 2,
-    badgeColor: 'lime'
+    badgeColor: 'teal'
   },
   {
     id: 'c4',
@@ -157,7 +157,7 @@ const conversations: Conversation[] = [
     avatar: '/images/chat/profile-ominsu-3.png',
     ring: 'gray',
     lastMessage: '안녕하세요! 마포구에서 만두집을 운영중인',
-    time: '한달 전'
+    time: '1달 전'
   },
   {
     id: 'c8',
@@ -191,7 +191,7 @@ const conversations: Conversation[] = [
     lastMessage: '여기 진짜 맛있어요 추천!',
     time: '오늘',
     unreadCount: 3,
-    badgeColor: 'lime'
+    badgeColor: 'teal'
   },
   {
     id: 'c11',
@@ -289,7 +289,7 @@ const conversations: Conversation[] = [
     lastMessage: '이번 주 토요일 북한산 어때요?',
     time: '2주 전',
     unreadCount: 1,
-    badgeColor: 'lime'
+    badgeColor: 'teal'
   },
   {
     id: 'c20',
@@ -340,22 +340,32 @@ const filteredConversations = computed(() => {
 
 <style scoped>
 /*
- * Desktop preview 에서는 Figma 의 iPhone status bar 영역을
- * 인위적으로 만들지 않는다.
- * 실제 iPhone/PWA 에서만 env(safe-area-inset-top) 이
- * 0 이 아닌 값을 반환하며, 이때만 위쪽 여백이 생긴다.
+ * /chat (Figma 11:244)
+ *  - 배경: #FAFAFA (--color-background)
+ *  - desktop preview 에서도 status bar 를 흉내내지 않는다.
+ *  - 실제 iPhone/PWA 에서만 env(safe-area-inset-top) 으로 노치 영역 확보.
+ *  - floating BottomNavigation 아래로 마지막 row 가 가려지지 않도록
+ *    page padding-bottom (app.vue 의 app-content--with-bottom-nav) +
+ *    본 페이지의 추가 여유분으로 확보.
  */
 .chat-page {
   width: 100%;
   min-height: 100%;
   background: var(--color-background);
-  padding-top: 0;
 }
 
 .chat-scroll {
   display: flex;
   flex-direction: column;
   width: 100%;
+  /*
+    * Floating nav (Figma 3:266) 가 nav 자체 padding-bottom:
+    *   safe-area + 25px 만큼 띄워져 있다.
+    * app-content 는 이미 nav height + 24px 만큼 padding-bottom 을
+    * 갖지만, nav 가 fixed 라 마지막 row 의 time 영역은 nav 위에 정확히
+    * 걸쳐도 자연스럽다. 본 page 에서는 추가 padding 을 두지 않는다.
+    */
+  padding-bottom: 0;
 }
 
 .filter-area {

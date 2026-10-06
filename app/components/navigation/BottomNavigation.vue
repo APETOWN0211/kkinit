@@ -60,12 +60,10 @@ const setActive = (id: string) => {
 
 <style scoped>
 /*
- * Figma 41:1897 — 네비게이션-글작성 (네비게이션 바)
- *  - 위치: 가운데 정렬 (left 50%, translate-x-1/2)
- *  - top: 763 (홈 frame 1345h, FAB top 762, home indicator ~ 8px from bottom)
- *  - padding: 20 × 14, gap: 18
- *  - height: 28 + 28 = 56
- *  - icon: 28 × 28
+ * Figma 3:266 (네비게이션) — 홈 하단 floating nav
+ *  - 위치: viewport 중앙 정렬 (left 50%, translate-x-1/2)
+ *  - 크기: 206 × 56  (px 20, py 14, gap 18, icon 28 × 4)
+ *  - top 763 → 하단에서 25px 위 (홈바 바로 위)
  *  - radius: 999 (full pill)
  *  - background: #1B1F22
  *  - shadow: 0 4 16 0 rgba(0,0,0,0.18)
@@ -86,10 +84,17 @@ const setActive = (id: string) => {
   pointer-events: none;
 
   /*
-   * Nav 와 FAB 모두를 포함한다.
-   * 실제 iPhone safe-area + Figma bottom offset (≈8px).
+   * Figma 3:266: nav 206 × 56, top 763
+   *   → 844 - 763 - 56 = 25 (viewport 하단에서 25px 위)
+   *
+   * 3:265 홈바(top 823) 바로 위(4px)에 nav 아래단이 오도록 맞춘 값.
+   * 실제 iPhone safe-area 는 env() 로 더한다.
    */
-  padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 25px);
+}
+
+.floating-bottom-nav::before {
+  content: none;
 }
 
 .floating-bottom-nav__capsule {

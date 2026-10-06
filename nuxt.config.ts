@@ -37,7 +37,14 @@ export default defineNuxtConfig({
       orientation: 'portrait',
       start_url: '/',
       scope: '/',
-      background_color: '#FAFAFA',
+      // PWA launch window 배경. 앱이 첫 프레임을 그리기 전에 보이는 색이라
+      // Figma 1:178 splash orange(#FF6940) 로 맞춰 흰색 flash 를 없앤다.
+      //
+      // theme_color 는 여기서 바꾸지 않는다. manifest 의 theme_color 는 앱
+      // 전역 기본값이라 orange 로 고정하면 route 별 theme-color 정책
+      // (Home #FAFAFA / My #FF6940 / Notifications #F3F4F6) 과 충돌한다.
+      // 실제 상태줄 색은 실행 중 <meta name="theme-color"> 가 route 별로 덮어쓴다.
+      background_color: '#FF6940',
       theme_color: '#FAFAFA',
     },
     workbox: {

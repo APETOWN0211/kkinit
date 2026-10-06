@@ -64,6 +64,21 @@ const select = (value: ChatFilter) => {
 <template>
   <div class="filter-wrapper">
     <div class="filter-container">
+      <!--
+        Figma 11:305 — 묶음 (filter container)
+          - width 362 (= 390 - 14 × 2), 위치 left 14, top 206
+          - padding 3px, radius 296px (full pill)
+          - shadow 0 4 18.9 rgba(0,0,0,0.09)
+          - 배경: 화이트 + mix-blend 다층. 본 구현에서는 단색 #FFFFFF 사용.
+      -->
+
+      <!--
+        Active pill (Figma 11:302)
+          - bg #55C7AE (chip-teal)
+          - height 35, radius 20
+          - 좌측 3px padding 안에서 활성화된 tab 의 offsetLeft/offsetWidth 로
+          translate3d + width 만 변경 (GPU friendly).
+      -->
       <span
         class="filter-active-pill"
         :style="pillStyle"
@@ -104,7 +119,7 @@ const select = (value: ChatFilter) => {
         <span class="filter-tab__label">모임</span>
         <span
           v-if="groupCount > 0"
-          class="filter-tab__mark filter-tab__mark--lime"
+          class="filter-tab__mark filter-tab__mark--teal"
         >{{ groupCount }}</span>
       </button>
     </div>
@@ -120,17 +135,13 @@ const select = (value: ChatFilter) => {
   box-sizing: border-box;
 }
 
-/*
- * Figma filter-container 외관은 white 기반 블렌드 레이어 합성.
- * 요구사항에 따라 단색 background 로 명시한다.
- */
 .filter-container {
   position: relative;
   display: flex;
   align-items: center;
   width: 100%;
-  height: 44px;
-  padding: 4px;
+  height: 41px; /* padding 3 × 2 + pill height 35 */
+  padding: 3px;
   background: #FFFFFF;
   border-radius: 296px;
   box-shadow: 0 4px 18.9px rgba(0, 0, 0, 0.09);
@@ -139,17 +150,19 @@ const select = (value: ChatFilter) => {
 }
 
 /*
- * 오렌지 active indicator. 버튼 아래에 깔리고,
- * 현재 선택된 tab 의 offsetLeft/offsetWidth 로
- * translate3d + width 만 GPU friendly 하게 변한다.
+ * Active indicator: Figma 11:302 (1번 pill)
+ *  - top 3, left 3, height 35
+ *  - width 는 측정된 active tab 의 폭
+ *  - bg --color-chip-teal (#55C7AE)
+ *  - radius 20
  */
 .filter-active-pill {
   position: absolute;
-  top: 4px;
+  top: 3px;
   left: 0;
-  height: 36px;
-  background: #FE5531;
-  border-radius: 24px;
+  height: 35px;
+  background: var(--color-chip-teal);
+  border-radius: 20px;
   z-index: 0;
   pointer-events: none;
   transition:
@@ -163,15 +176,15 @@ const select = (value: ChatFilter) => {
   z-index: 1;
   flex: 1 1 0;
   min-width: 0;
-  height: 36px;
+  height: 35px;
   padding: 0 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   background: transparent;
   border: none;
-  border-radius: 24px;
+  border-radius: 20px;
   cursor: pointer;
   white-space: nowrap;
   transition: transform 110ms ease;
@@ -181,41 +194,59 @@ const select = (value: ChatFilter) => {
   transform: scale(0.97);
 }
 
+/*
+ * Figma 11:303 / 11:304 (2, 3번)
+ *  - inactive: 글자 Pretendard Medium 16, color #191919
+ *  - active:   SemiBold 16, color #FFFFFF
+ */
 .filter-tab__label {
   font-size: 16px;
-  font-weight: 600;
-  line-height: 20px;
+  font-weight: 500;
+  line-height: 18px;
   color: #191919;
-  letter-spacing: -0.4px;
-  transition: color 180ms ease;
+  letter-spacing: -0.08px;
+  transition: color 180ms ease, font-weight 180ms ease;
 }
 
 .filter-tab--active .filter-tab__label {
   color: #FFFFFF;
+  font-weight: 600;
 }
 
+/*
+ * Figma 11:303 (안읽음 Mark): bg #E9E9E9, color #4D5160
+ * Figma 11:304 (모임 Mark):    bg #55C7AE, color #FFFFFF
+ *
+ * 두 마크 모두 동일 형태:
+ *  - padding 0 4, min-width 18, max-width 34
+ *  - height 18, radius 23
+ *  - font 14 Regular
+ */
 .filter-tab__mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 999px;
+  min-width: 18px;
+  max-width: 34px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 23px;
   font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-  letter-spacing: -0.2px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: -0.08px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .filter-tab__mark--gray {
-  background: var(--color-chip-gray);
-  color: var(--color-chip-gray-text);
+  background: #E9E9E9;
+  color: #4D5160;
 }
 
-.filter-tab__mark--lime {
-  background: var(--color-chip-lime);
-  color: var(--color-text-primary);
+.filter-tab__mark--teal {
+  background: var(--color-chip-teal);
+  color: #FFFFFF;
 }
 </style>
