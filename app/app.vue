@@ -42,6 +42,10 @@ const themeColor = computed(() => {
     // theme-color 도 white 가 맞다.
     return '#FFFFFF'
   }
+  if (route.path === '/history') {
+    // Figma 22:906 — 최상단 background = #F3F4F6.
+    return '#F3F4F6'
+  }
   if (route.path.startsWith('/notifications')) {
     return '#F3F4F6'
   }

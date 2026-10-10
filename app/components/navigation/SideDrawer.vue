@@ -46,7 +46,7 @@ const handleArchive = () => {
 
 const handleHistory = () => {
   emit('close')
-  // 방문기록 라우트
+  router.push('/history')
 }
 
 const handleSettings = () => {

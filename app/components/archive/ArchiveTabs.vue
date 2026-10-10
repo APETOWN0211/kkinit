@@ -13,10 +13,12 @@ import tabUnderline from '~/assets/icons/explore/tab-underline.svg?raw'
  *    underline 이 활성 탭의 전체 width 를 차지한다.
  *  - 한 element 만 translate3d 로 좌우 이동 (이야기 ↔ 장소).
  *
- *  Figma 의 tabs 가 2 flex-1 + gap 20 이므로 각 탭 width = (100% - 20px) / 2.
- *  - 이야기: indicator left 0, width 50% (= tab width)
- *  - 장소  : indicator left 0, width 50%, translateX calc(100% + 20px)
- *            (= 우측 탭의 시작 위치)
+ * viewport 390px 기준 (.archive-tabs padding 20 20):
+ *  - inner area = 350px, 각 indicator = 175px (= 50%)
+ *  - story: indicator 가 viewport 20–195
+ *  - place: indicator 가 viewport 195–370  (우측 20px inset)
+ *  - translateX 100% 만으로 inner area 의 절반 너머로 이동.
+ *    + 20px 가 들어가면 track 우측 padding edge 를 20px 넘어 viewport 끝까지 붙음.
  */
 
 export type ArchiveTab = 'story' | 'place'
@@ -31,7 +33,7 @@ const emit = defineEmits<{
 
 const indicatorTransform = computed(() => {
   return props.modelValue === 'place'
-    ? 'translate3d(calc(100% + 20px), 0, 0)'
+    ? 'translate3d(calc(100%), 0, 0)'
     : 'translate3d(0, 0, 0)'
 })
 
@@ -118,18 +120,15 @@ const labels: Record<ArchiveTab, string> = {
 }
 
 /*
- * Figma 의 imgLine41 (32×4, stroke #FF6940 4px) 를 tab 영역의 1/2 width 로 stretch.
- * 한 element 만 translateX 0% ↔ 100% 로 좌우 이동한다.
- *  - 0% = 이야기 (left: 0)
- *  - 100% = 장소 (left: 50% + gap 20px의 절반만큼 이동 필요하지만,
- *    Figma 의 underline 이 탭 container 의 w-full 기준이고 우리는
- *    track 의 1/2 width 라 100% = track 의 정확히 절반 너머로 이동)
- * Figma 의 tabs 가 2 flex-1 + gap 20 이므로 각 탭 width = (100% - 20px) / 2.
- * track width = 100%, indicator width = 50%, gap 20 만큼 story→place 이동 시
- * 우측으로 (100% + 20px) 이동해야 한다. → translateX 100% 가 약간 부족.
+ * Indicator = 두 viewport 20px inset 안의 inner area (= 350px) 에서
+ * 175px 너비(= 50%) 의 단일 element. translateX 0 ↔ 100% 로 좌우 이동.
+ *  - 0%   = track 좌측 edge → viewport 20 – 195 (story)
+ *  - 100% = track 좌측 + 175px → viewport 195 – 370 (place, 우측 20px inset)
  *
- * 100% = 50% (indicator width), 100% + 20px = 50% + 20px.
- * gap 만큼 더 가려면 translateX calc(100% + 20px) 사용.
+ * width 50% 는 inner area 의 절반. button 의 flex-1 1/2 + gap 20 은 button box
+ * 안에서만 적용되며 indicator 는 그 시각적 영역을 따라가지 않으므로
+ * + 20px 보정 없이 translateX 100% 만으로 양쪽 indicator 가 정확히 20px inset 안에
+ * 175px씩 채운다.
  */
 .archive-tabs__indicator {
   position: absolute;
