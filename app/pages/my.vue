@@ -13,6 +13,15 @@ import MyBadgeGrid from '~/components/my/MyBadgeGrid.vue'
 import FeedPost from '~/components/feed/FeedPost.vue'
 import type { FeedPost as FeedPostType } from '~/components/feed/FeedPost.vue'
 
+const { safeNavigate } = useSafeNavigation()
+
+/*
+ * 프로필 편집 route 가 아직 없다면 그대로 stay.
+ */
+const onEditProfile = () => {
+  safeNavigate('/profile/edit')
+}
+
 const activeTab = ref<MyTab>('feed')
 
 /* =========================
@@ -198,7 +207,7 @@ const badges = [
       프로필 편집 + Feed/Repost/Badge 탭.
       프로필 편집은 Figma 18:567/753/772 의 full-width button.
     -->
-    <MyContentTabs v-model="activeTab" />
+    <MyContentTabs v-model="activeTab" @edit="onEditProfile" />
 
     <!--
       Tab content.

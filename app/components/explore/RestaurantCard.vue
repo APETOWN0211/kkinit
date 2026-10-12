@@ -1,21 +1,15 @@
 <script setup lang="ts">
 /*
- * Restaurant Card — Figma 8:422 / 8:455 / 8:486 (탐색 - 메인)
+ * Restaurant Card — Figma 30:1079 / 30:1063 (탐색 - 메인, 최신)
  *  - 220 × 270, radius 16, border 1 #DBDBDB, shadow 0 1 8.2 rgba(0,0,0,0.04)
- *  - top image 218 × 128
- *  - body 218 × 141, padding 18 / 14 / 10, gap 10
- *  - badge 8:450 / 8:483 / 8:514: absolute left 11.5, top 113,
- *    padding 6 / 8, radius 8, gap 6, h 25
+ *  - top image 218 × 128 (object-fit: cover)
+ *  - body: padding 18 top / 14 x / 10 bottom, gap 10, height: auto (normal flow)
+ *  - badge: absolute left 11.5, top 113
  *
- * node 8:404 의 정확한 좌표:
- *  - card  x 20,  y 0    (track 안에서)
- *  - image  x 1,   y 1    → 218 × 128
- *  - body   x 1,   y 129  → 218 × 141
- *  - location row  y 18 (card 기준)  → 12px, h 20 (bookmark row height)
- *  - name         y 41
- *  - info row     y 72
- *  - divider      y 98
- *  - amenities    y 108, h 18
+ * 중요 (수정 사항):
+ *  - 카드 내부 콘텐츠는 normal flow 로 배치 → 어떤 row 도 잘리지 않음
+ *  - 모든 icon wrapper 는 정사각형 visual frame + flex-shrink:0 유지
+ *  - 카드 자체는 flex: 0 0 220px + min-width 220px 로 carousel 에서 압축되지 않음
  */
 import bookmarkIcon from '~/assets/icons/explore/bookmark.svg?raw'
 import distanceIcon from '~/assets/icons/explore/distance.svg?raw'
@@ -63,116 +57,108 @@ const bookmarkVariant = computed(() => {
 
 <template>
   <article class="restaurant-card">
-    <div class="restaurant-card__inner">
-      <!-- image -->
-      <div class="restaurant-card__image">
-        <img
-          :src="restaurant.image"
-          :alt="restaurant.name"
-          loading="lazy"
-        />
+    <!-- image -->
+    <div class="restaurant-card__image">
+      <img
+        :src="restaurant.image"
+        :alt="restaurant.name"
+        loading="lazy"
+      />
+    </div>
+
+    <!-- body (normal flow) -->
+    <div class="restaurant-card__body">
+      <!-- category row: location + bookmark -->
+      <div class="restaurant-card__top">
+        <p class="restaurant-card__location">{{ restaurant.location }}</p>
+        <button
+          type="button"
+          class="restaurant-card__bookmark"
+          :aria-label="isSaved ? '저장 취소' : '저장'"
+          :aria-pressed="isSaved"
+          @click="onBookmarkClick"
+        >
+          <span class="restaurant-card__bookmark-icon" v-html="bookmarkIcon" />
+        </button>
       </div>
 
-      <!-- body -->
-      <div class="restaurant-card__body">
-        <div class="restaurant-card__top">
-          <p class="restaurant-card__location">{{ restaurant.location }}</p>
-          <button
-            type="button"
-            class="restaurant-card__bookmark"
-            :aria-label="isSaved ? '저장 취소' : '저장'"
-            :aria-pressed="isSaved"
-            @click="onBookmarkClick"
-          >
-            <span class="restaurant-card__bookmark-icon" v-html="bookmarkIcon" />
-          </button>
-        </div>
+      <!-- title -->
+      <p class="restaurant-card__name">{{ restaurant.name }}</p>
 
-        <p class="restaurant-card__name">{{ restaurant.name }}</p>
+      <!-- meta: distance + hours -->
+      <div class="restaurant-card__info">
+        <span class="restaurant-card__info-item">
+          <span class="restaurant-card__info-icon restaurant-card__info-icon--distance" v-html="distanceIcon" />
+          <span class="restaurant-card__info-text">{{ restaurant.distance }}</span>
+        </span>
+        <span class="restaurant-card__info-item">
+          <span class="restaurant-card__info-icon restaurant-card__info-icon--time" v-html="timeIcon" />
+          <span class="restaurant-card__info-text">{{ restaurant.hours }}</span>
+        </span>
+      </div>
 
-        <div class="restaurant-card__info">
-          <span class="restaurant-card__info-item">
-            <span class="restaurant-card__info-icon" v-html="distanceIcon" />
-            <span>{{ restaurant.distance }}</span>
-          </span>
-          <span class="restaurant-card__info-item">
-            <span class="restaurant-card__info-icon" v-html="timeIcon" />
-            <span>{{ restaurant.hours }}</span>
-          </span>
-        </div>
+      <!-- divider -->
+      <div class="restaurant-card__divider" v-html="dividerIcon" />
 
-        <div class="restaurant-card__divider" v-html="dividerIcon" />
-
-        <div class="restaurant-card__amenities">
-          <span class="restaurant-card__amenities-icon" v-html="amenitiesIcon" />
-          <span class="restaurant-card__amenities-text">{{ restaurant.amenities }}</span>
-        </div>
+      <!-- amenities footer -->
+      <div class="restaurant-card__amenities">
+        <span class="restaurant-card__amenities-icon" v-html="amenitiesIcon" />
+        <span class="restaurant-card__amenities-text">{{ restaurant.amenities }}</span>
       </div>
     </div>
 
-    <!-- badge (outside inner for absolute positioning) -->
+    <!-- badge (outside inner, absolute over image) -->
     <div
       v-if="restaurant.badge"
       class="restaurant-card__badge"
       :class="bookmarkVariant"
     >
-      <span
-        v-if="restaurant.badge.variant === 'solo' || restaurant.badge.variant === 'green'"
-        class="restaurant-card__badge-icon"
-        v-html="restaurant.badge.icon ?? ''"
-      />
-      <span
-        v-else
-        class="restaurant-card__badge-icon"
-        v-html="restaurant.badge.icon ?? ''"
-      />
-      <span>{{ restaurant.badge.label }}</span>
+      <span class="restaurant-card__badge-icon" v-html="restaurant.badge.icon ?? ''" />
+      <span class="restaurant-card__badge-label">{{ restaurant.badge.label }}</span>
     </div>
   </article>
 </template>
 
 <style scoped>
 /*
- * RestaurantCard — Figma 1:1658
+ * RestaurantCard — Figma 30:1079 (탐색 - 메인, 최신)
  *  - 220 × 270, border 1px #DBDBDB, radius 16, shadow 0 1 8.2 rgba(0,0,0,0.04)
  *  - image: 218 × 128 (top)
- *  - body: padding 18 top / 14 x / 10 bottom, gap 10, height 141
+ *  - body: padding 18 top / 14 x / 10 bottom, gap 10, normal flow (height: auto)
  */
 .restaurant-card {
   position: relative;
-  flex: 0 0 auto;
 
+  /* Carousel 에서 절대 압축되지 않도록 명시 */
+  flex: 0 0 220px;
   width: 220px;
-  height: 270px;
+  min-width: 220px;
 
-  flex-shrink: 0;
-}
-
-.restaurant-card__inner {
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: space-between;
-
-  padding-bottom: 18px;
-
+  /* outer surface (border + radius + shadow) */
   border: 1px solid #DBDBDB;
   border-radius: 16px;
   background: #FFFFFF;
   box-shadow: 0 1px 8.2px rgba(0, 0, 0, 0.04);
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  box-sizing: border-box;
+
+  /* overflow 는 카드 자체에는 두지 않음 (badge 가 card border edge 위에 ) */
   overflow: hidden;
 }
 
 .restaurant-card__image {
   position: relative;
 
-  width: 218px;
+  width: 100%;
   height: 128px;
-  overflow: hidden;
   flex-shrink: 0;
+
+  overflow: hidden;
+  background: #F3F4F6;
 }
 
 .restaurant-card__image img {
@@ -188,47 +174,57 @@ const bookmarkVariant = computed(() => {
   align-items: stretch;
   gap: 10px;
 
-  height: 141px;
   padding: 18px 14px 10px;
-  overflow: hidden;
+
+  /* Figma: body height 141 — 하지만 콘텐츠(특히 amenities)가 넘칠 때 잘리지 않도록
+     normal flow + min-height 로 잡고, inner 가 min-width 220 을 보장. */
+  min-height: 141px;
+  flex: 1 1 auto;
 }
 
+/* ----- top row (location + bookmark) ----- */
 .restaurant-card__top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
+  width: 100%;
 }
 
 .restaurant-card__location {
+  margin: 0;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 12px;
   font-weight: 500;
   line-height: normal;
   color: #6E6F72;
+
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .restaurant-card__bookmark {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
 
   /*
-   * Figma 8:429 Vector = 16.842 × 20 (location row 8:427 이 h 20).
-   * 이전 asset 은 13.4 × 15.4 로 더 작았고, 최신 asset 은
-   * 18.8245 × 21.9823 이라 wrapper 를 Figma vector box 에 맞춘다.
+   * Figma 30:1086: bookmark wrapper = 16.842 × 20 (location row h 20).
+   *  -> 명시적 고정 size + flex-shrink:0 으로 줄지 않도록.
    */
   width: 16.842px;
   height: 20px;
+  min-width: 16.842px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: 16.842px;
 
   padding: 0;
   border: 0;
   background: transparent;
 
   cursor: pointer;
-
   -webkit-tap-highlight-color: transparent;
-
-  flex-shrink: 0;
 }
 
 .restaurant-card__bookmark-icon {
@@ -238,6 +234,7 @@ const bookmarkVariant = computed(() => {
 
   width: 16.842px;
   height: 20px;
+  flex-shrink: 0;
 }
 
 .restaurant-card__bookmark-icon :deep(svg) {
@@ -246,19 +243,29 @@ const bookmarkVariant = computed(() => {
   height: 100%;
 }
 
+/* ----- name ----- */
 .restaurant-card__name {
+  margin: 0;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 18px;
   font-weight: 600;
   line-height: normal;
   color: #191919;
   letter-spacing: 0.72px;
+
+  /* 한 줄, 넘치면 ellipsis (Figma: 한 줄) */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* ----- meta row (distance + hours) ----- */
 .restaurant-card__info {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  width: 100%;
 }
 
 .restaurant-card__info-item {
@@ -266,6 +273,27 @@ const bookmarkVariant = computed(() => {
   align-items: center;
   gap: 4px;
   justify-content: center;
+
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+/* distance icon: Figma 30:1090 = 11 × 13 (정사각형 visual frame X — 종횡비 보존) */
+.restaurant-card__info-icon--distance {
+  width: 11px;
+  height: 13px;
+  min-width: 11px;
+  min-height: 13px;
+  flex: 0 0 11px;
+}
+
+/* time icon: Figma 30:1093 = 14 × 14 (정사각형) */
+.restaurant-card__info-icon--time {
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  min-height: 14px;
+  flex: 0 0 14px;
 }
 
 .restaurant-card__info-icon {
@@ -273,37 +301,31 @@ const bookmarkVariant = computed(() => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+
   color: #4D5160;
-}
-
-.restaurant-card__info-item:nth-child(1) .restaurant-card__info-icon {
-  width: 11px;
-  height: 13px;
-}
-
-.restaurant-card__info-item:nth-child(2) .restaurant-card__info-icon {
-  width: 14px;
-  height: 14px;
 }
 
 .restaurant-card__info-icon :deep(svg) {
   display: block;
   width: 100%;
   height: 100%;
+  flex-shrink: 0;
 }
 
-.restaurant-card__info-item > span:last-child {
+.restaurant-card__info-text {
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 13px;
   font-weight: 400;
   line-height: normal;
   color: #4D5160;
+  white-space: nowrap;
 }
 
-.restaurant-card__info-item:nth-child(2) > span:last-child {
+.restaurant-card__info-item:nth-child(2) .restaurant-card__info-text {
   letter-spacing: -0.26px;
 }
 
+/* ----- divider ----- */
 .restaurant-card__divider {
   height: 1px;
   width: 100%;
@@ -317,11 +339,13 @@ const bookmarkVariant = computed(() => {
   height: 1px;
 }
 
+/* ----- amenities footer ----- */
 .restaurant-card__amenities {
   display: flex;
   align-items: center;
   gap: 4px;
-  justify-content: center;
+
+  width: 100%;
 }
 
 .restaurant-card__amenities-icon {
@@ -329,8 +353,12 @@ const bookmarkVariant = computed(() => {
   align-items: center;
   justify-content: center;
 
+  /* Figma 30:1101 / 30:1133 / 30:1164: amenities icon = 18 × 18 */
   width: 18px;
   height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  flex: 0 0 18px;
 
   flex-shrink: 0;
 }
@@ -339,22 +367,27 @@ const bookmarkVariant = computed(() => {
   display: block;
   width: 100%;
   height: 100%;
+  flex-shrink: 0;
 }
 
 .restaurant-card__amenities-text {
+  margin: 0;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 11px;
   font-weight: 400;
   line-height: normal;
   color: #6E6F72;
 
-  width: 168px;
+  flex: 1 1 auto;
+  min-width: 0;
+
+  /* card inner 218 - padding 14x2 - icon 18 - gap 4 = 168px */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Badge — absolute over the card image, Figma top:113 left:11.5 */
+/* ----- Badge (absolute over image, Figma 30:1106 / 30:1138 / 30:1169) ----- */
 .restaurant-card__badge {
   position: absolute;
   top: 113px;
@@ -380,22 +413,37 @@ const bookmarkVariant = computed(() => {
 .restaurant-card__badge--orange .restaurant-card__badge-icon {
   width: 10.001px;
   height: 12px;
+  min-width: 10.001px;
+  flex: 0 0 10.001px;
 }
 
 .restaurant-card__badge--solo .restaurant-card__badge-icon {
   width: 10px;
   height: 12px;
+  min-width: 10px;
+  flex: 0 0 10px;
 }
 
 .restaurant-card__badge--green .restaurant-card__badge-icon {
   width: 8.357px;
   height: 11.62px;
+  min-width: 8.357px;
+  flex: 0 0 8.357px;
 }
 
 .restaurant-card__badge-icon :deep(svg) {
   display: block;
   width: 100%;
   height: 100%;
+  flex-shrink: 0;
+}
+
+.restaurant-card__badge-label {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: normal;
+  white-space: nowrap;
 }
 
 .badge--orange,
@@ -410,18 +458,11 @@ const bookmarkVariant = computed(() => {
 }
 
 /*
- * node 8:514 (오브테이블, 동네 인기):
- *   bg #70DDC5, icon 8.357 × 11.62, text #4D5160 11px Medium
+ * Figma 30:1169 (오브테이블, 동네 인기):
+ *   bg #70DDC5, text #4D5160 11px Medium
  */
 .restaurant-card__badge--green {
   background: #70DDC5;
   color: #4D5160;
-}
-
-.restaurant-card__badge > span:last-child {
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  line-height: normal;
 }
 </style>

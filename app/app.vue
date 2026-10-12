@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppSplash from '~/components/common/AppSplash.vue'
 import SideDrawer from '~/components/navigation/SideDrawer.vue'
+import { useMapSelection } from '~/composables/useMapSelection'
 
 const route = useRoute()
 
@@ -49,6 +50,14 @@ const themeColor = computed(() => {
   if (route.path.startsWith('/notifications')) {
     return '#F3F4F6'
   }
+  if (route.path === '/explore') {
+    // Figma 30:1063 (탐색 - 메인) 최상단 background = #FFFFFF (header 가 white).
+    return '#FFFFFF'
+  }
+  if (route.path === '/map') {
+    // Figma 25:706/25:905 최상단 MAP 영역 = #F9F8F9
+    return '#F9F8F9'
+  }
   if (route.path === '/chat') {
     // Figma 11:244 — 최상단 background = --color-background
     return '#FAFAFA'
@@ -95,14 +104,33 @@ const showBottomNavigation = computed(() =>
 )
 
 /*
+ * Map page 의 selectedPlace state.
+ *
+ * Figma 25:905 (식당 미리보기) 에서는 floating dark BottomNavigation 이
+ * 보이지 않는다. /map 페이지 내부에서 marker 를 선택해
+ * selectedPlace 가 set 되면 nav 를 숨긴다.
+ */
+const { selectedPlace: mapSelectedPlace } = useMapSelection()
+
+const hideBottomNavigationForMapSelection = computed(() =>
+  route.path === '/map' && mapSelectedPlace.value !== null
+)
+
+const showBottomNavigationEffective = computed(() =>
+  showBottomNavigation.value && !hideBottomNavigationForMapSelection.value
+)
+
+/*
  * FAB는 Figma 1:1639 (탐색 - 메인) 기준,
  * 탐색 화면에는 보이지 않는다.
  * 또한 /chat 화면 (Figma 11:244) 에는 FAB 가 없다.
- * Home/Map 에서만 노출.
+ * Figma 의 /map (25:706 / 25:905) 에도 FAB 가 없으므로
+ * /map 에서는 FAB 도 숨긴다.
  */
 const showCreatePostFab = computed(() => {
   if (route.path === '/explore') return false
   if (route.path === '/chat') return false
+  if (route.path === '/map') return false
   return mainTabRoutes.includes(route.path)
 })
 
@@ -301,13 +329,13 @@ const drawerVisible = computed(() => isDrawerOpen.value || isDragging.value)
         <div
           class="app-content"
           :class="{
-            'app-content--with-bottom-nav': showBottomNavigation,
+            'app-content--with-bottom-nav': showBottomNavigationEffective,
             'app-content--no-scroll': isNotificationsPage
           }"
         >
           <NuxtPage :transition="pageTransition" />
         </div>
-        <NavigationBottomNavigation v-if="showBottomNavigation" />
+        <NavigationBottomNavigation v-if="showBottomNavigationEffective" />
         <NavigationCreatePostFab v-if="showCreatePostFab" />
 
         <!--

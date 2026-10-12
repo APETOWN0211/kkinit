@@ -1,13 +1,19 @@
 <script setup lang="ts">
 /*
  * Neighborhood Ranking — Figma 1:1840 (10월 동네 랭킹)
- *  - title: "10월 동네 랭킹", Pretendard Bold 20px, "10월" #FF6940, rest #191919
- *  - card: bg #F3F4F6, padding 20, radius 12, width 350
- *  - lead text: Pretendard SemiBold 20px, 3 lines with 서교동 in middle
- *  - rank row: 3 items, gap 2px, centered
- *    - item: avatar 46px border-4, name Pretendard SemiBold 16px, visits Pretendard Regular 12px
- *    - rank 1: gold border #FFD54B (서교동), rank 2: silver border #E1E0E5 (상수동), rank 3: bronze border #C47E66 (망원동)
- *    - bar: bg white, height varies (68/41/24), rank number inside
+ *  - title: "10월 동네 랭킹", Pretendard Bold 20px, "10월" #FF5538, rest #191919
+ *  - section title → card: 20px gap
+ *  - card: bg #F3F4F6, padding 25, radius 12
+ *  - lead text: 2 줄, "10월에는 / 서교동을 가장 많이 찾았어요"
+ *    - font-size 20px / line-height 1.4 / letter-spacing -0.3px / color #191919
+ *    - "서교동" 아래 4px orange underline
+ *  - headline → ranking row: 20px gap
+ *  - rank row: 3 items, 가운데 1위가 가장 위
+ *    - avatar 46px, border 4px (rank 1 #FFD54B, 2 #E1E0E5, 3 #C47E66), radius 12
+ *    - name Pretendard SemiBold 16px #191919
+ *    - visits Pretendard Regular 12px #4D5160
+ *    - bar: bg white, height 68/41/24, radius 2
+ *    - image → name 8px, name → visits 4px
  */
 export type RankingItem = {
   id: string
@@ -28,26 +34,30 @@ defineProps<{
 
 <template>
   <section class="neighborhood-ranking">
+    <!--
+      Section title — 10월 + 동네 랭킹
+      "10월" 만 primary orange + bold, 나머지 191919 + bold
+    -->
     <div class="neighborhood-ranking__header">
-      <p>
+      <h2 class="neighborhood-ranking__title">
         <span class="neighborhood-ranking__month">{{ month }}</span>
-        <span> </span>
-        <span class="neighborhood-ranking__title">동네 랭킹</span>
-      </p>
+        <span> 동네 랭킹</span>
+      </h2>
     </div>
 
+    <!--
+      Card
+      margin-top 20px 로 section title → card 20px 간격 확보
+    -->
     <div class="neighborhood-ranking__card">
-      <!-- Lead text -->
-      <div class="neighborhood-ranking__lead">
-        <p>
-          <span class="neighborhood-ranking__lead-light">10월에는</span>
-          <br />
-          <span class="neighborhood-ranking__lead-bold">{{ topNeighborhood }}</span>
-          <br />
-          <span class="neighborhood-ranking__lead-light">을 가장 많이 찾았어요</span>
-        </p>
-        <div class="neighborhood-ranking__lead-line" />
-      </div>
+      <!--
+        Headline — 2 줄 구조
+        "10월에는" / "<서교동>을 가장 많이 찾았어요"
+      -->
+      <p class="neighborhood-ranking__message">
+        10월에는<br />
+        <span class="neighborhood-ranking__highlight">서교동</span>을 가장 많이 찾았어요
+      </p>
 
       <!-- Rank row -->
       <div class="neighborhood-ranking__row">
@@ -80,16 +90,14 @@ defineProps<{
 
 <style scoped>
 /*
- * Figma 1:1840-1:1869
- *  - header: padding 20, pt 20, Pretendard Bold 20px, "10월" #FF6940
- *  - card: bg #F3F4F6, padding 25, radius 12, width 350
- *  - lead: Pretendard SemiBold 20px, line height 1.4, underline below
- *  - rank row: gap 2px, items centered
- *    - avatar: 46×46, border-4, radius 12
- *    - rank 1: border #FFD54B, rank 2: #E1E0E5, rank 3: #C47E66
- *    - name: Pretendard SemiBold 16px #191919
- *    - visits: Pretendard Regular 12px #4D5160
- *    - bar: bg white, height 68/41/24, radius 2, rank number centered
+ * 10월 동네 랭킹 섹션
+ *  - Figma 1:1840
+ *  - section padding: 20px (top/sides), title → card 20px gap
+ *  - card: bg #F3F4F6, padding 25px 20px, radius 12
+ *  - lead: 2 줄, 20px / 1.4 / -0.3px, 191919
+ *  - highlight underline: 4px, primary orange, 텍스트 폭에 정확히
+ *  - rank row: 3 columns, 가운데 1위가 가장 위
+ *  - avatar 46px / border 4 / radius 12
  */
 .neighborhood-ranking {
   display: flex;
@@ -98,74 +106,79 @@ defineProps<{
   background: #FFFFFF;
 }
 
+/* Section title */
 .neighborhood-ranking__header {
   padding: 20px 20px 0;
 }
 
-.neighborhood-ranking__header p {
+.neighborhood-ranking__title {
+  /* Figma: Pretendard Bold 20px */
   margin: 0;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 20px;
   font-weight: 700;
-  line-height: normal;
+  line-height: 1.2;
   color: #191919;
   white-space: nowrap;
 }
 
 .neighborhood-ranking__month {
-  color: #FF6940;
+  /* "10월" — primary orange + bold */
+  color: #FF5538;
+  font-weight: 700;
 }
 
-.neighborhood-ranking__title {
-  font-weight: 600;
-}
-
+/* Card */
 .neighborhood-ranking__card {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 20px;
 
-  margin: 0 20px 20px;
+  /* section title → card 20px gap (Figma spacing) */
+  margin: 20px 20px 20px;
   padding: 25px 20px;
   border-radius: 12px;
   background: #F3F4F6;
+
+  /* 내용이 잘리지 않도록 auto, Figma 비율 유지 */
+  height: auto;
+  min-height: 290px;
 }
 
-/* Lead text */
-.neighborhood-ranking__lead {
-  position: relative;
-  min-height: 58px;
-}
-
-.neighborhood-ranking__lead p {
-  position: absolute;
-  top: 0;
-  left: 0;
+/* Headline (2 줄) */
+.neighborhood-ranking__message {
   margin: 0;
+
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 20px;
-  font-weight: 600;
-  line-height: 1.4;
-  color: #191919;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-}
-
-.neighborhood-ranking__lead-light {
   font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.3px;
+  color: #191919;
 }
 
-.neighborhood-ranking__lead-bold {
+/* "서교동" highlight + underline */
+.neighborhood-ranking__highlight {
+  position: relative;
+  display: inline-block;
+
   font-weight: 600;
+  color: #191919;
 }
 
-.neighborhood-ranking__lead-line {
+.neighborhood-ranking__highlight::after {
+  content: '';
+
   position: absolute;
-  bottom: -4px;
   left: 0;
   right: 0;
-  height: 1px;
+
+  bottom: -4px;
+
+  height: 4px;
+  background: #FF5538;
+  border-radius: 999px;
 }
 
 /* rank row */
@@ -189,7 +202,9 @@ defineProps<{
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+
+  /* image → name 8px, name → visits 4px */
+  gap: 4px;
   margin-bottom: 20px;
 }
 
@@ -201,6 +216,9 @@ defineProps<{
   overflow: hidden;
   flex-shrink: 0;
   background: #E9E9E9;
+
+  /* image → name 8px (위 4px + 추가) */
+  margin-bottom: 8px;
 }
 
 .neighborhood-ranking__avatar--rank1 {
@@ -237,7 +255,7 @@ defineProps<{
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 12px;
   font-weight: 400;
-  line-height: normal;
+  line-height: 1.4;
   color: #4D5160;
   text-align: center;
 }
@@ -257,7 +275,7 @@ defineProps<{
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
   font-weight: 600;
-  line-height: normal;
+  line-height: 1;
   color: #B7B7B7;
   text-align: center;
 }

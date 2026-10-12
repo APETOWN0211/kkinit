@@ -245,10 +245,10 @@ const onToggleBookmark = (e: Event) => {
  * text 14px Medium #4D5160 를 동일 chip 안에서 일관되게 표시한다.
  * Figma 의 비대칭 padding (location chip right 12) 은 visual 영향 미미.
  */
+/* Chip 공통 (Figma 21:685 / 21:690) */
 .place-card__chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
   justify-content: center;
 
   height: 25px;
@@ -266,12 +266,21 @@ const onToggleBookmark = (e: Event) => {
   white-space: nowrap;
 }
 
+/* Location chip (Figma 21:685) */
+.place-card__chip--location {
+  /* Figma 21:685: icon x 6 y 6.25 (11.16×12.5) → 핀 비율 = 11.16 / 12.5 (가로 약간 좁음) */
+  /* 텍스트는 right-aligned 가 아닌, 자연 flow + icon-text gap 4 */
+  padding: 6.25px 6px 6.25px 6px;
+  gap: 4px;
+}
+
+/* Figma 21:685 icon 11.16×12.5 — 핀 모양 비율 */
 .place-card__chip-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 12.5px;
-  height: 11.157px;
+  width: 11.16px;
+  height: 12.5px;
   flex-shrink: 0;
 }
 
@@ -295,8 +304,9 @@ const onToggleBookmark = (e: Event) => {
 
 /*
  * Figma 21:695 bookmark wrapper 41.263 × 41.916, right-aligned (x 38.737 from right col left).
- * vector (21:696) 13.26×15.92 centered → wrapper bg 는 Figma actual #f5f6f8 + 1px stroke #191919/0.1
- * (explore bookmark icon 과 동일).
+ * vector (21:696) 13.26×15.92 centered.
+ *  - default  : bg #f5f6f8, icon #4D5160
+ *  - saved    : bg #55c7ae (primary teal), icon #FFFFFF
  */
 .place-card__bookmark {
   display: flex;
@@ -323,8 +333,9 @@ const onToggleBookmark = (e: Event) => {
 }
 
 .place-card__bookmark--saved {
-  background: rgba(85, 199, 174, 0.12);
-  color: #55c7ae;
+  /* 북마크 원형 색 → #55c7ae (사용자 요청) */
+  background: #55c7ae;
+  color: #ffffff;
 }
 
 .place-card__bookmark-icon {

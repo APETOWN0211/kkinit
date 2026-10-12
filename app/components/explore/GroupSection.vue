@@ -1,13 +1,21 @@
 <script setup lang="ts">
 /*
- * Group Section — Figma 1:1751 (지금 인기있는 모임)
- *  - title row: padding 20px, pt 20, pb 10, Pretendard SemiBold 20px #191919
- *               + 더보기 Pretendard Regular 14px #9F9A9A tracking 0.5 + chevron-right 5×11
- *  - category tabs (1:1759): height 61, padding 20, gap 20, item height 41
- *  - list (1:1776): bg white, top border #DBDBDB, padding 20, gap 20
+ * Group Section — Figma 30:1174 / 30:1063 (탐색 - 메인, 최신)
+ *
+ * 레이아웃 구조 (수정):
+ *  - section root: transparent bg, min-height fixed (전체 섹션 높이 고정)
+ *  - header (title + tabs): white bg, padding 20px, 내부 title + tabs
+ *  - list container: flex-grow 1, list items scroll 가능, empty space 흰색
+ *
+ * Tab active indicator:
+ *  - text "전체" (~32px) 에 맞춰 indicator width 32px 로 고정
+ *  - tab button 안에서 centered 배치
+ *
+ * Section fixed height:
+ *  - 전체 섹션 min-height = header 높이 + list 영역 고정 높이
+ *  - category 변경 시 "10월 동네 랭킹" 섹션 y 위치 불변
  */
 import chipLocationIcon from '~/assets/icons/explore/chip-location.svg?raw'
-import tabUnderline from '~/assets/icons/explore/tab-underline.svg?raw'
 import chevronRight from '~/assets/icons/explore/chevron-right.svg?raw'
 
 export type GroupCategory = 'all' | 'eat-together' | 'explore' | 'solo' | 'cafe' | 'drink'
@@ -17,9 +25,9 @@ export type GroupItem = {
   thumbnail: string
   name: string
   members: number
-  membersLabel: string        // e.g. "21명"
-  time: string                // e.g. "1분 전"
-  timeVariant: 'accent' | 'muted'  // "1분 전" = #FE5531, "방금 대화" = #FE5531 too in Figma
+  membersLabel: string
+  time: string
+  timeVariant: 'accent' | 'muted'
   locationChip: string
   categoryChip: string
   avatars: string[]
@@ -40,44 +48,48 @@ const emit = defineEmits<{
 
 <template>
   <section class="group-section">
-    <!-- Title row -->
-    <div class="group-section__title-row">
-      <p class="group-section__title">지금 인기있는 모임</p>
-      <button
-        type="button"
-        class="group-section__more"
-        aria-label="모임 더보기"
-        @click="emit('see-more')"
-      >
-        <span class="group-section__more-label">더보기</span>
-        <span class="group-section__more-chevron" v-html="chevronRight" />
-      </button>
-    </div>
+    <!-- Header: title + tabs (고정 높이) -->
+    <div class="group-section__header">
+      <!-- Title row -->
+      <div class="group-section__title-row">
+        <p class="group-section__title">지금 인기있는 모임</p>
+        <button
+          type="button"
+          class="group-section__more"
+          aria-label="모임 더보기"
+          @click="emit('see-more')"
+        >
+          <span class="group-section__more-label">더보기</span>
+          <span class="group-section__more-chevron" v-html="chevronRight" />
+        </button>
+      </div>
 
-    <!-- Category tabs -->
-    <div class="group-section__tabs">
-      <div class="group-section__tabs-scroller">
-        <div class="group-section__tabs-track">
-          <button
-            v-for="cat in categories"
-            :key="cat.id"
-            type="button"
-            class="group-section__tab"
-            :class="{ 'group-section__tab--active': activeCategory === cat.id }"
-            @click="emit('select-category', cat.id)"
-          >
-            <span class="group-section__tab-label">{{ cat.label }}</span>
-            <span
-              v-if="activeCategory === cat.id"
-              class="group-section__tab-underline"
-              v-html="tabUnderline"
-            />
-          </button>
+      <!-- Category tabs -->
+      <div class="group-section__tabs">
+        <div class="group-section__tabs-scroller">
+          <div class="group-section__tabs-track">
+            <button
+              v-for="cat in categories"
+              :key="cat.id"
+              type="button"
+              class="group-section__tab"
+              :class="{ 'group-section__tab--active': activeCategory === cat.id }"
+              @click="emit('select-category', cat.id)"
+            >
+              <span class="group-section__tab-label">{{ cat.label }}</span>
+              <span
+                v-if="activeCategory === cat.id"
+                class="group-section__tab-indicator"
+              />
+            </button>
+          </div>
         </div>
+        <!-- Bottom divider -->
+        <div class="group-section__tabs-divider" />
       </div>
     </div>
 
-    <!-- Group list -->
+    <!-- List container: flex-grow 1, 고정 높이 유지를 위한 min-height -->
     <div class="group-section__list">
       <button
         v-for="g in groups"
@@ -110,11 +122,11 @@ const emit = defineEmits<{
           </div>
 
           <div class="group-section__chips">
-            <span class="group-section__chip">
+            <span class="group-section__chip group-section__chip--location">
               <span class="group-section__chip-icon" v-html="chipLocationIcon" />
               <span>{{ g.locationChip }}</span>
             </span>
-            <span class="group-section__chip">
+            <span class="group-section__chip group-section__chip--category">
               <span>{{ g.categoryChip }}</span>
             </span>
           </div>
@@ -126,28 +138,43 @@ const emit = defineEmits<{
 
 <style scoped>
 /*
- * Figma 1:1751-1:1776
- *  - title row: padding 20, pt 20, pb 10, font 20 SemiBold #191919
- *  - category tabs row: 61 tall, padding 20, gap 20, item 41 tall
- *      - active: 18 SemiBold #191919 + 4px underline (Line41)
- *      - inactive: 18 Medium #B7B7B7
- *  - list: bg white, top border #DBDBDB, padding 20, gap 20
- *      - item: gap 16, thumb 78×78 radius 12 + gradient overlay
- *              body col gap 8
- *                - name: 16 SemiBold #191919 tracking 0.32
- *                - meta row: gap 6, avatar stack 24 mr -6 border #E9E9E9 + 14 Medium #4D5160 (count) + "·" 18 SemiBold #4D5160 + 14 Regular #FE5531 (time)
- *                - chip row: gap 6, chip bg #E9E9E9 radius 4 padding 6×4, icon 10×8 + 12 Medium #4D5160
+ * Figma 30:1174 / 30:1063 (탐색 - 메인, 최신)
+ *
+ * Section root: flex column layout
+ *  - fixed min-height: header (~95px) + list (~350px) = ~445px
+ *  - category 변경 시 이 전체 높이가 고정 → 다음 섹션 위치 불변
+ *
+ * Header:
+ *  - white bg, padding 20px
+ *  - title row + tabs row
+ *
+ * List:
+ *  - flex-grow 1, min-height fixed
+ *  - background #FFFFFF
  */
 .group-section {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  /* 전체 섹션 고정 높이: header + list */
+  min-height: 470px;
+
+  background: transparent;
+}
+
+/* ----- Header: white, contains title + tabs ----- */
+.group-section__header {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   background: #FFFFFF;
 }
 
+/* Title row */
 .group-section__title-row {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
 
   padding: 20px 20px 10px;
@@ -158,18 +185,15 @@ const emit = defineEmits<{
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 20px;
   font-weight: 600;
-  line-height: normal;
+  line-height: 1.2;
   color: #191919;
 }
 
 .group-section__more {
-  display: inline-grid;
-  grid-template-columns: max-content;
-  grid-template-rows: max-content;
-  place-items: start;
+  display: inline-flex;
   align-items: center;
+  gap: 0;
 
-  position: relative;
   padding: 0;
   border: 0;
   background: transparent;
@@ -178,8 +202,6 @@ const emit = defineEmits<{
 }
 
 .group-section__more-label {
-  grid-column: 1;
-  grid-row: 1;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -190,39 +212,38 @@ const emit = defineEmits<{
 }
 
 .group-section__more-chevron {
-  grid-column: 1;
-  grid-row: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 
   width: 5px;
   height: 11px;
-  margin-left: 44px;
-  margin-top: 3.5px;
-  transform: rotate(180deg);
+  margin-left: 5px;
 
   color: #9F9A9A;
+  transform: rotate(180deg);
 }
 
 .group-section__more-chevron :deep(svg) {
   display: block;
   width: 5px;
   height: 11px;
+  flex-shrink: 0;
 }
 
-/* Tabs */
+/* ----- Tabs ----- */
 .group-section__tabs {
-  height: 61px;
-  width: 100%;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  /* Title row 와 tabs 사이 간격 (Figma spacing) */
+  margin-top: 20px;
 }
 
 .group-section__tabs-scroller {
-  width: 100%;
-  height: 100%;
   overflow-x: auto;
-  overflow-y: clip;
+  overflow-y: hidden;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -233,27 +254,39 @@ const emit = defineEmits<{
 
 .group-section__tabs-track {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 20px;
-  height: 100%;
-  padding: 20px;
+
+  padding: 0 20px;
 }
 
+/* Bottom divider */
+.group-section__tabs-divider {
+  height: 1px;
+  width: 100%;
+  background: #DBDBDB;
+  flex-shrink: 0;
+}
+
+/* Tab button */
 .group-section__tab {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
 
   height: 41px;
+
+  /* indicator 가 divider 와 직접 닿도록 padding 제거 */
   padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .group-section__tab-label {
@@ -266,39 +299,48 @@ const emit = defineEmits<{
 }
 
 .group-section__tab--active .group-section__tab-label {
-  color: #191919;
+  color: #FE5531;
   font-weight: 600;
 }
 
-.group-section__tab-underline {
+/*
+ * Active indicator — Figma 30:1182:
+ *  - width 32px (text "전체" 폭과 동일)
+ *  - height 4px (Line 41 stroke-width 4)
+ *  - border-radius 2px (round ends)
+ *  - justify-content: space-between 으로 divider 와 직접 닿음
+ */
+.group-section__tab-indicator {
   display: block;
-  width: 100%;
+  width: 32px;
   height: 4px;
-  position: relative;
-  margin-top: 4px;
+  border-radius: 2px;
+  background: #FE5531;
+  flex-shrink: 0;
 }
 
-.group-section__tab-underline :deep(svg) {
-  display: block;
-  width: 100%;
-  height: 4px;
-}
-
-/* List */
+/* ----- List container: flex-grow 1, 고정 높이 ----- */
 .group-section__list {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 20px;
+  gap: 14px;
 
-  padding: 20px;
+  flex: 1 1 auto;
+
+  padding: 14px 20px 20px;
+  background: #FFFFFF;
   border-top: 1px solid #DBDBDB;
+
+  /* section min-height - header ~= 470 - 95 = 375 */
+  min-height: 375px;
 }
 
+/* Group row */
 .group-section__item {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 
   width: 100%;
   padding: 0;
@@ -307,16 +349,19 @@ const emit = defineEmits<{
   text-align: left;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+
   overflow: hidden;
 }
 
+/* Thumbnail: 80×80 */
 .group-section__thumb {
   position: relative;
-  width: 78px;
-  height: 78px;
+  width: 80px;
+  height: 80px;
   border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
+  flex-grow: 0;
   background: #E9E9E9;
 }
 
@@ -340,11 +385,13 @@ const emit = defineEmits<{
   pointer-events: none;
 }
 
+/* Body */
 .group-section__body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 6px;
+
   flex: 1;
   min-width: 0;
 }
@@ -363,30 +410,33 @@ const emit = defineEmits<{
   max-width: 100%;
 }
 
+/* Meta row */
 .group-section__meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   overflow: hidden;
 }
 
 .group-section__avatars {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .group-section__avatar {
   display: block;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border: 1px solid #E9E9E9;
   border-radius: 999px;
   overflow: hidden;
   flex-shrink: 0;
+  background: #F3F4F6;
 }
 
 .group-section__avatar + .group-section__avatar {
-  margin-left: -6px;
+  margin-left: -5px;
 }
 
 .group-section__avatar img {
@@ -396,44 +446,47 @@ const emit = defineEmits<{
   object-fit: cover;
 }
 
-.group-section__members,
-.group-section__dot,
-.group-section__time {
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 14px;
-  line-height: normal;
-}
-
 .group-section__members {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
   font-weight: 500;
+  line-height: normal;
   color: #4D5160;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .group-section__dot {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
   font-weight: 600;
-  font-size: 18px;
+  line-height: normal;
   color: #4D5160;
-  letter-spacing: 0.36px;
-  line-height: 0;
+  flex-shrink: 0;
 }
 
 .group-section__time {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
   font-weight: 400;
+  line-height: normal;
   color: #FE5531;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
+/* Chips row */
 .group-section__chips {
   display: flex;
-  align-items: flex-start;
-  gap: 6px;
+  align-items: center;
+  gap: 5px;
   overflow: hidden;
 }
 
 .group-section__chip {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 3px;
-  justify-content: center;
 
   padding: 4px 6px;
   border-radius: 4px;
@@ -445,21 +498,29 @@ const emit = defineEmits<{
   line-height: normal;
   color: #4D5160;
   white-space: nowrap;
+
+  flex-shrink: 0;
 }
 
 .group-section__chip-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  width: 8px;
-  height: 10px;
   flex-shrink: 0;
 }
 
 .group-section__chip-icon :deep(svg) {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: 10px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+/*
+ * Category chip: bg #67CFC1 (mint), text white
+ */
+.group-section__chip--category {
+  background: #67CFC1;
+  color: #FFFFFF;
 }
 </style>

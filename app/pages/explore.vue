@@ -1,13 +1,10 @@
 <script setup lang="ts">
 /*
- * Explore — Figma 1:1639 / 1:1651 (탐색 - 메인)
- *  - 390 × 844
- *  - safe-area top
- *  - sticky header
- *  - recommend band: white carousel + #F3F4F6 background
- *  - group section
- *  - neighborhood ranking section
- *  - bottom: floating nav (앱 레벨)
+ * Explore — Figma 30:1063 (탐색 - 메인, 최신)
+ *  - 390 × 844 (scrollable AppContent)
+ *  - safe-area top header (white)
+ *  - gray band (#F3F4F6) with: white card (title+carousel+CTA) + group section + ranking section
+ *  - floating nav (app-level)
  */
 import ExploreHeader from '~/components/explore/ExploreHeader.vue'
 import RestaurantCarousel from '~/components/explore/RestaurantCarousel.vue'
@@ -28,8 +25,7 @@ const location = ref('합정동')
 const userHandle = '닮은살걀'
 
 /*
- * 추천 맛집 (Figma 1:1657/1:1689/1:1719 참고).
- * image URL은 Figma node 1:1651 기준 새 asset.
+ * 추천 맛집 (Figma 30:1063 기준 새 asset).
  */
 const restaurants = [
   {
@@ -140,10 +136,10 @@ const rankingItems = [
   { id: 'rank3', name: '망원동', visits: '507회 방문', rank: 3 as const, image: '/images/explore/ranking-3.png', barHeight: 24 }
 ]
 
-const router = useRouter()
+const { safeNavigate } = useSafeNavigation()
 
 const onSearchClick = () => {
-  router.push('/explore/search')
+  safeNavigate('/explore/search')
 }
 
 const onLocationClick = () => {
@@ -151,15 +147,15 @@ const onLocationClick = () => {
 }
 
 const onSeeMore = () => {
-  router.push('/explore/groups')
+  safeNavigate('/explore/groups')
 }
 
 const onOpenGroup = (id: string) => {
-  router.push(`/groups/${id}`)
+  safeNavigate(`/groups/${id}`)
 }
 
 const onMapClick = () => {
-  router.push('/map')
+  safeNavigate('/map')
 }
 
 const onSelectCategory = (id: GroupCategory) => {
@@ -183,44 +179,37 @@ const onBookmarkToggle = (id: string) => {
       <RestaurantCarousel
         :restaurants="restaurants"
         :user-handle="userHandle"
+        @map-click="onMapClick"
       />
 
-      <button
-        type="button"
-        class="explore-page__map-cta"
-        aria-label="지도에서 확인하기"
-        @click="onMapClick"
-      >
-        지도에서 확인하기
-      </button>
+      <GroupSection
+        :groups="visibleGroups"
+        :categories="categories"
+        :active-category="activeCategory"
+        @select-category="onSelectCategory"
+        @see-more="onSeeMore"
+        @open-group="onOpenGroup"
+      />
+
+      <NeighborhoodRanking
+        month="10월"
+        top-area="10월에는"
+        top-neighborhood="서교동"
+        :items="rankingItems"
+      />
     </div>
-
-    <GroupSection
-      :groups="visibleGroups"
-      :categories="categories"
-      :active-category="activeCategory"
-      @select-category="onSelectCategory"
-      @see-more="onSeeMore"
-      @open-group="onOpenGroup"
-    />
-
-    <NeighborhoodRanking
-      month="10월"
-      top-area="10월에는"
-      top-neighborhood="서교동"
-      :items="rankingItems"
-    />
   </div>
 </template>
 
 <style scoped>
 /*
- * Explore page — Figma 1:1639 / 1:1651
- *  - recommend band: white carousel + #F3F4F6 background
- *  - CTA: width 350, padding 20x16, radius 12, bg #FE5531, white 16 SemiBold
- *  - group section: white background
- *  - neighborhood ranking: white background
- *  - bottom: floating nav (app-level)
+ * Explore page — Figma 30:1063 (탐색 - 메인)
+ *  - root bg #FFFFFF (header 가 white, page 자체도 white)
+ *  - band (below header): bg #F3F4F6, flex-col, gap 16, pb 16
+ *    children 순서:
+ *      1) white card (RestaurantCarousel): title+carousel+CTA 묶음
+ *      2) GroupSection: transparent root (gray 비쳐 보임), title row + tab row + white list
+ *      3) NeighborhoodRanking: white root with gray inner card
  */
 .explore-page {
   display: flex;
@@ -236,41 +225,11 @@ const onBookmarkToggle = (id: string) => {
 .explore-page__band {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 16px;
 
   padding-bottom: 16px;
 
   background: #F3F4F6;
-}
-
-.explore-page__map-cta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 350px;
-  padding: 16px 20px;
-
-  border: 0;
-  border-radius: 12px;
-  background: #FE5531;
-
-  color: #FFFFFF;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: normal;
-  white-space: nowrap;
-
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-
-  transition: opacity 120ms ease, transform 120ms ease;
-}
-
-.explore-page__map-cta:active {
-  opacity: 0.92;
-  transform: scale(0.99);
 }
 </style>

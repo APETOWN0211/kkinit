@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="39" height="41.2539" viewBox="0 0 39 41.2539" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 332">
+<path id="Union" d="M35.5 41.2539L8 25.377V15.877L35.5 0L36.098 3.58776C38.0189 15.1135 37.9838 26.8805 35.9941 38.3946L35.5 41.2539Z" fill="url(#paint0_linear_0_113)"/>
+<circle id="Ellipse 593" cx="8" cy="21" r="7" fill="#699DF9" stroke="white" stroke-width="2"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_113" x1="8.5" y1="21.5" x2="35.5" y2="21" gradientUnits="userSpaceOnUse">
+<stop stop-color="#699DF9" stop-opacity="0.47"/>
+<stop offset="1" stop-color="#699DF9" stop-opacity="0"/>
+</linearGradient>
+</defs>
+</svg>

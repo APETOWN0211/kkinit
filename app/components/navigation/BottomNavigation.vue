@@ -9,6 +9,7 @@ import chatActive from '~/assets/icons/navicgation/chat-white.svg?raw'
 import chatInactive from '~/assets/icons/navicgation/chat-active.svg?raw'
 
 const route = useRoute()
+const { safeNavigate } = useSafeNavigation()
 
 /*
  * New global floating bottom navigation (Figma 41:1897).
@@ -31,7 +32,7 @@ const activeMenu = computed(() => {
 const setActive = (id: string) => {
   const item = menuItems.find(m => m.id === id)
   if (item) {
-    navigateTo(item.route)
+    safeNavigate(item.route)
   }
 }
 </script>

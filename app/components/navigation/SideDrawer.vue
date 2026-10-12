@@ -27,31 +27,35 @@ const emit = defineEmits<{
   close: []
 }>()
 
-const router = useRouter()
+const { safeNavigate } = useSafeNavigation()
 
+/*
+ * 모임 route 는 아직 구현되지 않았다.
+ * safeNavigate('/meetings') 는 router 가 매칭하지 못해 자동으로 stay.
+ * 핸들러 자체를 비워 press feedback 만 유지한다.
+ */
 const handleProfile = () => {
   emit('close')
-  router.push('/my')
+  safeNavigate('/my')
 }
 
 const handleMeeting = () => {
   emit('close')
-  // 모임 라우트 결정 시 router.push('/meetings') 등
 }
 
 const handleArchive = () => {
   emit('close')
-  router.push('/archive')
+  safeNavigate('/archive')
 }
 
 const handleHistory = () => {
   emit('close')
-  router.push('/history')
+  safeNavigate('/history')
 }
 
 const handleSettings = () => {
   emit('close')
-  router.push('/settings')
+  safeNavigate('/settings')
 }
 
 const handleLogout = () => {

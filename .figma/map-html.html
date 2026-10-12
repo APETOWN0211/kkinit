@@ -1,0 +1,163 @@
+<!DOCTYPE html><html  data-app-booting=""><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><title>끼닛</title><link rel="stylesheet" href="/_nuxt/assets/css/main.css" crossorigin><link rel="stylesheet" href="/_nuxt/app.vue?vue&type=style&index=0&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/navigation/BottomNavigation.vue?vue&type=style&index=0&scoped=54b15f7f&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/navigation/CreatePostFab.vue?vue&type=style&index=0&scoped=9afdc123&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/common/AppSplash.vue?vue&type=style&index=1&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/common/AppSplash.vue?vue&type=style&index=0&scoped=94b03cb7&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/navigation/SideDrawer.vue?vue&type=style&index=0&scoped=f9b9901c&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/pages/index.vue?vue&type=style&index=0&scoped=02281a80&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/home/HomeTopBar.vue?vue&type=style&index=0&scoped=0529564f&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/feed/FeedPost.vue?vue&type=style&index=0&scoped=31618c22&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/pages/map.vue?vue&type=style&index=0&scoped=0d904c1c&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/map/MapCanvas.vue?vue&type=style&index=0&scoped=ffc27f30&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/map/MapCurrentLocation.vue?vue&type=style&index=0&scoped=b5612ba6&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/map/MapProfileMarker.vue?vue&type=style&index=0&scoped=c150c689&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/map/MapPlaceMarker.vue?vue&type=style&index=0&scoped=a5776764&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/map/MapSearchBar.vue?vue&type=style&index=0&scoped=1f78a4df&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/map/MapFilterChips.vue?vue&type=style&index=0&scoped=6d142541&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/map/MapPlacePreview.vue?vue&type=style&index=0&scoped=1be335a1&lang.css" crossorigin><link rel="stylesheet" href="/_nuxt/components/map/MapOverviewPanel.vue?vue&type=style&index=0&scoped=b4327819&lang.css" crossorigin><link rel="modulepreload" as="script" crossorigin href="/_nuxt/C:/Users/anubi/Desktop/kkinit/node_modules/nuxt/dist/app/entry.async.js"><script type="module" src="/_nuxt/@vite/client" crossorigin></script><script type="module" src="/_nuxt/C:/Users/anubi/Desktop/kkinit/node_modules/nuxt/dist/app/entry.async.js" crossorigin></script><meta name="description" content="끼닛 - 맛집 SNS"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="끼닛"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#FF6940"><script>
+if (!window.__NUXT_DEVTOOLS_TIME_METRIC__) {
+  Object.defineProperty(window, '__NUXT_DEVTOOLS_TIME_METRIC__', {
+    value: {},
+    enumerable: false,
+    configurable: true,
+  })
+}
+window.__NUXT_DEVTOOLS_TIME_METRIC__.appInit = Date.now()
+</script></head><body><div id="__nuxt"><div class="app-wrapper"><!-- App shell: slides right when drawer open --><div class="app-shell-clip" style="transform-origin:top left;width:100%;height:100%;"><div class="app-shell" style="transform:translate3d(0, 0, 0);transition:transform 280ms cubic-bezier(0.22, 1, 0.36, 1);"><div></div><div class="app-content--with-bottom-nav app-content"><!--[--><!--
+    Page wrapper.
+    - /map 은 interactive full-viewport view 이므로 페이지 자체가
+      AppContent 위에서 세로 스크롤되면 안 된다.
+    - AppShell 이 viewport 크기를 관리하므로 여기서 100dvh 를 추가하지 않는다.
+    - iOS safe-area 는 search/filter/panel/navigation 내부에서 env() 로 처리.
+  --><div class="map-page" data-v-0d904c1c><!--
+      Map container.
+      selection state 와 무관하게 항상 mount 되어 있다
+      (panel 교체 시 지도가 remount 되지 않도록).
+    --><div class="map-page__map" data-v-0d904c1c><!--[--><!--
+    Map background container. Figma 25:707 / 25:906 actual.
+    background click 으로 selection 해제 처리.
+  --><button type="button" class="map-canvas" aria-label="지도 배경" data-v-0d904c1c data-v-ffc27f30><!--
+      sm lines (back layer).
+      Figma 25:709-25:712 actual: sm lines bg 가 가장 큰 svg.
+    --><span class="map-canvas__sm-lines" aria-hidden="true" data-v-ffc27f30><img src="/images/map/bg-lines.svg" alt="" draggable="false" data-v-ffc27f30></span><!--
+      secondary roads (vector 41 / 42).
+      Figma 25:708/25:907 + 25:713/25:912 actual.
+    --><span class="map-canvas__road-secondary" aria-hidden="true" data-v-ffc27f30><img src="/images/map/bg-vector42.svg" alt="" draggable="false" data-v-ffc27f30></span><span class="map-canvas__road-secondary map-canvas__road-secondary--alt" aria-hidden="true" data-v-ffc27f30><img src="/images/map/bg-vector41.svg" alt="" draggable="false" data-v-ffc27f30></span><!--
+      main road (vector 43) + road name labels.
+      Figma 25:714/25:913 actual.
+    --><span class="map-canvas__road-main" aria-hidden="true" data-v-ffc27f30><img src="/images/map/bg-vector43.svg" alt="" draggable="false" data-v-ffc27f30></span><span class="map-canvas__road-label map-canvas__road-label--purnima" aria-hidden="true" data-v-ffc27f30><span data-v-ffc27f30>PURNIMA EDUCATION</span><span data-v-ffc27f30>PRIMARY SCHOOL</span></span><span class="map-canvas__road-label map-canvas__road-label--dokmang" aria-hidden="true" data-v-ffc27f30>독막로 8길</span><span class="map-canvas__road-label map-canvas__road-label--10" aria-hidden="true" data-v-ffc27f30>망원로10길</span><span class="map-canvas__road-label map-canvas__road-label--16" aria-hidden="true" data-v-ffc27f30>망원로16길</span><span class="map-canvas__road-label map-canvas__road-label--14" aria-hidden="true" data-v-ffc27f30>망원로14길</span><span class="map-canvas__road-label map-canvas__road-label--main" aria-hidden="true" data-v-ffc27f30>망원로</span><span class="map-canvas__road-label map-canvas__road-label--18" aria-hidden="true" data-v-ffc27f30>망원로18길</span><!--
+      Right side controls (Figma 25:946/25:797, 25:945/25:700).
+      클릭 시 background click 으로 처리되면 selection 이 풀리므로
+      button 으로 별도 emit + stopPropagation.
+    --><button type="button" class="map-canvas__control map-canvas__control--profile" style="top:351px;" aria-label="내 프로필" data-v-ffc27f30><span class="map-canvas__control-icon" data-v-ffc27f30><svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="iconamoon:profile-fill">
+<path id="Vector" d="M6.25 17.3419L9.42056 15.9974C9.79089 15.8404 10.2091 15.8404 10.5794 15.9974L13.75 17.3419C14.3452 17.5928 14.9107 17.5451 15.4464 17.1988C15.9821 16.8525 16.25 16.3627 16.25 15.7296V4.26689C16.2506 3.78159 16.0759 3.36578 15.7259 3.01947C15.3759 2.67316 14.9554 2.5 14.4643 2.5H5.53571C5.04524 2.50059 4.625 2.67374 4.275 3.01947C3.925 3.36519 3.75 3.781 3.75 4.26689V15.7296C3.75 16.3633 4.01786 16.8531 4.55357 17.1988C5.08929 17.5445 5.65476 17.5922 6.25 17.3419Z" fill="black" stroke="black" stroke-width="1.48421"/>
+</g>
+</svg>
+</span></button><button type="button" class="map-canvas__control map-canvas__control--locate" style="top:397px;" aria-label="현재 위치로" data-v-ffc27f30><span class="map-canvas__control-icon" data-v-ffc27f30><svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="ion:locate">
+<path id="Vector" d="M12 4.5V2.625M12 21.375V19.5M19.5 12H21.375M2.625 12H4.5M12 5.25C10.665 5.25 9.35993 5.64588 8.2499 6.38758C7.13987 7.12928 6.2747 8.18349 5.76381 9.41689C5.25292 10.6503 5.11925 12.0075 5.3797 13.3169C5.64015 14.6262 6.28302 15.829 7.22703 16.773C8.17103 17.717 9.37377 18.3599 10.6831 18.6203C11.9925 18.8808 13.3497 18.7471 14.5831 18.2362C15.8165 17.7253 16.8707 16.8601 17.6124 15.7501C18.3541 14.6401 18.75 13.335 18.75 12C18.75 10.2098 18.0388 8.4929 16.773 7.22703C15.5071 5.96116 13.7902 5.25 12 5.25Z" stroke="#191919" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>
+</span></button></button><!--]--><!--
+        current location marker (Figma 25:794).
+        map background 위 marker layer.
+      --><div class="map-current-location" style="left:58px;top:215px;" aria-hidden="true" data-v-0d904c1c data-v-b5612ba6><img class="map-current-location__icon" src="/images/map/location-marker.svg" alt="" draggable="false" data-v-b5612ba6></div><!--
+        profile/avatar markers (Figma 25:781 / 25:715).
+      --><!--[--><div class="map-profile-marker" style="left:384px;top:158px;width:48px;height:48px;" aria-hidden="true" data-v-0d904c1c data-v-c150c689><img class="map-profile-marker__avatar" src="/images/map/profile-duck.png" alt="" draggable="false" data-v-c150c689></div><div class="map-profile-marker" style="left:464px;top:408px;width:48px;height:48px;" aria-hidden="true" data-v-0d904c1c data-v-c150c689><img class="map-profile-marker__avatar" src="/images/map/profile-duck.png" alt="" draggable="false" data-v-c150c689></div><!--]--><!--
+        Place markers (Figma 25:817 / 25:826 / 25:835 / 25:844).
+        marker click 으로 selectedPlace 변경.
+        - visible filter 는 mock 으로 모든 marker 가 노출되지만,
+          필요 시 visiblePlaceIds 로 가려도 된다.
+      --><!--[--><button type="button" class="map-place-marker" style="left:26px;top:310px;" aria-label="명희원 선택" aria-pressed="false" data-v-0d904c1c data-v-a5776764><span class="map-place-marker__hit" data-v-a5776764><img class="map-place-marker__visual" src="/images/map/marker-orange.svg" alt="명희원" draggable="false" data-v-a5776764></span><span class="map-place-marker__label" style="left:40px;top:346px;" data-v-a5776764>명희원</span></button><button type="button" class="map-place-marker" style="left:108px;top:374px;" aria-label="숯불구이 우촌 선택" aria-pressed="false" data-v-0d904c1c data-v-a5776764><span class="map-place-marker__hit" data-v-a5776764><img class="map-place-marker__visual" src="/images/map/marker-orange.svg" alt="숯불구이 우촌" draggable="false" data-v-a5776764></span><span class="map-place-marker__label" style="left:122px;top:409.56px;" data-v-a5776764>숯불구이 우촌</span></button><button type="button" class="map-place-marker" style="left:215px;top:250px;" aria-label="부타스시 선택" aria-pressed="false" data-v-0d904c1c data-v-a5776764><span class="map-place-marker__hit" data-v-a5776764><img class="map-place-marker__visual" src="/images/map/marker-orange.svg" alt="부타스시" draggable="false" data-v-a5776764></span><span class="map-place-marker__label" style="left:229px;top:286px;" data-v-a5776764>부타스시</span></button><button type="button" class="map-place-marker map-place-marker--active" style="left:315px;top:183px;" aria-label="웨이브버거 선택" aria-pressed="false" data-v-0d904c1c data-v-a5776764><span class="map-place-marker__hit" data-v-a5776764><img class="map-place-marker__visual" src="/images/map/marker-teal.svg" alt="웨이브버거" draggable="false" data-v-a5776764></span><span class="map-place-marker__label" style="left:329px;top:218.56px;" data-v-a5776764>웨이브버거</span></button><!--]--><!--
+        상단 search bar (Figma 25:787).
+        selected state 에서도 그대로 유지.
+      --><div class="map-search-bar" data-v-0d904c1c data-v-1f78a4df><label class="map-search-bar__field" data-v-1f78a4df><span class="map-search-bar__icon" data-v-1f78a4df><svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="18.1654" height="18.1654" viewBox="0 0 18.1654 18.1654" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path id="Vector" d="M17.0827 17.0827L13.305 13.2983M15.3985 8.2406C15.3985 10.139 14.6444 11.9596 13.302 13.302C11.9596 14.6444 10.139 15.3985 8.2406 15.3985C6.34221 15.3985 4.52157 14.6444 3.17921 13.302C1.83684 11.9596 1.08271 10.139 1.08271 8.2406C1.08271 6.34221 1.83684 4.52157 3.17921 3.17921C4.52157 1.83684 6.34221 1.08271 8.2406 1.08271C10.139 1.08271 11.9596 1.83684 13.302 3.17921C14.6444 4.52157 15.3985 6.34221 15.3985 8.2406Z" stroke="#9F9A9A" stroke-width="2.16541" stroke-linecap="round"/>
+</svg>
+</span><input value="" type="text" class="map-search-bar__input" placeholder="망원동에서 뭐 먹지?" aria-label="장소 검색" data-v-1f78a4df></label><button type="button" class="map-search-bar__nav" aria-label="내비게이션" data-v-1f78a4df><span class="map-search-bar__nav-icon" data-v-1f78a4df><svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="27" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="fa6-solid:location-arrow">
+<path id="Vector" d="M22.8738 5.22545C23.133 4.62474 22.9849 3.93316 22.5036 3.4738C22.0223 3.01443 21.2978 2.87308 20.6684 3.12044L2.05195 10.3895C1.30094 10.6823 0.877842 11.4395 1.03122 12.1967C1.18459 12.9539 1.88271 13.4991 2.69189 13.4991H9.00012C10.657 13.4991 12.0001 14.8423 12.0001 16.4991V22.3836C12.0001 23.1559 12.5713 23.8172 13.3646 23.9686C14.1579 24.1201 14.9512 23.7112 15.258 22.9944L22.8738 5.22545Z" fill="white"/>
+</g>
+</svg>
+</span></button></div><!--
+        Filter chip row (Figma 25:801).
+        selected state 에서도 그대로 유지.
+      --><div class="map-filter-chips" role="tablist" aria-label="지도 필터" data-v-0d904c1c data-v-6d142541><!--[--><button type="button" class="map-filter-chips__chip--active map-filter-chips__chip" aria-pressed="true" role="tab" data-v-6d142541><!----><span data-v-6d142541>전체</span></button><button type="button" class="map-filter-chips__chip" aria-pressed="false" role="tab" data-v-6d142541><img src="/images/map/icon-friends.svg" class="map-filter-chips__chip-icon" alt="" aria-hidden="true" data-v-6d142541><span data-v-6d142541>친구 방문</span></button><button type="button" class="map-filter-chips__chip" aria-pressed="false" role="tab" data-v-6d142541><img src="/images/map/icon-people.svg" class="map-filter-chips__chip-icon" alt="" aria-hidden="true" data-v-6d142541><span data-v-6d142541>팔로잉 언급</span></button><button type="button" class="map-filter-chips__chip" aria-pressed="false" role="tab" data-v-6d142541><img src="/images/map/icon-hot.svg" class="map-filter-chips__chip-icon" alt="" aria-hidden="true" data-v-6d142541><span data-v-6d142541>요즘 뜨는</span></button><!--]--></div><!--
+        우측 control button 은 MapCanvas 가 자체 렌더링 (Figma 우측 column).
+        여기서는 column 위치를 참고하기 위한 placeholder 상수만 사용.
+        (MAP_RIGHT_CONTROLS 는 향후 control button 추가 시 사용 예정)
+      --><!----></div><!--
+      Bottom panel 영역.
+      - 기본 상태: MapOverviewPanel (Figma 25:730)
+      - 선택 상태: MapPlacePreview (Figma 25:999), MapOverviewPanel 숨김
+    --><!--[--><!--
+    Figma 25:730 actual:
+      - 390 wide, top radius 24, white, shadow 0 -2 15 rgba(0,0,0,0.09)
+      - handle 은 padding 13 top 안에 위치 (Figma 25:731 의 32x4)
+    height 는 Figma 의 388px 을 그대로 따른다.
+  --><section class="map-overview-panel" role="region" aria-label="마포구 망원동 정보" data-v-0d904c1c data-v-b4327819><!-- handle (Figma 25:731 actual: 32×4) --><span class="map-overview-panel__handle" aria-hidden="true" data-v-b4327819><img src="/images/map/handle.svg" alt="" draggable="false" data-v-b4327819></span><!--
+      Title block (Figma 25:733 actual: top inner, gap 20)
+        - 위치 row (25:734): pin + '마포구 망원동'
+    --><div class="map-overview-panel__title-row" data-v-b4327819><span class="map-overview-panel__pin" aria-hidden="true" data-v-b4327819><img src="/images/map/pin.svg" alt="" draggable="false" data-v-b4327819></span><p class="map-overview-panel__title" data-v-b4327819>마포구 망원동</p></div><!--
+      Quick cards row (Figma 25:737 actual).
+        3 cards × 128×94, gap 10, padding-left/right 20
+    --><div class="map-overview-panel__quick-cards" data-v-b4327819><!--[--><div class="map-overview-panel__quick-card" style="background:#FEF7E4;" data-v-b4327819><div class="map-overview-panel__quick-card-top" data-v-b4327819><!--[--><span class="map-overview-panel__quick-avatar" style="margin-left:0;z-index:10;" data-v-b4327819><img src="/images/map/avatar-1.png" alt="" draggable="false" data-v-b4327819></span><span class="map-overview-panel__quick-avatar" style="margin-left:-6.857px;z-index:9;" data-v-b4327819><img src="/images/map/avatar-2.png" alt="" draggable="false" data-v-b4327819></span><!--]--></div><p class="map-overview-panel__quick-text" data-v-b4327819><!--[-->친구 2명이<br data-v-b4327819>근처에 있어요.<!--]--></p></div><div class="map-overview-panel__quick-card" style="background:#E0FFF8;" data-v-b4327819><div class="map-overview-panel__quick-card-top" data-v-b4327819><img src="/images/map/icon-event.svg" class="map-overview-panel__quick-icon" alt="" draggable="false" data-v-b4327819></div><p class="map-overview-panel__quick-text" data-v-b4327819><!--[--><span data-v-b4327819>오늘</span>열리는 <span class="map-overview-panel__quick-bold" style="color:#55C7AE;" data-v-b4327819>저녁 모임</span><!--]--></p></div><div class="map-overview-panel__quick-card" style="background:#F5F6F8;" data-v-b4327819><div class="map-overview-panel__quick-card-top" data-v-b4327819><img src="/images/map/icon-posts.svg" class="map-overview-panel__quick-icon" alt="" draggable="false" data-v-b4327819></div><p class="map-overview-panel__quick-text" data-v-b4327819><!--[--><span data-v-b4327819>방금 글이</span><br data-v-b4327819>올라온 곳 <span class="map-overview-panel__quick-bold" style="color:#FF6940;" data-v-b4327819>4개</span><!--]--></p></div><!--]--></div><!--
+      Today event row (Figma 25:752 actual).
+        - height 67px, gap 12, items center, justify between
+        - date card  : 50w x 50h, radius 12, border rgba(0,0,0,0.1), padding 10
+          - 27 (28px SemiBold #FF6940)
+          - APR (16px Regular #39AC92 tracking -0.48)
+        - title column 182w, gap 6, padding y 6
+          - '웨얼이즈누들 망원본점' 18px SemiBold #191919 tracking 0.36
+          - '오늘 · 오후 7:00' row 16px Medium (오늘 #191919, · 3×3 dot, 오후 7:00 Regular #9F9A9A tracking 0.32)
+        - chevron (Frame734) 5.333×40
+    --><div class="map-overview-panel__event" data-v-b4327819><div class="map-overview-panel__event-left" data-v-b4327819><div class="map-overview-panel__event-date" data-v-b4327819><span class="map-overview-panel__event-day" data-v-b4327819>27</span><span class="map-overview-panel__event-month" data-v-b4327819>APR</span></div><div class="map-overview-panel__event-info" data-v-b4327819><p class="map-overview-panel__event-title" data-v-b4327819>웨얼이즈누들 망원본점</p><div class="map-overview-panel__event-time" data-v-b4327819><span data-v-b4327819>오늘</span><span class="map-overview-panel__event-dot" aria-hidden="true" data-v-b4327819></span><span class="map-overview-panel__event-time2" data-v-b4327819>오후 7:00</span></div></div></div><span class="map-overview-panel__event-chevron" aria-hidden="true" data-v-b4327819><img src="/images/map/chevron-right.svg" alt="" draggable="false" data-v-b4327819></span></div><!--
+      Recent visits header (Figma 25:766 actual).
+        - h 21, justify between, items center
+        - title '최근 방문지' 18px SemiBold #191919 tracking 0.36
+        - '방문 기록 >' row 16px Medium #73787E tracking 0.32, gap 8
+    --><div class="map-overview-panel__recent-header" data-v-b4327819><p class="map-overview-panel__recent-title" data-v-b4327819>최근 방문지</p><button type="button" class="map-overview-panel__recent-link" aria-label="방문 기록 페이지로 이동" data-v-b4327819><span data-v-b4327819>방문 기록</span><span class="map-overview-panel__recent-chevron" data-v-b4327819><svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="7.00003" height="13" viewBox="0 0 7.00003 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path id="Vector" d="M6.00002 1.00001L1.00002 6.50001H1.00084L6.00002 12" stroke="#9F9A9A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</span></button></div><!--
+      Recent visit cards (Figma 25:771 actual).
+        - flex row, gap 10, w full
+        - 128×99 + 128×99 + 94×99, padding 12, radius 12,
+          border rgba(0,0,0,0.05), gap inside 8
+    --><div class="map-overview-panel__recent-cards" data-v-b4327819><!--[--><div class="map-overview-panel__visit-card" data-v-b4327819><p class="map-overview-panel__visit-date" style="color:#FF6940;" data-v-b4327819>8월 21일</p><p class="map-overview-panel__visit-name" data-v-b4327819>긴자료코 서촌점</p></div><div class="map-overview-panel__visit-card" data-v-b4327819><p class="map-overview-panel__visit-date" style="color:#FF6940;" data-v-b4327819>8월 20일</p><p class="map-overview-panel__visit-name" data-v-b4327819>웨이브버거</p></div><div class="map-overview-panel__visit-card--last map-overview-panel__visit-card" data-v-b4327819><p class="map-overview-panel__visit-date" style="color:#FF6940;" data-v-b4327819>8월 18일</p><p class="map-overview-panel__visit-name" data-v-b4327819>숯불구이 우촌</p></div><!--]--></div></section><!--]--></div><!--]--></div><nav class="floating-bottom-nav" aria-label="메인 네비게이션" data-v-54b15f7f><div class="floating-bottom-nav__capsule" data-v-54b15f7f><!--[--><button class="floating-bottom-nav__item" aria-label="홈" data-v-54b15f7f><span class="floating-bottom-nav__icon--home floating-bottom-nav__icon" data-v-54b15f7f><svg preserveAspectRatio="xMidYMid meet" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="fluent:home-empty-24-filled">
+<path id="Vector" d="M12.2278 2.64113C12.7237 2.22708 13.3514 2 14 2C14.6486 2 15.2763 2.22708 15.7722 2.64113L24.0222 9.53513C24.6431 10.0533 25 10.8149 25 11.6176V22.2758C25 22.9983 24.7103 23.6912 24.1945 24.2021C23.6788 24.713 22.9793 25 22.25 25H5.75C5.02065 25 4.32118 24.713 3.80546 24.2021C3.28973 23.6912 3 22.9983 3 22.2758V11.6176C3 10.8149 3.35689 10.0533 3.97778 9.53513L12.2278 2.64113Z" fill="#73787E"/>
+</g>
+</svg></span></button><button class="floating-bottom-nav__item" aria-label="탐색" data-v-54b15f7f><span class="floating-bottom-nav__icon--explore floating-bottom-nav__icon" data-v-54b15f7f><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_185_1276)">
+<circle cx="13.8241" cy="13.824" r="10.95" transform="rotate(-45 13.8241 13.824)" stroke="#73787E" stroke-width="2.6"/>
+<path d="M16.912 8.26558C18.8341 7.35732 20.3952 8.91774 19.4872 10.8398L17.204 15.6718C16.8922 16.3316 16.3325 16.8913 15.6727 17.2031L10.8407 19.4863C8.91857 20.3944 7.35721 18.8332 8.26549 16.9111L10.5487 12.08C10.8605 11.4203 11.4202 10.8596 12.0799 10.5478L16.912 8.26558ZM14.8221 12.6679C14.2274 12.0736 13.2635 12.0734 12.6688 12.6679C12.0741 13.2627 12.0741 14.2275 12.6688 14.8222C13.2635 15.4167 14.2274 15.4166 14.8221 14.8222C15.4169 14.2275 15.4169 13.2627 14.8221 12.6679Z" fill="#73787E"/>
+</g>
+<defs>
+<clipPath id="clip0_185_1276">
+<rect width="28" height="28" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</span></button><button class="floating-bottom-nav__item--active floating-bottom-nav__item" aria-label="지도" aria-current="page" data-v-54b15f7f><span class="floating-bottom-nav__icon--map floating-bottom-nav__icon" data-v-54b15f7f><svg preserveAspectRatio="xMidYMid meet" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="fluent:location-48-filled">
+<path id="Vector" d="M14 2C19.5229 2 24 6.57639 24 12.2219C24.0038 14.6396 23.1657 16.9798 21.6357 18.8235C21.6354 18.8238 21.6351 18.8241 21.6347 18.8243C21.6343 18.8245 21.634 18.8248 21.6337 18.8251L21.6311 18.8282C21.6285 18.8313 21.6308 18.836 21.6348 18.836C21.6391 18.836 21.6412 18.8414 21.638 18.8443L15.7124 24.2444C15.4924 24.483 15.227 24.6731 14.9325 24.803C14.6381 24.933 14.3207 25 14 25C13.6793 25 13.3619 24.933 13.0675 24.803C12.773 24.6731 12.5076 24.483 12.2877 24.2444L6.36185 18.8441C6.35871 18.8412 6.36073 18.836 6.36499 18.836C6.369 18.836 6.37114 18.8313 6.36849 18.8283L6.36472 18.824L6.35296 18.809C5.97262 18.3485 5.63286 17.8545 5.33766 17.3328C4.45812 15.7798 3.9966 14.0164 4.00002 12.2219C4.00002 6.57639 8.47707 2 14 2ZM14 8.61415C13.0639 8.61415 12.1662 8.99424 11.5043 9.67082C10.8424 10.3474 10.4706 11.265 10.4706 12.2219C10.4706 13.1787 10.8424 14.0963 11.5043 14.7729C12.1662 15.4495 13.0639 15.8296 14 15.8296C14.9361 15.8296 15.8338 15.4495 16.4957 14.7729C17.1576 14.0963 17.5294 13.1787 17.5294 12.2219C17.5294 11.265 17.1576 10.3474 16.4957 9.67082C15.8338 8.99424 14.9361 8.61415 14 8.61415Z" fill="#FFFFFF"/>
+</g>
+</svg></span></button><button class="floating-bottom-nav__item" aria-label="채팅" data-v-54b15f7f><span class="floating-bottom-nav__icon--chat floating-bottom-nav__icon" data-v-54b15f7f><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M14.2815 2.02652C17.0691 2.21617 19.6925 3.41413 21.6614 5.39664C23.6302 7.3792 24.8094 10.0111 24.9797 12.8C25.15 15.5889 24.2993 18.3445 22.5862 20.5519C20.8731 22.7593 18.4151 24.2678 15.6711 24.7951C13.308 25.2492 10.8719 24.9493 8.70239 23.9533C8.02962 23.6445 7.27283 23.5297 6.55981 23.7287L3.76489 24.5089C2.98459 24.7264 2.26423 24.0119 2.47485 23.2296L3.25024 20.3507C3.43868 19.6507 3.32599 18.9105 3.0266 18.2502C2.03708 16.0678 1.74973 13.6205 2.22192 11.2521C2.76827 8.51194 4.29376 6.0641 6.51293 4.36637C8.73213 2.66868 11.4938 1.83692 14.2815 2.02652ZM8.57055 11.8566C7.66322 11.8568 6.92797 12.5929 6.92797 13.5002C6.92804 14.4074 7.66327 15.1425 8.57055 15.1427C9.47799 15.1427 10.214 14.4075 10.2141 13.5002C10.2141 12.5927 9.47804 11.8566 8.57055 11.8566ZM13.4993 11.8566C12.5918 11.8566 11.8557 12.5927 11.8557 13.5002C11.8558 14.4075 12.5918 15.1427 13.4993 15.1427C14.4065 15.1425 15.1418 14.4074 15.1418 13.5002C15.1418 12.5929 14.4066 11.8568 13.4993 11.8566ZM18.4289 11.8566C17.5215 11.8566 16.7854 12.5927 16.7854 13.5002C16.7855 14.4075 17.5215 15.1427 18.4289 15.1427C19.3364 15.1427 20.0724 14.4075 20.0725 13.5002C20.0725 12.5928 19.3364 11.8566 18.4289 11.8566Z" fill="#73787E"/>
+</svg>
+</span></button><!--]--></div></nav><!----><!--
+          App launch splash (Figma 1:178).
+          Mounted inside .app-shell so it covers only the app viewport, and it is
+          the last child so it paints above the bottom nav / FAB.
+        --><div class="app-splash" aria-hidden="true" data-v-94b03cb7><div class="app-splash__logo" data-v-94b03cb7><svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="260" height="52.5694" viewBox="0 0 260 52.5694" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 323">
+<path id="Vector" d="M126.446 0.000132619H119.342V52.5669H126.446V0.000132619Z" fill="white"/>
+<path id="Vector_2" d="M200.325 0.000132619H193.221V52.5669H200.325V0.000132619Z" fill="white"/>
+<g id="Group">
+<path id="Vector_3" d="M260 7.10466V2.10973e-05L207.433 2.10973e-05V7.10466L260 7.10466Z" fill="white"/>
+<path id="Vector_4" d="M237.265 2.10973e-05H230.16V52.5668H237.265V2.10973e-05Z" fill="white"/>
+</g>
+<g id="Group_2">
+<path id="Vector_5" d="M66.7787 0.000132619H59.6741V52.5669H66.7787V0.000132619Z" fill="white"/>
+<path id="Vector_6" d="M112.239 52.5694L66.7766 34.809V27.7144L112.239 45.4647V52.5694Z" fill="white"/>
+<path id="Vector_7" d="M66.7766 24.855L112.239 7.09463V2.10973e-05L66.7766 17.7503V24.855Z" fill="white"/>
+</g>
+<g id="Group_3">
+<path id="Vector_8" d="M7.10463 2.10973e-05H0V52.5668H7.10463V2.10973e-05Z" fill="white"/>
+<path id="Vector_9" d="M52.5652 52.5694L7.10307 34.809V27.7144L52.5652 45.4647V52.5694Z" fill="white"/>
+<path id="Vector_10" d="M7.10307 24.855L52.5652 7.09463V2.10973e-05L7.10307 17.7503V24.855Z" fill="white"/>
+</g>
+<g id="Group_4">
+<path id="Vector_11" d="M140.652 2.10973e-05H133.548V52.5668H140.652V2.10973e-05Z" fill="white"/>
+<path id="Vector_12" d="M186.119 17.7603V52.5692H179.014V14.9861L186.119 17.7603Z" fill="white"/>
+<path id="Vector_13" d="M186.117 17.7603V24.855L179.012 22.0808L140.652 7.10465V2.10973e-05L179.012 14.9862L186.117 17.7603Z" fill="white"/>
+</g>
+</g>
+</svg>
+</div></div></div></div><!-- Drawer overlay (sits inside app-wrapper so desktop preview aligns with 390px shell) --><!----></div></div><div id="teleports"></div><script type="application/json" data-nuxt-logs="nuxt-app">[[1],{"date":2,"args":3,"type":6,"level":7,"tag":8,"filename":9,"stack":10},["Date","2026-10-12T11:57:31.796Z"],[4,5],"Vite server hmr 29 files","in 2.015ms","success",3,"","file:///node_modules/@nuxt/vite-builder/dist/vite-node-entry.mjs",[11,16,21],{"function":12,"source":13,"line":14,"column":15},"vite_node_entry_default","/C:/Users/anubi/Desktop/kkinit/node_modules/@nuxt/vite-builder/dist/vite-node-entry.mjs",17,11,{"function":17,"source":18,"line":19,"column":20},"process.processTicksAndRejections","node:internal/process/task_queues",104,5,{"function":22,"source":23,"line":24,"column":25},"async Object.renderToString","/C:/Users/anubi/Desktop/kkinit/node_modules/vue-bundle-renderer/dist/runtime.mjs",264,16]</script><script>window.__NUXT__={};window.__NUXT__.config={public:{},app:{baseURL:"/",buildId:"dev",buildAssetsDir:"/_nuxt/",cdnURL:""}}</script><script type="application/json" data-nuxt-data="nuxt-app" data-ssr="true" id="__NUXT_DATA__">[["ShallowReactive",1],{"data":2,"state":4,"once":8,"_errors":9,"serverRendered":11,"path":12},["ShallowReactive",3],{},["Reactive",5],{"$s__nuxt_devtools__":6},{"timeSsrStart":7},1791806251914,["Set"],["ShallowReactive",10],{},true,"\u002Fmap"]</script></body></html>
