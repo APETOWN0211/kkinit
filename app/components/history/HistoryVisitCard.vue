@@ -124,8 +124,24 @@ const hasStory = computed(() => !!props.visit.memo)
  *  - overflow: hidden (memo 가 padding 을 뚫고 나가지 않게)
  *  - 이야기 작성 CTA 카드만 gap 12 (Figma 22:963)
  */
+/*
+ * Figma 22:930 — bg #FFFFFF, p 16, radius 12
+ * flex col, gap 10
+ * shadow 0 1px 8.2px rgba(0, 0, 0, 0.04)
+ * overflow: hidden (memo 가 padding 을 뚫고 나가지 않게)
+ * 이야기 작성 CTA 카드만 gap 12 (Figma 22:963)
+ *
+ * IMPORTANT:
+ *  `.date-group__cards` is a column flex container, so each visit-card's
+ *  main-axis is HEIGHT. Using `flex: 1 1 0` here would set the basis to 0
+ *  with no parent main size to grow into (parent height is auto), collapsing
+ *  every visit-card to 0 height and hiding all children except the first row.
+ *  Use `flex: 0 0 auto` (intrinsic) and let `align-items: stretch` (default)
+ *  on the parent make the card fill the column's cross-axis (width: 100%).
+ */
 .visit-card {
-  flex: 1 1 0;
+  flex: 0 0 auto;
+  width: 100%;
   min-width: 0;
 
   display: flex;

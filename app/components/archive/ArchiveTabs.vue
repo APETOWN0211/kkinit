@@ -3,22 +3,25 @@ import tabUnderline from '~/assets/icons/explore/tab-underline.svg?raw'
 
 /*
  * ArchiveTabs — Figma 21:557 (이야기 active) / 21:791 (장소 active)
- *  - 위치: top 97 (status bar 47 + header 50), h 52
- *  - px 20, pt 20, gap 20
- *  - 탭: 18px Pretendard, flex-1 (탭 영역의 1/2)
- *      - active: SemiBold #FF6940 + imgLine41 underline (4px stroke, tab width 절반)
- *      - inactive: Medium #B7B7B7
- *  - indicator 는 Figma 의 imgLine41 (32×4 stroke #FF6940) 를 tab width 의 100% 로 stretch.
- *    Figma 21:560/21:797 의 imgLine41 wrapper 가 `w-full` (= tab width 절반) 라
- *    underline 이 활성 탭의 전체 width 를 차지한다.
- *  - 한 element 만 translate3d 로 좌우 이동 (이야기 ↔ 장소).
  *
- * viewport 390px 기준 (.archive-tabs padding 20 20):
- *  - inner area = 350px, 각 indicator = 175px (= 50%)
- *  - story: indicator 가 viewport 20–195
- *  - place: indicator 가 viewport 195–370  (우측 20px inset)
- *  - translateX 100% 만으로 inner area 의 절반 너머로 이동.
- *    + 20px 가 들어가면 track 우측 padding edge 를 20px 넘어 viewport 끝까지 붙음.
+ * 탭 button 의 layout (flex 1/2 + gap 20) 은 변경하지 않는다.
+ * Figma 21:558/21:561 의 flex-1_0_0 으로 이야기/장소 tab 이 각각
+ * 165px (= (390-40-20)/2) 씩 차지.
+ *
+ * orange active indicator 만 별도 overlay 로, viewport 좌우 20px inset
+ * 안의 inner area (= 350px) 에서 정확히 절반(175px)씩 차지.
+ *  - 이야기: left 20px,  width 175px → 20–195
+ *  - 장소  : left 195px, width 175px → 195–370
+ *  - 0%/100% translateX 만으로 한 element 가 좌우로 이동.
+ *
+ * CSS custom property `--active-index` (0 | 1) 가 한 indicator 의 위치를 결정.
+ *  - 0 = 이야기: translateX(0%)
+ *  - 1 = 장소  : translateX(100%)
+ * translateX 100% 는 element 자기 width(= 175) 기준이므로
+ * inner area 350px 의 정확히 절반 너머로 이동 → left 195–370.
+ *
+ * gray divider 같은 background bar 는 추가하지 않는다 (기존 header/tabs 의
+ * 시각 디자인에 이미 충분한 분리감). orange active indicator 만 좌우 이동.
  */
 
 export type ArchiveTab = 'story' | 'place'
@@ -31,11 +34,11 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: ArchiveTab): void
 }>()
 
-const indicatorTransform = computed(() => {
-  return props.modelValue === 'place'
-    ? 'translate3d(calc(100%), 0, 0)'
-    : 'translate3d(0, 0, 0)'
-})
+const activeIndex = computed(() => (props.modelValue === 'place' ? 1 : 0))
+
+const indicatorStyle = computed(() => ({
+  '--active-index': activeIndex.value
+}))
 
 const select = (value: ArchiveTab) => {
   if (value === props.modelValue) return
@@ -50,15 +53,19 @@ const labels: Record<ArchiveTab, string> = {
 
 <template>
   <div class="archive-tabs">
-    <div class="archive-tabs__track">
-      <span
-        class="archive-tabs__indicator"
-        :style="{ transform: indicatorTransform }"
-        aria-hidden="true"
-      >
-        <span class="archive-tabs__indicator-svg" v-html="tabUnderline" />
-      </span>
+    <!--
+      Indicator overlay. .archive-tabs 자체의 padding 20 안쪽의 inner area
+      안에서 left 0 (= viewport 20px) 에서 시작. translateX 100% 는 element width
+      (= 175px) 만큼 이동하므로 한 element 가 이야기↔장소 사이를 자연스럽게
+      슬라이드한다.
+    -->
+    <span
+      class="archive-tabs__indicator"
+      :style="indicatorStyle"
+      aria-hidden="true"
+    />
 
+    <div class="archive-tabs__track">
       <button
         type="button"
         class="archive-tab archive-tab--story"
@@ -88,19 +95,17 @@ const labels: Record<ArchiveTab, string> = {
 /*
  * ArchiveTabs — Figma 21:557 / 21:791 actual
  *  - bg white, h 52, px 20, pt 20, gap 20
- *  - 탭 2개가 flex-1 로 영역을 균등 분할
- *  - Figma 21:558/21:561 의 flex-1_0_0 min-w-px
+ *  - 탭 2개가 flex-1 로 영역을 균등 분할 (button box layout, Figma 21:558/21:561)
+ *  - orange active indicator 는 .archive-tabs 의 padding 20 안쪽 (= inner area 350px)
+ *    에서 정확히 175px (= 50% of inner area) 씩 차지한다.
  */
 .archive-tabs {
   position: relative;
 
-  display: flex;
-  align-items: stretch;
-  justify-content: flex-start;
+  display: block;
 
   width: 100%;
   height: 52px;
-  padding: 0 20px;
   box-sizing: border-box;
 
   background: #ffffff;
@@ -109,6 +114,7 @@ const labels: Record<ArchiveTab, string> = {
 
 .archive-tabs__track {
   position: relative;
+  z-index: 1;
 
   display: flex;
   align-items: flex-start;
@@ -116,34 +122,49 @@ const labels: Record<ArchiveTab, string> = {
 
   width: 100%;
   height: 100%;
-  padding-top: 20px;
+  padding: 20px 20px 0;
+  box-sizing: border-box;
 }
 
 /*
- * Indicator = 두 viewport 20px inset 안의 inner area (= 350px) 에서
- * 175px 너비(= 50%) 의 단일 element. translateX 0 ↔ 100% 로 좌우 이동.
- *  - 0%   = track 좌측 edge → viewport 20 – 195 (story)
- *  - 100% = track 좌측 + 175px → viewport 195 – 370 (place, 우측 20px inset)
- *
- * width 50% 는 inner area 의 절반. button 의 flex-1 1/2 + gap 20 은 button box
- * 안에서만 적용되며 indicator 는 그 시각적 영역을 따라가지 않으므로
- * + 20px 보정 없이 translateX 100% 만으로 양쪽 indicator 가 정확히 20px inset 안에
- * 175px씩 채운다.
+ * Orange active indicator.
+ *  - .archive-tabs 의 padding-box (390 × 52) 안에서, padding 20 을 통과한
+ *    inner area (350 × 12) 의 left:0 (≡ viewport 20px) 에서 시작.
+ *  - width: calc((100% - 40px) / 2) = (350) / 2 = 175px.
+ *  - translateX var(--active-index) (0 | 1):
+ *      · 0 = 이야기: left 20,  끝 195.
+ *      · 1 = 장소  : left 195, 끝 370.
+ *  - 부모 (.archive-tabs) 의 padding-box 기준 left:0 이므로 indicator 의
+ *    시각적 left edge 는 정확히 viewport 20px. 100% translateX 는 element
+ *    width 175px 기준이므로 inner area 350 의 정확히 절반 너머로 이동.
  */
 .archive-tabs__indicator {
   position: absolute;
-  left: 0;
+  /*
+   * .archive-tabs 의 padding-box 좌상단 (≡ viewport 20, 149+52=97+52) 기준.
+   * top: padding-top 0 → indicator 의 top edge 는 tabs top (= viewport 97).
+   * bottom: 0 → tabs 의 bottom edge (height 52) 에 정확히 붙음.
+   *  - Figma 의 underline stroke 4 가 h 4 인데, 우리 indicator 도 h 3 으로
+   *    Figma 의 stroke 4px 시각 영역과 동일하게 표시.
+   */
+  left: 20px;
   bottom: 0;
 
   display: block;
-  width: 50%;
-  height: 4px;
+  width: calc((100% - 40px) / 2);
+  height: 3px;
 
   background: #ff6940;
   border-radius: 999px;
 
   pointer-events: none;
   z-index: 2;
+
+  transform: translate3d(
+    calc(var(--active-index, 0) * 100%),
+    0,
+    0
+  );
 
   transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
