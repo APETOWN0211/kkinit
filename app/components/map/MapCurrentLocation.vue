@@ -13,6 +13,8 @@ defineProps<{
   x: number
   y: number
 }>()
+
+import { getStorageImageUrl, STORAGE_FOLDERS } from '~/utils/storage'
 </script>
 
 <template>
@@ -23,7 +25,7 @@ defineProps<{
   >
     <img
       class="map-current-location__icon"
-      src="/images/map/location-marker.svg"
+      :src="getStorageImageUrl('location-marker.svg', STORAGE_FOLDERS.map)"
       alt=""
       draggable="false"
     />

@@ -1,8 +1,9 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import FeedPost, { type FeedPost as FeedPostType } from '~/components/feed/FeedPost.vue'
 import ArchiveHeader from '~/components/archive/ArchiveHeader.vue'
 import ArchiveTabs, { type ArchiveTab } from '~/components/archive/ArchiveTabs.vue'
 import ArchivePlaceCard, { type ArchivePlace } from '~/components/archive/ArchivePlaceCard.vue'
+import { getStorageImageUrl, STORAGE_FOLDERS } from '~/utils/storage'
 
 /*
  * /archive — Figma 21:556 (이야기) / 21:667 (장소) actual
@@ -49,7 +50,7 @@ const storyPosts: FeedPostType[] = [
     id: 'a1',
     author: {
       name: '쿠루미',
-      avatar: '/images/chat/profile-kurumi.png',
+      avatar: getStorageImageUrl('profile-kurumi.png', STORAGE_FOLDERS.chat),
       isFollowing: false
     },
     time: '1분 전',
@@ -66,8 +67,8 @@ const storyPosts: FeedPostType[] = [
       ]
     ],
     images: [
-      '/images/feed/kurumi-samgyeopsal.png',
-      '/images/feed/kurumi-storefront.png'
+      getStorageImageUrl('kurumi-samgyeopsal.png', STORAGE_FOLDERS.feed),
+      getStorageImageUrl('kurumi-storefront.png', STORAGE_FOLDERS.feed)
     ],
     likes: 149,
     comments: 2,
@@ -77,7 +78,7 @@ const storyPosts: FeedPostType[] = [
     id: 'a2',
     author: {
       name: '도기독',
-      avatar: '/images/my/repost/dogidog-avatar.png',
+      avatar: getStorageImageUrl('my-repost-dogidog-avatar.png', STORAGE_FOLDERS.root),
       isFollowing: false
     },
     time: '1분 전',
@@ -93,8 +94,8 @@ const storyPosts: FeedPostType[] = [
       ]
     ],
     images: [
-      '/images/feed/post1-food1.png',
-      '/images/feed/post1-food2.png'
+      getStorageImageUrl('post1-food1.png', STORAGE_FOLDERS.feed),
+      getStorageImageUrl('post1-food2.png', STORAGE_FOLDERS.feed)
     ],
     likes: 149,
     comments: 2,
@@ -104,7 +105,7 @@ const storyPosts: FeedPostType[] = [
     id: 'a3',
     author: {
       name: '죠니월드',
-      avatar: '/images/chat/profile-johnny.png',
+      avatar: getStorageImageUrl('profile-johnny.png', STORAGE_FOLDERS.chat),
       isFollowing: false
     },
     time: '2일 전',
@@ -119,8 +120,7 @@ const storyPosts: FeedPostType[] = [
       ]
     ],
     images: [
-      '/images/feed/post2-food1.png',
-      '/images/feed/post2-food2.png'
+      getStorageImageUrl('post2-food1.png', STORAGE_FOLDERS.feed)
     ],
     likes: 149,
     comments: 2,
@@ -140,7 +140,7 @@ const places: ArchivePlace[] = [
     hours: '08:00-20:30',
     locationChip: '망원동',
     categoryChip: '한식',
-    thumbnail: '/images/archive/place-uchon.png',
+    thumbnail: getStorageImageUrl('place-uchon.png', STORAGE_FOLDERS.archive),
     saved: true
   },
   {
@@ -150,7 +150,7 @@ const places: ArchivePlace[] = [
     hours: '11:00-22:00',
     locationChip: '합정동',
     categoryChip: '일식',
-    thumbnail: '/images/archive/place-orenoramen.png',
+    thumbnail: getStorageImageUrl('place-orenoramen.png', STORAGE_FOLDERS.archive),
     saved: true
   },
   {
@@ -160,7 +160,7 @@ const places: ArchivePlace[] = [
     hours: '11:00-22:00',
     locationChip: '합정동',
     categoryChip: '멕시칸',
-    thumbnail: '/images/archive/place-mexico.png',
+    thumbnail: getStorageImageUrl('place-mexico.png', STORAGE_FOLDERS.archive),
     saved: true
   }
 ]

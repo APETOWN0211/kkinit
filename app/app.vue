@@ -307,54 +307,65 @@ const drawerVisible = computed(() => isDrawerOpen.value || isDragging.value)
     @pointerup="onPointerUp"
     @pointercancel="onPointerCancel"
   >
-    <!-- App shell: slides right when drawer open -->
-    <div
-      class="app-shell-clip"
-      :style="{
-        transform: scale > 1 ? `scale(${scale})` : undefined,
-        transformOrigin: 'top left',
-        width: wrapperScale < 1 ? `${(wrapperScale) * 100}%` : '100%',
-        height: wrapperScale < 1 ? `${(wrapperScale) * 100}%` : '100%'
-      }"
-    >
+    <!--
+      Admin routes bypass the mobile AppShell entirely (spec #46).
+      NuxtLayout auto-picks layouts/admin.vue for pages with layout: 'admin'.
+      SideDrawer, AppSplash, BottomNavigation, FAB are all hidden below.
+    -->
+    <NuxtLayout v-if="route.path.startsWith('/admin')">
+      <NuxtPage :transition="pageTransition" />
+    </NuxtLayout>
+
+    <!-- Mobile AppShell (consumer app) -->
+    <template v-else>
       <div
-        class="app-shell"
-        :class="[shellClass, { 'app-shell--notifications': isNotificationsPage }]"
+        class="app-shell-clip"
         :style="{
-          transform: mainTransform,
-          transition: mainTransition
+          transform: scale > 1 ? `scale(${scale})` : undefined,
+          transformOrigin: 'top left',
+          width: wrapperScale < 1 ? `${(wrapperScale) * 100}%` : '100%',
+          height: wrapperScale < 1 ? `${(wrapperScale) * 100}%` : '100%'
         }"
       >
-        <NuxtRouteAnnouncer />
         <div
-          class="app-content"
-          :class="{
-            'app-content--with-bottom-nav': showBottomNavigationEffective,
-            'app-content--no-scroll': isNotificationsPage
+          class="app-shell"
+          :class="[shellClass, { 'app-shell--notifications': isNotificationsPage }]"
+          :style="{
+            transform: mainTransform,
+            transition: mainTransition
           }"
         >
-          <NuxtPage :transition="pageTransition" />
+          <NuxtRouteAnnouncer />
+          <div
+            class="app-content"
+            :class="{
+              'app-content--with-bottom-nav': showBottomNavigationEffective,
+              'app-content--no-scroll': isNotificationsPage
+            }"
+          >
+            <NuxtPage :transition="pageTransition" />
+          </div>
+          <NavigationBottomNavigation v-if="showBottomNavigationEffective" />
+          <NavigationCreatePostFab v-if="showCreatePostFab" />
+
+          <!--
+            App launch splash (Figma 1:178).
+            Mounted inside .app-shell so it covers only the app viewport, and it is
+            the last child so it paints above the bottom nav / FAB.
+          -->
+          <AppSplash />
         </div>
-        <NavigationBottomNavigation v-if="showBottomNavigationEffective" />
-        <NavigationCreatePostFab v-if="showCreatePostFab" />
-
-        <!--
-          App launch splash (Figma 1:178).
-          Mounted inside .app-shell so it covers only the app viewport, and it is
-          the last child so it paints above the bottom nav / FAB.
-        -->
-        <AppSplash />
       </div>
-    </div>
 
-    <!-- Drawer overlay (sits inside app-wrapper so desktop preview aligns with 390px shell) -->
-    <div
-      v-if="drawerVisible"
-      class="drawer-overlay"
-      :class="{ 'drawer-overlay--active': isDrawerOpen || isDragging }"
-    >
-      <SideDrawer @close="closeDrawer" />
-    </div>
+      <!-- Drawer overlay (sits inside app-wrapper so desktop preview aligns with 390px shell) -->
+      <div
+        v-if="drawerVisible"
+        class="drawer-overlay"
+        :class="{ 'drawer-overlay--active': isDrawerOpen || isDragging }"
+      >
+        <SideDrawer @close="closeDrawer" />
+      </div>
+    </template>
   </div>
 </template>
 

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 /*
  * Home Side Drawer
  * Figma node 16:301 (마이탭 - 메인) actual values
@@ -22,6 +22,7 @@ import archiveIcon from '~/assets/icons/drawer/archive.svg?raw'
 import historyIcon from '~/assets/icons/drawer/history.svg?raw'
 import settingsIcon from '~/assets/icons/drawer/settings.svg?raw'
 import logoutIcon from '~/assets/icons/drawer/logout.svg?raw'
+import { getStorageImageUrl, STORAGE_FOLDERS } from '~/utils/storage'
 
 const emit = defineEmits<{
   close: []
@@ -92,7 +93,7 @@ const handleLogout = () => {
         >
           <div class="side-drawer__avatar">
             <img
-              src="/images/my/avatar.png"
+              :src="getStorageImageUrl('avatar.png', STORAGE_FOLDERS.my)"
               alt="내 프로필"
               class="side-drawer__avatar-img"
             />

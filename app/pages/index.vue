@@ -1,6 +1,7 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import HomeTopBar from '~/components/home/HomeTopBar.vue'
-import FeedPost, { type FeedPost as FeedPostType } from '~/components/feed/FeedPost.vue'
+import FeedPost from '~/components/feed/FeedPost.vue'
+import { useFeedPosts } from '~/composables/useFeedPosts'
 
 /*
  * Home — Figma node 3:170 (홈 - 메인) source of truth.
@@ -18,6 +19,10 @@ import FeedPost, { type FeedPost as FeedPostType } from '~/components/feed/FeedP
  *  - 좌상단 프로필 버튼 → Side Drawer toggle (inject)
  *  - header / feed / nav / FAB 는 모두 .app-shell 내부라
  *    drawer open 시 함께 오른쪽으로 이동한다.
+ *
+ * spec #28 — Home feed 는 Supabase (posts / profiles / post_images / post_tags) 에서
+ * 가져온다. mock array 의존 제거.
+ * spec #33 / #34 — loading skeleton, empty state, error state.
  */
 
 /* Drawer state (app.vue provide/inject) — swipe 는 app.vue 레벨. */
@@ -32,98 +37,7 @@ const onAvatarClick = () => {
   drawerState?.toggle()
 }
 
-interface FeedPostItem extends FeedPostType {}
-
-const feedPosts: FeedPostItem[] = [
-  /* ---- 3:173 쿠루미 (2 images) ---- */
-  {
-    id: 1,
-    author: {
-      name: '쿠루미',
-      avatar: '/images/chat/profile-kurumi.png',
-      isFollowing: false
-    },
-    time: '1분 전',
-    content: [
-      [
-        { text: '우리 동네 유명한 ' },
-        { text: '삼겹살', isChip: true, chipType: 'orange' },
-        { text: ' 집인데' }
-      ],
-      [
-        { text: '저녁에는 ' },
-        { text: '웨이팅', isChip: true, chipType: 'teal' },
-        { text: ' 30분 정도 걸림..' }
-      ]
-    ],
-    images: [
-      '/images/feed/kurumi-samgyeopsal.png',
-      '/images/feed/kurumi-storefront.png'
-    ],
-    likes: 149,
-    comments: 2,
-    reposts: 2
-  },
-
-  /* ---- 3:236 티라노리 (1 large image) ---- */
-  {
-    id: 2,
-    author: {
-      name: '티라노리',
-      avatar: '/images/chat/profile-tiranori.png',
-      isFollowing: false
-    },
-    time: '2시간 전',
-    content: [
-      [
-        { text: '유명한 빵집 줄 서기 싫어서 들어갔는데' }
-      ],
-      [
-        { text: '오히려 여기가 좋았음.' }
-      ],
-      [
-        { text: '소금빵', isChip: true, chipType: 'orange' },
-        { text: ' 은 포장하고 바로드셈' }
-      ]
-    ],
-    images: [
-      '/images/feed/tiranori-bakery.png'
-    ],
-    likes: 14,
-    comments: 2,
-    reposts: 2
-  },
-
-  /* ---- 3:204 쿠루미 (heart already active) ---- */
-  {
-    id: 3,
-    author: {
-      name: '쿠루미',
-      avatar: '/images/chat/profile-kurumi.png',
-      isFollowing: false
-    },
-    time: '1분 전',
-    content: [
-      [
-        { text: '우리 동네 유명한 ' },
-        { text: '삼겹살', isChip: true, chipType: 'orange' },
-        { text: ' 집인데' }
-      ],
-      [
-        { text: '저녁에는 ' },
-        { text: '웨이팅', isChip: true, chipType: 'teal' },
-        { text: ' 30분 정도 걸림..' }
-      ]
-    ],
-    images: [
-      '/images/feed/kurumi-samgyeopsal-alt.png'
-    ],
-    likes: 149,
-    comments: 2,
-    reposts: 2,
-    isLiked: true
-  }
-]
+const { posts, loading, error, reload } = useFeedPosts()
 </script>
 
 <template>
@@ -131,21 +45,40 @@ const feedPosts: FeedPostItem[] = [
     <HomeTopBar @avatar-click="onAvatarClick" />
 
     <div class="feed-list">
-      <FeedPost
-        v-for="post in feedPosts"
-        :key="post.id"
-        :post="post"
-        :show-bookmark="false"
-      />
+      <!-- spec #32 — loading skeleton -->
+      <div v-if="loading" class="feed-skeleton" aria-hidden="true">
+        <div v-for="n in 3" :key="n" class="feed-skeleton__item">
+          <div class="feed-skeleton__avatar" />
+          <div class="feed-skeleton__body">
+            <div class="feed-skeleton__line feed-skeleton__line--short" />
+            <div class="feed-skeleton__line" />
+            <div class="feed-skeleton__line" />
+            <div class="feed-skeleton__media" />
+          </div>
+        </div>
+      </div>
 
-      <!--
-        Figma 의도: nav 가 두 번째 게시글 이미지 위에 뜬다
-        (3:266 y 763 = 두 번째 post 3:259 이미지 y 612~820 위쪽).
-        그래서 feed 를 nav 높이만큼 위로 밀지 않는다.
-        마지막 게시글이 nav 뒤에 영원히 가려지지 않는 여유는
-        app.vue 의 .app-content--with-bottom-nav
-        (nav 56 + 여유 24 + safe-area) 이 담당한다.
-      -->
+      <template v-else>
+        <FeedPost
+          v-for="post in posts"
+          :key="post.id"
+          :post="post"
+          :show-bookmark="false"
+        />
+
+        <!-- spec #34 — empty state -->
+        <div v-if="posts.length === 0 && !error" class="feed-empty">
+          <p>아직 올라온 이야기가 없어요.</p>
+          <button class="feed-empty__retry" @click="reload">새로고침</button>
+        </div>
+
+        <!-- spec #33 — error state -->
+        <div v-if="error" class="feed-error">
+          <p>게시글을 불러오지 못했어요.</p>
+          <p class="feed-error__msg">{{ error }}</p>
+          <button class="feed-empty__retry" @click="reload">다시 시도</button>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -162,18 +95,6 @@ const feedPosts: FeedPostItem[] = [
 
   width: 100%;
 
-  /*
-   * Figma 3:170 bg-white.
-   *
-   * 앱 전역 하단 여백 (.app-content--with-bottom-nav 의 padding-bottom) 이
-   * flex 컨테이너 (.app-content) 안에서 여백으로 계산되면, 이 배경이 그
-   * 여백까지 채우는 대신 natural height 로 남게 된다.
-   * 그결과 홈 피드 끝 아래에 .app-shell 의 #FAFAFA 가 그대로 드러나
-   * "흰색 띠" 로 보이는 현상이 생긴다.
-   *
-   * flex: 1 + box-sizing: border-box 로 컨테이너 높이를 꽉 채워
-   * 하단 여백까지 이 배경색(#FFFFFF)이 덮도록 한다.
-   */
   flex: 1 1 auto;
   box-sizing: border-box;
 
@@ -196,4 +117,82 @@ const feedPosts: FeedPostItem[] = [
 .feed-list::-webkit-scrollbar {
   display: none;
 }
+
+/* ===========================================================
+ * spec #32 — Loading skeleton
+ * =========================================================== */
+.feed-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px var(--page-padding);
+}
+.feed-skeleton__item {
+  display: flex;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--color-divider);
+}
+.feed-skeleton__item:first-child { border-top: 0; }
+.feed-skeleton__avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: #ECEEF1;
+  flex-shrink: 0;
+  animation: feed-skeleton-pulse 1.2s ease-in-out infinite;
+}
+.feed-skeleton__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.feed-skeleton__line {
+  height: 12px;
+  background: #ECEEF1;
+  border-radius: 4px;
+  width: 100%;
+  animation: feed-skeleton-pulse 1.2s ease-in-out infinite;
+}
+.feed-skeleton__line--short { width: 35%; }
+.feed-skeleton__media {
+  height: 208px;
+  background: #ECEEF1;
+  border-radius: 12px;
+  animation: feed-skeleton-pulse 1.2s ease-in-out infinite;
+}
+@keyframes feed-skeleton-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.9; }
+}
+
+/* ===========================================================
+ * spec #33 / #34 — empty / error state
+ * =========================================================== */
+.feed-empty,
+.feed-error {
+  padding: 60px 24px;
+  text-align: center;
+  color: #73787E;
+  font-size: 14px;
+}
+.feed-error__msg {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #A0A4AB;
+}
+.feed-empty__retry {
+  margin-top: 12px;
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #F5F6F8;
+  color: #4D5160;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.feed-empty__retry:hover { background: #ECEEF1; }
 </style>

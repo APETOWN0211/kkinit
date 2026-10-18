@@ -7,12 +7,19 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "images:optimize": "node scripts/images.mjs",
+    "images:upload": "node --env-file=.env scripts/upload-storage.mjs"
   },
   "dependencies": {
     "@vite-pwa/nuxt": "^1.1.1",
     "nuxt": "^4.5.2",
     "vue": "^3.5.41",
     "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "dotenv": "^18.0.8",
+    "sharp": "^0.35.5"
   }
 }

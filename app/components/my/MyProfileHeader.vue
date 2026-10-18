@@ -1,6 +1,7 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import backIcon from '~/assets/icons/my/back.svg?raw'
 import moreIcon from '~/assets/icons/my/more.svg?raw'
+import { getStorageImageUrl, STORAGE_FOLDERS } from '~/utils/storage'
 
 const router = useRouter()
 
@@ -67,7 +68,7 @@ const onMore = () => {
         </div>
         <div class="my-profile__avatar">
           <img
-            src="/images/my/avatar.png"
+            :src="getStorageImageUrl('avatar.png', STORAGE_FOLDERS.my)"
             alt="내 프로필"
             class="my-profile__avatar-img"
           />

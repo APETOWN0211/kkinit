@@ -22,6 +22,12 @@ export interface FeedPost {
     isFollowing?: boolean
   }
   time: string
+  /*
+   * Optional ISO date. If present, the time label is rendered with
+   * formatRelativeTime() so the feed stays in real-time order without
+   * the parent having to recompute `time` on every tick.
+   */
+  createdAt?: string
   content: ContentLine[][]
   images: string[]
   likes: number
@@ -41,6 +47,15 @@ const props = defineProps<{
    * 다른 화면에서 재사용할 수 있도록 기본값만 켜고 Home 은 끈다.
    */
   showBookmark?: boolean
+}>()
+
+/*
+ * Edit event — fires only on my-posts when the user taps the more
+ * button. Parents (e.g. /my) open an editor sheet and patch the
+ * underlying post. Repost posts never emit this because isOwnPost=false.
+ */
+const emit = defineEmits<{
+  (e: 'edit', post: FeedPost): void
 }>()
 
 const isLiked = ref(props.post.isLiked ?? false)
@@ -93,6 +108,45 @@ const formatCount = (count: number): string => {
 }
 
 /*
+ * Relative time label.
+ *  - post.createdAt (ISO) 가 있으면 매번 formatRelativeTime 으로 계산.
+ *  - 없으면 기존 post.time 그대로 (레거시 호환).
+ *  - 60초마다 re-evaluate 해서 "1분 전 → 2분 전" 자동 갱신.
+ */
+import { formatRelativeTime } from '~/utils/relative-time'
+const _nowTick = ref(Date.now())
+let _tickHandle: ReturnType<typeof setInterval> | null = null
+onMounted(() => {
+  if (props.post.createdAt) {
+    _tickHandle = setInterval(() => {
+      _nowTick.value = Date.now()
+    }, 60_000)
+  }
+})
+onBeforeUnmount(() => {
+  if (_tickHandle) clearInterval(_tickHandle)
+})
+
+const displayTime = computed(() => {
+  if (props.post.createdAt) {
+    // touch the tick so the value re-evaluates on each interval
+    void _nowTick.value
+    return formatRelativeTime(props.post.createdAt)
+  }
+  return props.post.time
+})
+
+/*
+ * More-button handler.
+ *  - isOwnPost=true: 부모 (e.g. /my) 가 이 이벤트로 수정 시트를 연다.
+ *  - isOwnPost=false: 기존처럼 no-op (다른 유저 게시글).
+ */
+const onMore = () => {
+  if (!props.isOwnPost) return
+  emit('edit', props.post)
+}
+
+/*
  * 3장 이상일 때만 가로 scroll 컨테이너를 쓴다.
  * 1장 / 2장은 Figma 와 동일하게 고정 레이아웃으로 렌더링한다.
  */
@@ -138,12 +192,13 @@ const hasOverflowMedia = computed(() => props.post.images.length > 2)
         <div class="header-text">
           <span class="author-name">{{ post.author.name }}</span>
           <span class="dot" aria-hidden="true" />
-          <span class="post-time">{{ post.time }}</span>
+          <span class="post-time">{{ displayTime }}</span>
         </div>
         <button
           type="button"
           class="more-button"
-          aria-label="더보기"
+          :aria-label="isOwnPost ? '게시글 수정' : '더보기'"
+          @click="onMore"
         >
           <span class="more-icon" v-html="morePill" />
         </button>

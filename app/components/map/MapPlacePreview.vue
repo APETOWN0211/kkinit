@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 /*
  * /map selected place preview bottom sheet.
  *
@@ -28,6 +28,7 @@
  *  - 260ms cubic-bezier(0.22, 1, 0.36, 1)
  */
 import type { MapPlace } from '~/composables/useMapData'
+import { getStorageImageUrl, STORAGE_FOLDERS } from '~/utils/storage'
 
 const props = defineProps<{
   place: MapPlace
@@ -58,7 +59,7 @@ const onShareClick = (e: Event) => {
   >
     <!-- handle (Figma 25:1000 actual: 32×4) -->
     <span class="map-place-preview__handle" aria-hidden="true">
-      <img src="/images/map/handle.svg" alt="" draggable="false" />
+      <img :src="getStorageImageUrl('handle.svg', STORAGE_FOLDERS.map)" alt="" draggable="false" />
     </span>
 
     <!--
@@ -90,13 +91,13 @@ const onShareClick = (e: Event) => {
         <div class="map-place-preview__meta">
           <span class="map-place-preview__meta-item">
             <span class="map-place-preview__meta-icon">
-              <img src="/images/map/icon-distance.svg" alt="" draggable="false" />
+              <img :src="getStorageImageUrl('icon-distance.svg', STORAGE_FOLDERS.map)" alt="" draggable="false" />
             </span>
             <span>{{ place.distance }}</span>
           </span>
           <span class="map-place-preview__meta-item">
             <span class="map-place-preview__meta-icon">
-              <img src="/images/map/icon-clock.svg" alt="" draggable="false" />
+              <img :src="getStorageImageUrl('icon-clock.svg', STORAGE_FOLDERS.map)" alt="" draggable="false" />
             </span>
             <span class="map-place-preview__meta-hours">{{ place.hours }}</span>
           </span>
@@ -110,7 +111,7 @@ const onShareClick = (e: Event) => {
           aria-label="공유"
           @click="onShareClick"
         >
-          <img src="/images/map/action-share.svg" alt="" draggable="false" />
+          <img :src="getStorageImageUrl('action-share.svg', STORAGE_FOLDERS.map)" alt="" draggable="false" />
         </button>
         <button
           type="button"
@@ -119,7 +120,7 @@ const onShareClick = (e: Event) => {
           :aria-pressed="isSaved"
           @click="onBookmarkClick"
         >
-          <img src="/images/map/action-bookmark.svg" alt="" draggable="false" />
+          <img :src="getStorageImageUrl('action-bookmark.svg', STORAGE_FOLDERS.map)" alt="" draggable="false" />
         </button>
       </div>
     </div>

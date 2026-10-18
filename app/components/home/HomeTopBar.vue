@@ -1,8 +1,9 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import kkLeft from '~/assets/icons/home/kk-letter-left.svg?raw'
 import kkRight from '~/assets/icons/home/kk-letter-right.svg?raw'
 import kkChevron from '~/assets/icons/home/kk-chevron.svg?raw'
 import notificationIcon from '~/assets/icons/home/notification.svg?raw'
+import { getStorageImageUrl, STORAGE_FOLDERS } from '~/utils/storage'
 
 /*
  * Home header — Figma node 3:170 › 3:269 "Frame 665".
@@ -50,7 +51,7 @@ const onKkDropdown = () => {}
     >
       <span class="home-top-bar__avatar-image">
         <img
-          src="/images/home/header-avatar.png"
+          :src="getStorageImageUrl('header-avatar.png', STORAGE_FOLDERS.home)"
           alt="내 프로필"
         />
       </span>

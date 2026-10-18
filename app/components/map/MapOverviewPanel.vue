@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 /*
  * /map 기본 상태 bottom panel (Figma 44:1019 / 44:1044 actual).
  *
@@ -20,6 +20,7 @@
 import handleIcon from '~/assets/icons/common/sheet-handle.svg?raw'
 import chevronIcon from '~/assets/icons/explore/chevron-right.svg?raw'
 import pinIcon from '~/assets/icons/map/pin.svg?raw'
+import { getStorageImageUrl, STORAGE_FOLDERS } from '~/utils/storage'
 
 import {
   MAP_QUICK_CARDS,
@@ -30,6 +31,18 @@ import {
 const emit = defineEmits<{
   /* panel 자체 클릭은 배경 click 으로 처리하지 않도록 stopPropagation 만 한다. */
 }>()
+
+/*
+ * quick card avatar / icon 을 helper 로 한 번 더 resolve.
+ * (useMapData 가 path 만 보관하므로 여기서 URL 로 변환.)
+ */
+const resolvedCards = computed(() =>
+  MAP_QUICK_CARDS.map(c => ({
+    ...c,
+    avatars: c.avatars?.map(a => getStorageImageUrl(a, STORAGE_FOLDERS.map)),
+    icon: c.icon ? getStorageImageUrl(c.icon, STORAGE_FOLDERS.map) : undefined
+  }))
+)
 </script>
 
 <template>
@@ -47,7 +60,7 @@ const emit = defineEmits<{
   >
     <!-- handle (Figma 25:731 actual: 32×4) -->
     <span class="map-overview-panel__handle" aria-hidden="true">
-      <img src="/images/map/handle.svg" alt="" draggable="false" />
+      <img :src="getStorageImageUrl('handle.svg', STORAGE_FOLDERS.map)" alt="" draggable="false" />
     </span>
 
     <!--
@@ -59,14 +72,14 @@ const emit = defineEmits<{
     <div class="map-overview-panel__header-section">
       <div class="map-overview-panel__title-row">
         <span class="map-overview-panel__pin" aria-hidden="true">
-          <img src="/images/map/pin.svg" alt="" draggable="false" />
+          <img :src="getStorageImageUrl('pin.svg', STORAGE_FOLDERS.map)" alt="" draggable="false" />
         </span>
         <p class="map-overview-panel__title">마포구 망원동</p>
       </div>
 
       <div class="map-overview-panel__quick-cards">
         <div
-          v-for="card in MAP_QUICK_CARDS"
+          v-for="card in resolvedCards"
           :key="card.id"
           class="map-overview-panel__quick-card"
           :style="{ background: card.bg }"
@@ -134,7 +147,7 @@ const emit = defineEmits<{
         </div>
       </div>
       <span class="map-overview-panel__event-chevron" aria-hidden="true">
-        <img src="/images/map/chevron-right.svg" alt="" draggable="false" />
+        <img :src="getStorageImageUrl('chevron-right.svg', STORAGE_FOLDERS.map)" alt="" draggable="false" />
       </span>
     </div>
 

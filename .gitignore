@@ -22,3 +22,9 @@ logs
 .env
 .env.*
 !.env.example
+
+# Image optimization backup (spec #3) — keep original raster safe
+.backup/
+
+# audit scratch scripts (spec #1 ad-hoc)
+scripts/audit-*.ps1

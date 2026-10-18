@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 /*
  * /map 페이지.
  *
@@ -28,6 +28,7 @@ import {
   type MapFilter
 } from '~/composables/useMapData'
 import { useMapSelection } from '~/composables/useMapSelection'
+import { getStorageImageUrl, STORAGE_FOLDERS } from '~/utils/storage'
 
 /*
  * selectedPlace state.
@@ -43,8 +44,7 @@ const { selectedPlace, setSelectedPlace, clearSelectedPlace } = useMapSelection(
 const activeFilter = ref<MapFilter>('all')
 
 const visiblePlaceIds = computed<Set<string>>(() => {
-  if (activeFilter.value === 'all') return new Set(MAP_PLACES.map(p => p.id))
-  return new Set(MAP_PLACES.map(p => p.id))
+  return new Set(resolvedPlaces.value.map(p => p.id))
 })
 
 const onPlaceSelect = (place: MapPlace) => {
@@ -80,6 +80,18 @@ const CURRENT_LOCATION = { x: 58, y: 215 }
 const controlRight = MAP_RIGHT_CONTROLS.right
 const profileTop = MAP_RIGHT_CONTROLS.profileTop
 const locateTop = MAP_RIGHT_CONTROLS.locateTop
+
+/*
+ * Map surface / quick cards / place images 모두 helper 통과.
+ * supabaseUrl 있으면 Storage URL, 없으면 local public/ 매핑으로 fallback.
+ */
+const mapSurfaceUrl = getStorageImageUrl('map/map-bg.webp', STORAGE_FOLDERS.map)
+const resolvedPlaces = computed(() =>
+  MAP_PLACES.map(p => ({
+    ...p,
+    images: p.images.map(img => getStorageImageUrl(img, STORAGE_FOLDERS.map))
+  }))
+)
 </script>
 
 <template>
@@ -96,7 +108,7 @@ const locateTop = MAP_RIGHT_CONTROLS.locateTop
     <div class="map-surface" aria-hidden="true">
       <img
         class="map-surface__img"
-        src="/images/map/map-bg.png"
+        :src="mapSurfaceUrl"
         alt=""
         draggable="false"
       />
@@ -123,7 +135,7 @@ const locateTop = MAP_RIGHT_CONTROLS.locateTop
 
       <!-- place markers (Figma 44:1131 / 44:1140 / 44:1149 / 44:1158) -->
       <MapPlaceMarker
-        v-for="place in MAP_PLACES"
+        v-for="place in resolvedPlaces"
         :key="place.id"
         v-show="visiblePlaceIds.has(place.id)"
         :place="place"
@@ -151,7 +163,7 @@ const locateTop = MAP_RIGHT_CONTROLS.locateTop
           @click="onProfileClick"
         >
           <span class="map-controls__icon">
-            <img src="/images/map/profile-icon.svg" alt="" draggable="false" />
+            <img :src="getStorageImageUrl('profile-icon.svg', STORAGE_FOLDERS.map)" alt="" draggable="false" />
           </span>
         </button>
         <button
@@ -161,7 +173,7 @@ const locateTop = MAP_RIGHT_CONTROLS.locateTop
           @click="onLocateClick"
         >
           <span class="map-controls__icon">
-            <img src="/images/map/locate.svg" alt="" draggable="false" />
+            <img :src="getStorageImageUrl('locate.svg', STORAGE_FOLDERS.map)" alt="" draggable="false" />
           </span>
         </button>
       </div>

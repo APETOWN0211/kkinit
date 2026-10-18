@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 /*
  * Explore — Figma 30:1063 (탐색 - 메인, 최신)
  *  - 390 × 844 (scrollable AppContent)
@@ -13,6 +13,7 @@ import NeighborhoodRanking from '~/components/explore/NeighborhoodRanking.vue'
 import badgeRevisit from '~/assets/icons/explore/badge-revisit.svg?raw'
 import badgeSolo from '~/assets/icons/explore/badge-solo.svg?raw'
 import badgeLocal from '~/assets/icons/explore/badge-local.svg?raw'
+import { getStorageImageUrl, STORAGE_FOLDERS } from '~/utils/storage'
 
 /*
  * 헤더: 합정동
@@ -30,7 +31,7 @@ const userHandle = '닮은살걀'
 const restaurants = [
   {
     id: 'r1',
-    image: '/images/explore/r1.png',
+    image: getStorageImageUrl('r1.png', STORAGE_FOLDERS.explore),
     location: '망원동 · 일식',
     name: '유메노키',
     distance: '1.2km',
@@ -40,7 +41,7 @@ const restaurants = [
   },
   {
     id: 'r2',
-    image: '/images/explore/r2.png',
+    image: getStorageImageUrl('r2.png', STORAGE_FOLDERS.explore),
     location: '상수동 · 수제버거',
     name: '웨이브버거',
     distance: '1.5km',
@@ -50,7 +51,7 @@ const restaurants = [
   },
   {
     id: 'r3',
-    image: '/images/explore/r3.png',
+    image: getStorageImageUrl('r3.png', STORAGE_FOLDERS.explore),
     location: '합정동 · 양식',
     name: '오브테이블',
     distance: '0.9km',
@@ -77,7 +78,7 @@ const activeCategory = ref<GroupCategory>('all')
 const allGroups: GroupItem[] = [
   {
     id: 'g1',
-    thumbnail: '/images/explore/g1.png',
+    thumbnail: getStorageImageUrl('g1.png', STORAGE_FOLDERS.explore),
     name: '라멘원정대',
     members: 21,
     membersLabel: '21명',
@@ -85,11 +86,15 @@ const allGroups: GroupItem[] = [
     timeVariant: 'accent',
     locationChip: '망원동',
     categoryChip: '맛집 탐방',
-    avatars: ['/images/explore/g1a.png', '/images/explore/g1b.png', '/images/explore/g1c.png']
+    avatars: [
+      getStorageImageUrl('g1a.png', STORAGE_FOLDERS.explore),
+      getStorageImageUrl('g1b.png', STORAGE_FOLDERS.explore),
+      getStorageImageUrl('g1c.png', STORAGE_FOLDERS.explore)
+    ]
   },
   {
     id: 'g2',
-    thumbnail: '/images/explore/g2.png',
+    thumbnail: getStorageImageUrl('g2.png', STORAGE_FOLDERS.explore),
     name: '점심시간에 혼밥은 싫어',
     members: 30,
     membersLabel: '30명',
@@ -97,11 +102,15 @@ const allGroups: GroupItem[] = [
     timeVariant: 'accent',
     locationChip: '연남동',
     categoryChip: '같이 먹기',
-    avatars: ['/images/explore/g2a.png', '/images/explore/g2b.png', '/images/explore/g2c.png']
+    avatars: [
+      getStorageImageUrl('g2a.png', STORAGE_FOLDERS.explore),
+      getStorageImageUrl('g2b.png', STORAGE_FOLDERS.explore),
+      getStorageImageUrl('g2c.png', STORAGE_FOLDERS.explore)
+    ]
   },
   {
     id: 'g3',
-    thumbnail: '/images/explore/g3.png',
+    thumbnail: getStorageImageUrl('g3.png', STORAGE_FOLDERS.explore),
     name: '을지로 술친구',
     members: 45,
     membersLabel: '45명',
@@ -109,7 +118,11 @@ const allGroups: GroupItem[] = [
     timeVariant: 'accent',
     locationChip: '합정동',
     categoryChip: '술 · 야식',
-    avatars: ['/images/explore/g3a.png', '/images/explore/g3b.png', '/images/explore/g3c.png']
+    avatars: [
+      getStorageImageUrl('g3a.png', STORAGE_FOLDERS.explore),
+      getStorageImageUrl('g3b.png', STORAGE_FOLDERS.explore),
+      getStorageImageUrl('g3c.png', STORAGE_FOLDERS.explore)
+    ]
   }
 ]
 
@@ -131,9 +144,9 @@ const visibleGroups = computed(() => {
  * 10월 동네 랭킹.
  */
 const rankingItems = [
-  { id: 'rank2', name: '상수동', visits: '1,239회 방문', rank: 2 as const, image: '/images/explore/ranking-1.png', barHeight: 41 },
-  { id: 'rank1', name: '서교동', visits: '3,499회 방문', rank: 1 as const, image: '/images/explore/ranking-2.png', barHeight: 68 },
-  { id: 'rank3', name: '망원동', visits: '507회 방문', rank: 3 as const, image: '/images/explore/ranking-3.png', barHeight: 24 }
+  { id: 'rank2', name: '상수동', visits: '1,239회 방문', rank: 2 as const, image: getStorageImageUrl('ranking-1.png', STORAGE_FOLDERS.explore), barHeight: 41 },
+  { id: 'rank1', name: '서교동', visits: '3,499회 방문', rank: 1 as const, image: getStorageImageUrl('ranking-2.png', STORAGE_FOLDERS.explore), barHeight: 68 },
+  { id: 'rank3', name: '망원동', visits: '507회 방문', rank: 3 as const, image: getStorageImageUrl('ranking-3.png', STORAGE_FOLDERS.explore), barHeight: 24 }
 ]
 
 const { safeNavigate } = useSafeNavigation()

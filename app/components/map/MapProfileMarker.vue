@@ -12,6 +12,7 @@
  * 위치는 props 의 x/y (wrapper top-left) 그대로.
  */
 import type { MapProfileMarker } from '~/composables/useMapData'
+import { getStorageImageUrl, imagePathFacade, STORAGE_FOLDERS } from '~/utils/storage'
 
 defineProps<{
   marker: MapProfileMarker
@@ -21,6 +22,18 @@ function markerAvatarName(kind: MapProfileMarker['kind']) {
   if (kind === 'duck') return 'duck'
   if (kind === 'duck2') return 'duck' // Frame743 → 같은 duck 사진이 두 번 사용됨
   return 'dino'
+}
+
+/*
+ * Storage path 로 통일. helper 가 .webp / .png 매핑.
+ *
+ * `imagePath.map(...)` 는 storage path 만 반환 (spec #22).
+ * `<img :src>` 에는 public URL 이 필요하므로, 같은 helper 인 `getStorageImageUrl`
+ * 로 감싸서 한 번에 public URL 로 만든다.
+ */
+function markerAvatarPath(kind: MapProfileMarker['kind']): string {
+  const name = markerAvatarName(kind)
+  return getStorageImageUrl(imagePathFacade.map(`profile-${name}.webp`), STORAGE_FOLDERS.map)
 }
 </script>
 
@@ -32,7 +45,7 @@ function markerAvatarName(kind: MapProfileMarker['kind']) {
   >
     <img
       class="map-profile-marker__avatar"
-      :src="`/images/map/profile-${markerAvatarName(marker.kind)}.png`"
+      :src="markerAvatarPath(marker.kind)"
       alt=""
       draggable="false"
     />

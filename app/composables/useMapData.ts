@@ -1,9 +1,13 @@
-/*
+﻿/*
  * /map mock data.
  *
  * - 좌표/이미지/텍스트는 Figma 44:1019 (지도 - 메인) 의 actual value 를 그대로 따른다.
  * - 실제 API / Supabase 는 연결하지 않는다 (이번 작업 범위 밖).
+ *
+ * image_path → URL 변환은 `useMapSelection` 의 caller 인 /map 페이지의 setup 에서
+ * `getStorageImageUrl` 로 일괄 처리한다. 이 모듈은 path 만 보관 (spec #22).
  */
+import { imagePathFacade } from '~/utils/storage'
 
 export type MapPlaceCategory = 'korean' | 'japanese' | 'western' | 'cafe'
 
@@ -69,7 +73,7 @@ export const MAP_PLACES: MapPlace[] = [
     labelY: 409.56,
     labelX: 170.5,
     variant: 'default',
-    images: ['/images/map/uchon-1.png', '/images/map/uchon-2.png'],
+    images: [imagePathFacade.map('uchon-1.webp'), imagePathFacade.map('uchon-2.webp')],
     distance: '1.2km',
     hours: '08:00-20:30',
     badge: '영업중',
@@ -151,9 +155,9 @@ export type MapFilter = 'all' | 'friends' | 'following' | 'hot'
 
 export const MAP_FILTERS: { id: MapFilter; label: string; icon?: string }[] = [
   { id: 'all',       label: '전체' },
-  { id: 'friends',   label: '친구 방문', icon: '/images/map/icon-friends.svg' },
-  { id: 'following', label: '팔로잉 언급', icon: '/images/map/icon-people.svg' },
-  { id: 'hot',       label: '요즘 뜨는', icon: '/images/map/icon-hot.svg' }
+  { id: 'friends',   label: '친구 방문', icon: imagePathFacade.map('icon-friends.svg') },
+  { id: 'following', label: '팔로잉 언급', icon: imagePathFacade.map('icon-people.svg') },
+  { id: 'hot',       label: '요즘 뜨는', icon: imagePathFacade.map('icon-hot.svg') }
 ]
 
 /*
@@ -163,14 +167,14 @@ export const MAP_FILTERS: { id: MapFilter; label: string; icon?: string }[] = [
 export const MAP_QUICK_CARDS = [
   {
     id: 'friends',
-    avatars: ['/images/map/avatar-1.png', '/images/map/avatar-2.png'],
+    avatars: [imagePathFacade.map('avatar-1.webp'), imagePathFacade.map('avatar-2.webp')],
     text: ['친구 2명이', '근처에 있어요.'],
     bg: '#FEF7E4',
     accent: '#FFB300'
   },
   {
     id: 'event',
-    icon: '/images/map/icon-event.svg',
+    icon: imagePathFacade.map('icon-event.svg'),
     text: ['오늘', '열리는 ', '저녁 모임'],
     bg: '#E0FFF8',
     accent: '#55C7AE',
@@ -178,7 +182,7 @@ export const MAP_QUICK_CARDS = [
   },
   {
     id: 'posts',
-    icon: '/images/map/icon-posts.svg',
+    icon: imagePathFacade.map('icon-posts.svg'),
     text: ['방금 글이', '올라온 곳 ', '4개'],
     bg: '#F5F6F8',
     accent: '#FF6940',

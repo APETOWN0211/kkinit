@@ -56,7 +56,7 @@ const bookmarkVariant = computed(() => {
 </script>
 
 <template>
-  <article class="restaurant-card">
+  <article class="restaurant-card" data-card-id="restaurant-card">
     <!-- image -->
     <div class="restaurant-card__image">
       <img
@@ -128,6 +128,8 @@ const bookmarkVariant = computed(() => {
  */
 .restaurant-card {
   position: relative;
+  z-index: 0;
+  isolation: isolate;
 
   /* Carousel 에서 절대 압축되지 않도록 명시 */
   flex: 0 0 220px;
@@ -146,8 +148,14 @@ const bookmarkVariant = computed(() => {
 
   box-sizing: border-box;
 
-  /* overflow 는 카드 자체에는 두지 않음 (badge 가 card border edge 위에 ) */
-  overflow: hidden;
+  /*
+   * overflow 는 카드 자체에는 두지 않는다.
+   * - badge 가 absolute 로 이미지/본문 경계에 걸쳐서 떠 있어야 한다
+   *   (Figma 30:1106, 8:450 등 — image top + 113px 위치).
+   * - hidden 이면 badge 가 잘려서 "동네 인기 / 혼밥 인기" 같은 칩이
+   *   안 보이는 현상이 생긴다.
+   * - 둥근 모서리는 각 child (image, body) 가 따로 radius 처리.
+   */
 }
 
 .restaurant-card__image {
@@ -157,7 +165,18 @@ const bookmarkVariant = computed(() => {
   height: 128px;
   flex-shrink: 0;
 
-  overflow: hidden;
+  /*
+   * image 의 overflow:hidden 을 두면 badge 의 absolute (top 113 + height ~30 = 143,
+   * image 끝 128 보다 15px 아래로 빠짐) 가 image 영역 밖에서 잘려서 사라진다.
+   * image 의 img 자체에 object-fit:cover + radius 처리는 img 의 border-radius 로 하고,
+   * image wrapper 는 overflow 를 visible 로 둔다.
+   */
+  overflow: visible;
+
+  /* 카드 상단 둥근 모서리 (16px) — 카드 자체에 overflow:hidden 이 없으므로
+   * 각 child 가 직접 처리. */
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
   background: #F3F4F6;
 }
 
@@ -166,6 +185,10 @@ const bookmarkVariant = computed(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+
+  /* image 영역 자체의 둥근 모서리 (badge 와 무관, image 안쪽 클립용) */
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
 }
 
 .restaurant-card__body {
@@ -180,6 +203,16 @@ const bookmarkVariant = computed(() => {
      normal flow + min-height 로 잡고, inner 가 min-width 220 을 보장. */
   min-height: 141px;
   flex: 1 1 auto;
+
+  /* 카드 자체 overflow:hidden 제거에 따른 하단 둥근 모서리 보존 */
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  /* body 자체 배경은 두지 않는다 — article 의 background #FFFFFF 가 비쳐 보여
+     둥근 모서리 안쪽까지 깨끗하게 채워진다. body 가 background 를 가지면
+     badge 가 body 배경에 가려질 수 있다. */
+  background: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 /* ----- top row (location + bookmark) ----- */
@@ -387,11 +420,15 @@ const bookmarkVariant = computed(() => {
   white-space: nowrap;
 }
 
-/* ----- Badge (absolute over image, Figma 30:1106 / 30:1138 / 30:1169) ----- */
-.restaurant-card__badge {
+/* ----- Badge (absolute over image, Figma 30:1106 / 30:1138 / 30:1169 / 8:450) -----
+   spec: top:113px, left:11.5px, orange #FE5531 / mint #70DDC5
+   z-index 2 + isolation: isolate 로 body (z-index default) 위에 항상 떠 있어야 한다. */
+article.restaurant-card .restaurant-card__badge {
   position: absolute;
   top: 113px;
   left: 11.5px;
+  z-index: 2;
+  isolation: isolate;
 
   display: flex;
   align-items: center;

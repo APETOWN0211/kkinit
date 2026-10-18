@@ -19,6 +19,7 @@
  *    가로/세로 40px 이상으로 확장한다 (40px hit zone, visual 은 그대로).
  */
 import type { MapPlace } from '~/composables/useMapData'
+import { getStorageImageUrl, STORAGE_FOLDERS } from '~/utils/storage'
 
 const props = defineProps<{
   place: MapPlace
@@ -54,12 +55,12 @@ const onClick = (e: Event) => {
  */
 const markerSrc = computed(() => {
   if (props.isSelected && props.forceUchonWhenSelected) {
-    return '/images/map/marker-uchon.svg'
+    return getStorageImageUrl('marker-uchon.svg', STORAGE_FOLDERS.map)
   }
   if (props.place.variant === 'selected' || props.isSelected) {
-    return '/images/map/marker-teal.svg'
+    return getStorageImageUrl('marker-teal.svg', STORAGE_FOLDERS.map)
   }
-  return '/images/map/marker-orange.svg'
+  return getStorageImageUrl('marker-orange.svg', STORAGE_FOLDERS.map)
 })
 </script>
 

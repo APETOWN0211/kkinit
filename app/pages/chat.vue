@@ -1,9 +1,10 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import ChatHeader from '~/components/chat/ChatHeader.vue'
 import ChatProfileStrip from '~/components/chat/ChatProfileStrip.vue'
 import ChatFilterTabs from '~/components/chat/ChatFilterTabs.vue'
 import ChatList from '~/components/chat/ChatList.vue'
 import type { ChatFilter } from '~/components/chat/ChatFilterTabs.vue'
+import { getStorageImageUrl, STORAGE_FOLDERS } from '~/utils/storage'
 
 const activeFilter = ref<ChatFilter>('all')
 
@@ -28,40 +29,40 @@ const profiles: ProfileItem[] = [
   {
     id: 'dalm',
     name: '닮은살걀',
-    avatar: '/images/chat/profile-dalm.png',
+    avatar: getStorageImageUrl('profile-dalm.png', STORAGE_FOLDERS.chat),
     ring: 'none',
     showFollowPlus: true
   },
   {
     id: 'johnny',
     name: '죠니월드',
-    avatar: '/images/chat/profile-johnny.png',
+    avatar: getStorageImageUrl('profile-johnny.png', STORAGE_FOLDERS.chat),
     ring: 'orange'
   },
   {
     id: 'tiranori',
     name: '티라노리',
-    avatar: '/images/chat/profile-tiranori.png',
+    avatar: getStorageImageUrl('profile-tiranori.png', STORAGE_FOLDERS.chat),
     ring: 'orange-short'
   },
   {
     id: 'kurumi',
     name: '쿠루미',
-    avatar: '/images/chat/profile-kurumi.png',
+    avatar: getStorageImageUrl('profile-kurumi.png', STORAGE_FOLDERS.chat),
     ring: 'gray',
     dimName: true
   },
   {
     id: 'ominsu',
     name: '오민수',
-    avatar: '/images/chat/profile-ominsu.png',
+    avatar: getStorageImageUrl('profile-ominsu.png', STORAGE_FOLDERS.chat),
     ring: 'gray',
     dimName: true
   },
   {
     id: 'deokdeokgo',
     name: '덕덕고',
-    avatar: '/images/feed/profile-deokdeokgo.png',
+    avatar: getStorageImageUrl('profile-deokdeokgo.png', STORAGE_FOLDERS.feed),
     ring: 'gray',
     dimName: true
   }
@@ -88,7 +89,7 @@ const conversations: Conversation[] = [
     id: 'c1',
     type: 'direct',
     name: '티라노리',
-    avatar: '/images/chat/profile-tiranori.png',
+    avatar: getStorageImageUrl('profile-tiranori.png', STORAGE_FOLDERS.chat),
     ring: 'orange-short',
     lastMessage: '그래 여기 한번 가보자',
     time: '20:11',
@@ -99,7 +100,7 @@ const conversations: Conversation[] = [
     id: 'c2',
     type: 'direct',
     name: '죠니월드',
-    avatar: '/images/chat/profile-johnny-muted.png',
+    avatar: getStorageImageUrl('profile-johnny-muted.png', STORAGE_FOLDERS.chat),
     ring: 'orange-short',
     lastMessage: '안녕하세요! 마포구에서 만두집을 운영중인 ㅇㅁㄹㄴㅇㄹ',
     time: '17:03',
@@ -110,9 +111,9 @@ const conversations: Conversation[] = [
     type: 'group',
     name: '합정 야식 모임',
     members: [
-      '/images/chat/group-member-1.png',
-      '/images/chat/group-member-2.png',
-      '/images/chat/group-member-3.png'
+      getStorageImageUrl('group-member-1.png', STORAGE_FOLDERS.chat),
+      getStorageImageUrl('group-member-2.png', STORAGE_FOLDERS.chat),
+      getStorageImageUrl('group-member-3.png', STORAGE_FOLDERS.chat)
     ],
     memberCount: 6,
     sender: '도기도그',
@@ -125,7 +126,7 @@ const conversations: Conversation[] = [
     id: 'c4',
     type: 'direct',
     name: '오민수',
-    avatar: '/images/chat/profile-ominsu-2.png',
+    avatar: getStorageImageUrl('profile-ominsu-2.png', STORAGE_FOLDERS.chat),
     ring: 'gray',
     lastMessage: '오케이, 그때 봐!',
     time: '3일 전'
@@ -134,7 +135,7 @@ const conversations: Conversation[] = [
     id: 'c5',
     type: 'direct',
     name: '바람새',
-    avatar: '/images/chat/profile-baramsae.png',
+    avatar: getStorageImageUrl('profile-baramsae.png', STORAGE_FOLDERS.chat),
     ring: 'none',
     lastMessage: '식당 정보를 보냈어요.',
     time: '일주일',
@@ -145,7 +146,7 @@ const conversations: Conversation[] = [
     id: 'c6',
     type: 'direct',
     name: '파란하늘구름',
-    avatar: '/images/chat/profile-paran.png',
+    avatar: getStorageImageUrl('profile-paran.png', STORAGE_FOLDERS.chat),
     ring: 'gray',
     lastMessage: "'합정 야식 모임' 모임 가입 요청을 보냈어요.",
     time: '2주 전'
@@ -154,7 +155,7 @@ const conversations: Conversation[] = [
     id: 'c7',
     type: 'direct',
     name: '오민수',
-    avatar: '/images/chat/profile-ominsu-3.png',
+    avatar: getStorageImageUrl('profile-ominsu-3.png', STORAGE_FOLDERS.chat),
     ring: 'gray',
     lastMessage: '안녕하세요! 마포구에서 만두집을 운영중인',
     time: '1달 전'
@@ -163,7 +164,7 @@ const conversations: Conversation[] = [
     id: 'c8',
     type: 'direct',
     name: '오민수',
-    avatar: '/images/chat/profile-ominsu-2.png',
+    avatar: getStorageImageUrl('profile-ominsu-2.png', STORAGE_FOLDERS.chat),
     ring: 'gray',
     lastMessage: '안녕하세요! 마포구에서 만두집을 운영중인',
     time: '1일 전'
@@ -172,7 +173,7 @@ const conversations: Conversation[] = [
     id: 'c9',
     type: 'direct',
     name: '닉네임9',
-    avatar: '/images/chat/profile-nickname9.png',
+    avatar: getStorageImageUrl('/images/chat/profile-nickname9.png', 'feed'),
     ring: 'orange-short',
     lastMessage: '내일 같이 가요!',
     time: '12:42'
@@ -182,9 +183,9 @@ const conversations: Conversation[] = [
     type: 'group',
     name: '마포구 맛집 탐방',
     members: [
-      '/images/chat/group-member-1.png',
-      '/images/chat/group-member-2.png',
-      '/images/chat/group-member-3.png'
+      getStorageImageUrl('group-member-1.png', STORAGE_FOLDERS.chat),
+      getStorageImageUrl('group-member-2.png', STORAGE_FOLDERS.chat),
+      getStorageImageUrl('group-member-3.png', STORAGE_FOLDERS.chat)
     ],
     memberCount: 8,
     sender: '바람새',
@@ -197,7 +198,7 @@ const conversations: Conversation[] = [
     id: 'c11',
     type: 'direct',
     name: '하늘바라기',
-    avatar: '/images/chat/profile-sky.png',
+    avatar: getStorageImageUrl('/images/chat/profile-sky.png', 'feed'),
     ring: 'none',
     lastMessage: '사진 잘 봤어요 :)',
     time: '오늘'
@@ -206,7 +207,7 @@ const conversations: Conversation[] = [
     id: 'c12',
     type: 'direct',
     name: '지우',
-    avatar: '/images/chat/profile-jiwoo.png',
+    avatar: getStorageImageUrl('/images/chat/profile-jiwoo.png', 'feed'),
     ring: 'gray',
     lastMessage: '주말에 시간 되세요?',
     time: '어제'
@@ -215,7 +216,7 @@ const conversations: Conversation[] = [
     id: 'c13',
     type: 'direct',
     name: '햇살한점',
-    avatar: '/images/chat/profile-sun.png',
+    avatar: getStorageImageUrl('/images/chat/profile-sun.png', 'feed'),
     ring: 'orange',
     lastMessage: '답장 고마워요!',
     time: '2일 전',
@@ -227,9 +228,9 @@ const conversations: Conversation[] = [
     type: 'group',
     name: '고양이 집사 모임',
     members: [
-      '/images/chat/group-member-2.png',
-      '/images/chat/group-member-3.png',
-      '/images/chat/group-member-4.png'
+      getStorageImageUrl('group-member-2.png', STORAGE_FOLDERS.chat),
+      getStorageImageUrl('group-member-3.png', STORAGE_FOLDERS.chat),
+      getStorageImageUrl('/images/chat/group-member-4.png', 'feed')
     ],
     memberCount: 12,
     sender: '냥냥이',
@@ -241,7 +242,7 @@ const conversations: Conversation[] = [
     id: 'c15',
     type: 'direct',
     name: '초록이',
-    avatar: '/images/chat/profile-green.png',
+    avatar: getStorageImageUrl('/images/chat/profile-green.png', 'feed'),
     ring: 'none',
     lastMessage: '카페에서 만나요',
     time: '4일 전'
@@ -250,7 +251,7 @@ const conversations: Conversation[] = [
     id: 'c16',
     type: 'direct',
     name: '별빛루나',
-    avatar: '/images/chat/profile-luna.png',
+    avatar: getStorageImageUrl('/images/chat/profile-luna.png', 'feed'),
     ring: 'orange-short',
     lastMessage: '내일 일정 변경 가능할까요?',
     time: '5일 전',
@@ -261,7 +262,7 @@ const conversations: Conversation[] = [
     id: 'c17',
     type: 'direct',
     name: '달빛사냥꾼',
-    avatar: '/images/chat/profile-moon.png',
+    avatar: getStorageImageUrl('/images/chat/profile-moon.png', 'feed'),
     ring: 'gray',
     lastMessage: '알겠어요 :)',
     time: '6일 전'
@@ -270,7 +271,7 @@ const conversations: Conversation[] = [
     id: 'c18',
     type: 'direct',
     name: '코코넛',
-    avatar: '/images/chat/profile-coco.png',
+    avatar: getStorageImageUrl('/images/chat/profile-coco.png', 'feed'),
     ring: 'none',
     lastMessage: '재밌는 영상 보냈어요!',
     time: '일주일 전'
@@ -280,9 +281,9 @@ const conversations: Conversation[] = [
     type: 'group',
     name: '주말 등산 모임',
     members: [
-      '/images/chat/group-member-1.png',
-      '/images/chat/group-member-3.png',
-      '/images/chat/group-member-4.png'
+      getStorageImageUrl('group-member-1.png', STORAGE_FOLDERS.chat),
+      getStorageImageUrl('group-member-3.png', STORAGE_FOLDERS.chat),
+      getStorageImageUrl('/images/chat/group-member-4.png', 'feed')
     ],
     memberCount: 5,
     sender: '산꾼',
@@ -295,7 +296,7 @@ const conversations: Conversation[] = [
     id: 'c20',
     type: 'direct',
     name: '맛집헌터',
-    avatar: '/images/chat/profile-hunter.png',
+    avatar: getStorageImageUrl('/images/chat/profile-hunter.png', 'feed'),
     ring: 'orange',
     lastMessage: '신규 맛집 리뷰 올렸어요!',
     time: '한달 전'

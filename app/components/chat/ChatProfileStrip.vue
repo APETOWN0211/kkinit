@@ -81,8 +81,8 @@ const onAvatarError = (e: Event) => {
             class="profile-follow-badge"
             aria-hidden="true"
           >
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M4 1.5V6.5M1.5 4H6.5" stroke="white" stroke-width="1.3" stroke-linecap="round" />
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+              <path d="M4.5 1.5V7.5M1.5 4.5H7.5" stroke="white" stroke-width="1.4" stroke-linecap="round" />
             </svg>
           </span>
         </span>
@@ -200,10 +200,10 @@ const onAvatarError = (e: Event) => {
  */
 .profile-follow-badge {
   position: absolute;
-  right: 2px;
-  bottom: 14px;
-  width: 16px;
-  height: 16px;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
