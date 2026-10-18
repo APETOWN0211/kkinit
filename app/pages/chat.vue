@@ -130,22 +130,53 @@ const conversations: Conversation[] = [
     ring: 'gray',
     lastMessage: '오케이, 그때 봐!',
     time: '3일 전'
+  },
+  {
+    id: 'c5',
+    type: 'direct',
+    name: '바람새',
+    avatar: getStorageImageUrl('profile-baramsae.png', STORAGE_FOLDERS.chat),
+    ring: 'none',
+    lastMessage: '식당 정보를 보냈어요.',
+    time: '일주일',
+    unreadCount: 2,
+    badgeColor: 'orange'
+  },
+  {
+    id: 'c6',
+    type: 'direct',
+    name: '파란하늘구름',
+    avatar: getStorageImageUrl('profile-paran.png', STORAGE_FOLDERS.chat),
+    ring: 'gray',
+    lastMessage: "'합정 야식 모임' 모임 가입 요청을 보냈어요.",
+    time: '2주 전'
+  },
+  {
+    id: 'c7',
+    type: 'direct',
+    name: '오민수',
+    avatar: getStorageImageUrl('profile-ominsu-3.png', STORAGE_FOLDERS.chat),
+    ring: 'gray',
+    lastMessage: '안녕하세요! 마포구에서 만두집을 운영중인',
+    time: '1달 전'
   }
   /*
-   * NOTE: 더 아래의 mock conversation (c5..c20 — 바람새, 파란하늘구름,
-   * 추가 오민수들, 닉네임9, 마포구 맛집 탐방, 하늘바라기, 지우, 햇살한점,
-   * 고양이 집사 모임, 초록이, 별빛루나, 달빛사냥꾼, 코코넛, 주말 등산 모임,
-   * 맛집헌터) 은 모두 제거됨.
+   * NOTE: c7 (두 번째 오민수) 아래의 mock conversation (c8..c20 — 추가 오민수,
+   * 닉네임9, 마포구 맛집 탐방, 하늘바라기, 지우, 햇살한점, 고양이 집사 모임,
+   * 초록이, 별빛루나, 달빛사냥꾼, 코코넛, 주말 등산 모임, 맛집헌터) 은 모두 제거.
    *
-   * 이유: /chat 의 mock conversation list 는 현재 다음 4 명만 표시:
+   * 이유: /chat 의 mock conversation list 는 다음 7 건만 표시:
    *   1) 티라노리 (c1)
    *   2) 쵸니월드 (c2)
    *   3) 합정 야식 모임 (c3)
    *   4) 오민수 (c4)
-   * "전체 / 안읽음 / 모임" 모든 filter 에서도 동일하게 4 개만 렌더.
+   *   5) 바람새 (c5)
+   *   6) 파란하늘구름 (c6)
+   *   7) 오민수 (c7) ← 두 번째 오민수 (여기까지 유지)
+   * "전체 / 안읽음 / 모임" 모든 filter 에서도 동일하게 위 7 건만 렌더.
    *
    * CSS (display:none, nth-child) 로 가리지 않고 data 자체를 제거했으므로
-   * filter 분기 (`filteredConversations`) 도 자동으로 줄어든 4 개만 반환한다.
+   * filter 분기 (`filteredConversations`) 도 자동으로 줄어든 7 건만 반환한다.
    */
 ]
 
