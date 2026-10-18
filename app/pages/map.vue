@@ -83,12 +83,6 @@ const locateTop = MAP_RIGHT_CONTROLS.locateTop
 </script>
 
 <template>
-  <!--
-    Page wrapper.
-    - AppShell (390×844) 의 AppContent 안에서 full-bleed 로 동작.
-    - height 100% + overflow hidden 으로 page 자체는 스크롤되지 않게 한다.
-    - BottomNavigation (app.vue 의 fixed element) 은 이 page 와 무관하게 viewport 하단에 floating.
-  -->
   <div class="map-page">
     <!--
       지도 background layer.

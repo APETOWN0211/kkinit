@@ -221,9 +221,22 @@ const emit = defineEmits<{
    * Figma initial viewport (844) 에서 panel 안에 모든 content 가 다 들어가지
    * 않을 수 있어, 좁은 viewport / 작은 device 에서는 sheet 내부만
    * 세로 스크롤되게 한다. panel 자체는 viewport/AppShell 에 고정.
+   *
+   * 스크롤바는 디자인상 보이지 않게 한다:
+   *  - Firefox: scrollbar-width: none
+   *  - IE / legacy Edge: -ms-overflow-style: none
+   *  - WebKit (Chrome / Safari / iOS PWA): ::-webkit-scrollbar { display: none }
+   *  → sheet 내부의 세로 스크롤 자체는 그대로 유지 (touch/wheel scroll OK).
    */
   overflow-y: auto;
   overflow-x: hidden;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.map-overview-panel::-webkit-scrollbar {
+  display: none;
 }
 
 /*
