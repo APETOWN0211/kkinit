@@ -5,6 +5,22 @@ import storyRingOrangeShort from '~/assets/icons/chat/story-ring-orange-short.sv
 import storyRingGray from '~/assets/icons/chat/story-ring-gray.svg?raw'
 import GroupAvatar from '~/components/chat/GroupAvatar.vue'
 
+/*
+ * Default avatar fallback.
+ * 원본 <img src> 가 404 / load error 시 이 URL 로 swap 해서
+ * 깨진 이미지 아이콘이 보이지 않게 한다.
+ *  - /images/chat/default-avatar.svg 는 항상 존재하는 gray silhouette.
+ *  - 한 번 swap 한 element 는 다시 swap 하지 않도록 src-ref 를 기억.
+ */
+const DEFAULT_AVATAR = '/images/chat/default-avatar.svg'
+
+const onAvatarError = (e: Event) => {
+  const img = e.target as HTMLImageElement
+  if (!img || img.dataset.fallbackApplied === '1') return
+  img.dataset.fallbackApplied = '1'
+  img.src = DEFAULT_AVATAR
+}
+
 type RingKind = 'orange' | 'orange-short' | 'gray' | 'none'
 type BadgeColor = 'orange' | 'teal'
 
@@ -81,6 +97,7 @@ defineProps<{
             :src="item.avatar"
             :alt="item.name"
             class="conversation-avatar__img"
+            @error="onAvatarError"
           />
         </div>
       </template>

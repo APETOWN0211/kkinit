@@ -63,7 +63,8 @@ const onShareClick = (e: Event) => {
 
     <!--
       Image row (Figma 25:1001 actual).
-      horizontal scroll 가능, padding 10 top / 4 bottom / 20 x
+      horizontal scroll 가능, padding 10 top / 20 bottom / 20 x
+      - bottom padding 20 으로 title 시작까지 20px 시각적 간격 확보.
     -->
     <div v-if="place.images.length > 0" class="map-place-preview__images">
       <div
@@ -125,7 +126,10 @@ const onShareClick = (e: Event) => {
 
     <!--
       Description (Figma 25:1029-25:1031 actual).
-      - py 4, Regular 15 #6E6F72, line-height 1.4, tracking 0.3, w 350
+      - header 의 형제 row 로 두고 sheet content 의 좌우 padding 과 정렬.
+      - title/meta row 와 세로로 겹치지 않으며, action button column 의
+        폭에 영향 받지 않고 카드 전체 폭을 사용.
+      - white-space: normal + word-break: keep-all 로 한국어 자연스러운 줄바꿈.
     -->
     <p class="map-place-preview__description">{{ place.description }}</p>
   </section>
@@ -133,26 +137,28 @@ const onShareClick = (e: Event) => {
 
 <style scoped>
 /*
- * Figma 25:999 actual:
- *  - 390×389
- *  - top radius 24, white, shadow 0 -2 15 rgba(0,0,0,0.09)
+ * Figma 44:1019 selected state 의 preview bottom sheet.
+ *  - 390 wide, top radius 24, white, shadow 0 -2 15 rgba(0,0,0,0.09)
+ *  - 기본 (MapOverviewPanel) 과 동일한 top 457 으로 맞춰 일관성 유지.
  *  - pb 28 / pt 14
- *  - center x = 50% (Figma -translate-x-1/2)
+ *
+ * position: fixed 로 AppShell (390×844) 기준 457 부터 bottom 까지 채움.
+ * (MapOverviewPanel 과 동일 방식)
  */
 .map-place-preview {
-  position: absolute;
-  left: 50%;
+  position: fixed;
+  top: 457px;
+  left: 0;
+  right: 0;
   bottom: 0;
-
-  transform: translateX(-50%);
 
   width: 100%;
   max-width: 390px;
 
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  align-items: stretch;
+  gap: 0;
 
   padding: 14px 0 calc(28px + env(safe-area-inset-bottom));
 
@@ -169,22 +175,35 @@ const onShareClick = (e: Event) => {
 
   box-sizing: border-box;
 
+  overflow-y: auto;
+  overflow-x: hidden;
+
   /*
    * 등장 animation (Figma 요구):
    *  translateY(20) + opacity 0 → translateY(0) + opacity 1
    *  260ms cubic-bezier(0.22, 1, 0.36, 1)
+   *
+   * contain: layout paint; + will-change: transform, opacity
+   *  - 이 element 의 transform/opacity animation 으로 인해
+   *    viewport 의 다른 layer (특히 .map-surface 배경 이미지) 가
+   *    reflow/repaint 되는 것을 차단.
+   *  - GPU layer 를 명시적으로 분리해 background 의 cover crop 이
+   *    흔들리는 현상 제거.
    */
+  contain: layout paint;
+  will-change: transform, opacity;
+
   animation: map-place-preview-enter 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes map-place-preview-enter {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(20px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
   }
 }
 
@@ -197,6 +216,8 @@ const onShareClick = (e: Event) => {
   width: 32px;
   height: 4px;
   flex-shrink: 0;
+
+  align-self: center;
 }
 
 .map-place-preview__handle img {
@@ -207,8 +228,9 @@ const onShareClick = (e: Event) => {
 
 /*
  * Image row (Figma 25:1001 actual).
- *  - horizontal scroll 가능, padding 10 top / 4 bottom / 20 x
+ *  - horizontal scroll 가능, padding 10 top / 20 bottom / 20 x
  *  - 각 image 208×144, radius 12, gap 10
+ *  - bottom padding 20 으로 header 시작까지의 시각적 간격 확보.
  */
 .map-place-preview__images {
   display: flex;
@@ -216,7 +238,7 @@ const onShareClick = (e: Event) => {
   gap: 10px;
 
   width: 100%;
-  padding: 10px 20px 4px;
+  padding: 10px 20px 20px;
 
   overflow-x: auto;
   overflow-y: hidden;
@@ -253,8 +275,11 @@ const onShareClick = (e: Event) => {
 
 /*
  * Header row (Figma 25:1004 actual).
- *  - padding-x 20
- *  - justify-between
+ *  - left col (info): title row + meta row
+ *  - right col (actions): 2 × 42×42 action buttons, gap 13.263
+ *  - justify-between 으로 info / actions 분리.
+ *  - padding-x 20 → sheet content 의 좌우 padding 과 정렬.
+ *  - 아래 description row 와의 간격은 description 의 margin-top (20) 이 담당.
  */
 .map-place-preview__header {
   display: flex;
@@ -267,6 +292,8 @@ const onShareClick = (e: Event) => {
   padding: 0 20px;
 
   box-sizing: border-box;
+
+  flex-shrink: 0;
 }
 
 .map-place-preview__info {
@@ -288,7 +315,8 @@ const onShareClick = (e: Event) => {
   align-items: center;
   gap: 8px;
 
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
 }
 
 .map-place-preview__title {
@@ -301,6 +329,11 @@ const onShareClick = (e: Event) => {
   color: #191919;
   letter-spacing: 0;
   white-space: nowrap;
+
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .map-place-preview__badge {
@@ -320,6 +353,8 @@ const onShareClick = (e: Event) => {
   color: #FF6940;
   letter-spacing: 0;
   white-space: nowrap;
+
+  flex-shrink: 0;
 }
 
 /*
@@ -340,6 +375,20 @@ const onShareClick = (e: Event) => {
   justify-content: center;
 }
 
+/*
+ * Meta icon wrapper.
+ *
+ * distance icon (icon-distance.svg) 은 Figma 원본 그대로 세로로 긴 pin
+ * (intrinsic 13.5385 × 16, viewBox 0 0 13.5385 16) 이다.
+ * SVG 내부에 preserveAspectRatio="none" 이 박혀 있어 wrapper 가 정사각형이면
+ * 가로로 눌려서 찌그러진다.
+ *
+ * → 16×16 정사각형 frame 안에 그대로 두고 img 에
+ *   object-fit: contain 으로 SVG 비율을 유지시킨다.
+ *   (위/아래 또는 좌/우에 자연스러운 여백이 생기지만 pin 본래 비율은 보존됨)
+ *
+ * clock icon (icon-clock.svg) 은 정사각형 (15.5429 × 15.5429) 이라 영향 없음.
+ */
 .map-place-preview__meta-icon {
   display: flex;
   align-items: center;
@@ -355,6 +404,7 @@ const onShareClick = (e: Event) => {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: contain;
 }
 
 .map-place-preview__meta-item > span:last-child {
@@ -417,22 +467,26 @@ const onShareClick = (e: Event) => {
 
 /*
  * Description (Figma 25:1029-25:1031 actual).
- *  - py 4, Regular 15 #6E6F72, line-height 1.4, tracking 0.3, w 350
+ *  - meta row 와의 20px 간격으로 시각적 분리.
+ *  - sheet content 의 좌우 padding 20 과 정렬 (header 와 동일 edge).
+ *  - action button column 의 폭에 영향 받지 않고 카드 전체 폭 사용.
+ *  - 한국어 자연스러운 줄바꿈 (word-break: keep-all).
  */
 .map-place-preview__description {
-  margin: 0;
+  margin: 20px 0 0;
 
   width: 100%;
-  max-width: 350px;
-
-  padding: 4px 20px 0;
+  padding: 0 20px;
 
   font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 15px;
   font-weight: 400;
-  line-height: 1.4;
+  line-height: 1.55;
   color: #6E6F72;
   letter-spacing: 0.3px;
+
+  white-space: normal;
+  word-break: keep-all;
 
   box-sizing: border-box;
 }

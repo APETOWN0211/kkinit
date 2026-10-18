@@ -1,8 +1,7 @@
 /*
  * /map mock data.
  *
- * - 좌표/이미지/텍스트는 Figma 25:706 (지도 - 메인) / 25:905 (식당 미리보기) 의
- *   actual value 를 그대로 따른다.
+ * - 좌표/이미지/텍스트는 Figma 44:1019 (지도 - 메인) 의 actual value 를 그대로 따른다.
  * - 실제 API / Supabase 는 연결하지 않는다 (이번 작업 범위 밖).
  */
 
@@ -13,8 +12,7 @@ export type MapPlace = {
   name: string
   category: MapPlaceCategory
   /*
-   * map container (390×844 viewport) 기준 marker top-left 좌표 (px).
-   * Figma 의 marker wrapper (28×31) 위치를 그대로 사용.
+   * 390×844 AppShell 기준 marker wrapper (28 × 31.556) top-left 좌표 (px).
    */
   x: number
   y: number
@@ -26,10 +24,10 @@ export type MapPlace = {
    * visual marker variant.
    *  - 'default' (orange outline circle + dot)  → marker-orange.svg
    *  - 'selected' (teal outline circle + dot)   → marker-teal.svg
-   *  - 'uchon' (Figma 25:905 의 active 상태)    → marker-uchon.svg
+   *  - 'uchon' (Figma 식당 미리보기 active 상태) → marker-uchon.svg
    */
   variant: 'default' | 'selected' | 'uchon'
-  /* Figma 25:905 에서 사용. */
+  /* 식당 미리보기 (selected state) 에서 사용. */
   images: string[]
   distance: string
   hours: string
@@ -40,8 +38,11 @@ export type MapPlace = {
 }
 
 /*
- * Figma 25:706 actual 위치 그대로.
- * (marker wrapper 28×31 + label top/left)
+ * Figma 44:1019 actual 위치 그대로.
+ * (marker wrapper 28×31.556 + label top/left)
+ *
+ * x/y 는 390×844 AppShell 기준 marker wrapper top-left 좌표 (px).
+ * labelX/labelY 는 label element absolute top-left 좌표.
  */
 export const MAP_PLACES: MapPlace[] = [
   {
@@ -63,10 +64,10 @@ export const MAP_PLACES: MapPlace[] = [
     id: 'uchon',
     name: '숯불구이 우촌',
     category: 'korean',
-    x: 108,
+    x: 156,
     y: 374,
     labelY: 409.56,
-    labelX: 122,
+    labelX: 170.5,
     variant: 'default',
     images: ['/images/map/uchon-1.png', '/images/map/uchon-2.png'],
     distance: '1.2km',
@@ -81,10 +82,10 @@ export const MAP_PLACES: MapPlace[] = [
     id: 'butasushi',
     name: '부타스시',
     category: 'japanese',
-    x: 215,
+    x: 255,
     y: 250,
     labelY: 286,
-    labelX: 229,
+    labelX: 268.5,
     variant: 'default',
     images: [],
     distance: '2.1km',
@@ -96,10 +97,10 @@ export const MAP_PLACES: MapPlace[] = [
     id: 'waveburger',
     name: '웨이브버거',
     category: 'western',
-    x: 315,
+    x: 329,
     y: 183,
     labelY: 218.56,
-    labelX: 329,
+    labelX: 343.5,
     variant: 'selected',
     images: [],
     distance: '0.9km',
@@ -111,7 +112,9 @@ export const MAP_PLACES: MapPlace[] = [
 
 /*
  * Map 위에 떠 있는 사용자/친구 profile avatar marker.
- * Figma 25:706 의 duck / dino avatar 위치를 그대로 사용한다.
+ * Figma 44:1100 / 44:1043 의 absolute viewport 좌표.
+ *  - 44:1100 (top duck, Frame744)  : wrapper left 387.38 - 221.38 = 166, top 160.95 - 1.95 = 159
+ *  - 44:1043 (bottom duck, Frame743): wrapper left 470.38 - 221.38 = 249, top 410.95 - 1.95 = 409
  */
 export type MapProfileMarkerKind = 'duck' | 'dino' | 'duck2'
 
@@ -124,32 +127,26 @@ export type MapProfileMarker = {
 }
 
 export const MAP_PROFILE_MARKERS: MapProfileMarker[] = [
-  /* Figma 25:781 — left 387.38 top 160.95, wrapper 48×48 (42×42 avatar + pointer) */
-  { id: 'p1', kind: 'duck', x: 384, y: 158, size: 48 },
-  /* Figma 25:715 — left 467.38 top 407.95, wrapper 48×48 */
-  { id: 'p2', kind: 'duck2', x: 464, y: 408, size: 48 }
-  /*
-   * green dino avatar 는 Figma 의 다른 layer 에서 발견되지 않아
-   * 일단 제외. 추후 asset 추가 시 위 배열에 더한다.
-   */
+  { id: 'p1', kind: 'duck', x: 163, y: 156, size: 48 },
+  { id: 'p2', kind: 'duck2', x: 246, y: 406, size: 48 }
 ]
 
 /*
- * Map 우측 control button 위치 (Figma 25:797 / 25:946, 25:700 / 25:945).
- * - profile button : 38×38, top 351 (base) / 316 (selected)
- * - locate button  : 38×38, top 397 (base) / 362 (selected)
- *
- * 두 상태 모두 같은 우측 column (left = calc(75% + 39.5px) ≈ 332px).
+ * Map 우측 control button 위치 (Figma 44:1111 / Frame714).
+ *  - left = calc(75% + 39.5px) ≈ 332px
+ *  - profile button (Frame714): 38×38, top 351
+ *  - locate button  (44:1111)  : 38×38, top 397
  */
 export const MAP_RIGHT_CONTROLS = {
   left: 332,
+  right: 20,
   size: 38,
   gap: 8,
   profileTop: 351,
   locateTop: 397
 }
 
-/* Filter chip 옵션 (Figma 25:801). */
+/* Filter chip 옵션 (Figma 44:1115). */
 export type MapFilter = 'all' | 'friends' | 'following' | 'hot'
 
 export const MAP_FILTERS: { id: MapFilter; label: string; icon?: string }[] = [
@@ -160,7 +157,7 @@ export const MAP_FILTERS: { id: MapFilter; label: string; icon?: string }[] = [
 ]
 
 /*
- * Quick cards (Figma 25:737) + Event (25:752) + Recent visits (25:766/25:771)
+ * Quick cards (Figma 44:1051) + Event (44:1066) + Recent visits (44:1080/44:1085)
  * 모두 실제 텍스트를 그대로 사용한다.
  */
 export const MAP_QUICK_CARDS = [

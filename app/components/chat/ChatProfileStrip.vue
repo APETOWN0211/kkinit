@@ -17,6 +17,20 @@ interface ProfileItem {
 defineProps<{
   items: ProfileItem[]
 }>()
+
+/*
+ * Avatar fallback.
+ * 원본 src 가 404 / load error 면 /images/chat/default-avatar.svg 로 swap.
+ * dataset.fallbackApplied 로 무한 swap 방지.
+ */
+const DEFAULT_AVATAR = '/images/chat/default-avatar.svg'
+
+const onAvatarError = (e: Event) => {
+  const img = e.target as HTMLImageElement
+  if (!img || img.dataset.fallbackApplied === '1') return
+  img.dataset.fallbackApplied = '1'
+  img.src = DEFAULT_AVATAR
+}
 </script>
 
 <template>
@@ -60,6 +74,7 @@ defineProps<{
             :src="item.avatar"
             :alt="item.name"
             class="profile-avatar"
+            @error="onAvatarError"
           />
           <span
             v-if="item.showFollowPlus"

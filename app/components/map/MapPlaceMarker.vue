@@ -97,14 +97,27 @@ const markerSrc = computed(() => {
 
 <style scoped>
 /*
- * Figma 25:817/25:833/25:842/25:851 marker wrapper
- *  - 위치는 props 의 x/y 그대로
- *  - visual marker 28x31 (svg preserveAspectRatio='none' 이미 그대로 적용됨)
+ * Figma 44:1131/44:1140/44:1149/44:1158 marker wrapper
+ *  - 위치는 props 의 x/y 그대로 (390×844 AppShell 기준 logical px)
+ *  - visual marker 28 × 31.556 (svg 자체 size)
  *  - touch hit area 는 40x40 으로 키워 모바일에서 누르기 쉽게 한다.
+ *  - SVG root 의 preserveAspectRatio="none" 이므로 wrapper 와 viewBox 의
+ *    비율이 정확히 같지 않아도 약간의 stretch 가 발생할 수 있으나,
+ *    그게 Figma 의 의도이다.
  */
 .map-place-marker {
   position: absolute;
   z-index: 3;
+
+  /* label 이 button 영역을 덮어도 clickable 이어야 하므로 pointer-events 는
+     button 이 가지되, label 자체는 hit-through (아래 style). */
+  pointer-events: auto;
+
+  /* marker visual size 28 × 31.556 그대로 노출, hit area 만 별도 */
+  width: 28px;
+  height: 31.556px;
+
+  flex-shrink: 0;
 
   /* visual marker 는 wrapper 안의 hit 자식이므로 button 자체 padding 0 */
   padding: 0;
@@ -113,14 +126,10 @@ const markerSrc = computed(() => {
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-
-  /* label 이 button 영역을 덮어도 clickable 이어야 하므로 pointer-events 는
-     button 이 가지되, label 자체는 hit-through (아래 style). */
-  pointer-events: auto;
 }
 
 /*
- * hit area: visual marker 의 중심이 hit area 의 (left+20, top+15) 가 되도록
+ * hit area: visual marker 의 중심이 hit area 의 (left+14, top+15.778) 가 되도록
  * wrapper 의 offset 을 (-6, -6) 으로 잡고 40x43 hit box 를 만든다.
  */
 .map-place-marker__hit {
@@ -137,17 +146,18 @@ const markerSrc = computed(() => {
 }
 
 /*
- * Figma marker svg 는 width 28 height 31 로 export 되어 있다.
- * (vector wrapper 가 아니라 svg 자체 size)
+ * Figma marker svg (Group327/326/328) 는 width 28 height 31.556 로 export.
+ * SVG 의 preserveAspectRatio="none" 이므로 wrapper size 에 맞춰 stretch.
  */
 .map-place-marker__visual {
   display: block;
   width: 28px;
-  height: 31px;
+  height: 31.556px;
   flex-shrink: 0;
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
+  aspect-ratio: 28 / 31.556;
 }
 
 /*

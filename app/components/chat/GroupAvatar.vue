@@ -1,7 +1,23 @@
 <script setup lang="ts">
+/*
+ * Group avatar wrapper.
+ *
+ * 멤버 avatar <img> 들이 load 실패해도 깨진 이미지 아이콘이 보이지 않도록
+ * onMemberImgError 로 /images/chat/default-avatar.svg 로 swap.
+ *  - dataset.fallbackApplied 로 중복 swap 방지.
+ */
 defineProps<{
   members: string[]
 }>()
+
+const DEFAULT_AVATAR = '/images/chat/default-avatar.svg'
+
+const onMemberImgError = (e: Event) => {
+  const img = e.target as HTMLImageElement
+  if (!img || img.dataset.fallbackApplied === '1') return
+  img.dataset.fallbackApplied = '1'
+  img.src = DEFAULT_AVATAR
+}
 </script>
 
 <template>
@@ -16,7 +32,11 @@ defineProps<{
         zIndex: members.length - idx
       }"
     >
-      <img :src="member" :alt="`멤버 ${idx + 1}`" />
+      <img
+        :src="member"
+        :alt="`멤버 ${idx + 1}`"
+        @error="onMemberImgError"
+      />
     </div>
   </div>
 </template>

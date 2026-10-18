@@ -1,23 +1,21 @@
 <script setup lang="ts">
 /*
- * /map 기본 상태 bottom panel (Figma 25:730 actual).
+ * /map 기본 상태 bottom panel (Figma 44:1019 / 44:1044 actual).
  *
  * Layout:
- *  - panel        : 390×388 (실제 height 는 내용에 따라 자연스럽게,
- *                    handle 4 + padding 13 top + content + pb 28)
+ *  - panel        : 390×~387 (top 457, bottom 0, AppShell 844 기준)
  *  - top radius   : 24 24 0 0
  *  - background   : white
  *  - shadow       : 0 -2 15 0 rgba(0,0,0,0.09)
  *  - left/right   : 0 / 0 (full width 390)
- *  - bottom y     : 388px (panel 이 viewport 아래쪽에 위치)
+ *  - position: fixed → AppShell (390×844) 기준 457~844 고정 panel 영역
  *
- * 내부 layout (Figma 25:732):
- *  - handle  : 32x4 (Figma 25:731), center
- *  - title row (25:733): pin + '마포구 망원동'
- *  - quick cards (25:737): 3 cards 128×94, gap 10
- *  - event row (25:752): 67px height, 27/APR + 웨얼이즈누들 망원본점 + 오늘/오후7:00
- *  - recent visits header (25:766)
- *  - recent visit cards (25:771): 3 cards 128×99 + last 94, gap 10
+ * 내부 layout (Figma 44:1046 안의 children):
+ *  - handle (44:1045)         : 32×4
+ *  - header section (44:1047) : title row (44:1048) + quick cards (44:1051)
+ *  - event row (44:1066)      : 67px height
+ *  - recent header (44:1080)  : 21px height
+ *  - recent cards (44:1085)   : 3 cards 128/128/94, gap 10
  */
 import handleIcon from '~/assets/icons/common/sheet-handle.svg?raw'
 import chevronIcon from '~/assets/icons/explore/chevron-right.svg?raw'
@@ -53,64 +51,64 @@ const emit = defineEmits<{
     </span>
 
     <!--
-      Title block (Figma 25:733 actual: top inner, gap 20)
-        - 위치 row (25:734): pin + '마포구 망원동'
+      Title + Quick cards section (Figma 44:1047 actual).
+      - inner section: bg white, flex-col, gap 20, pt 8, w 350
+      - title row (44:1048): pin 14×15.685 + '마포구 망원동' SemiBold 16
+      - quick cards (44:1051): 3 cards × 128×94, gap 10, w 370
     -->
-    <div class="map-overview-panel__title-row">
-      <span class="map-overview-panel__pin" aria-hidden="true">
-        <img src="/images/map/pin.svg" alt="" draggable="false" />
-      </span>
-      <p class="map-overview-panel__title">마포구 망원동</p>
-    </div>
+    <div class="map-overview-panel__header-section">
+      <div class="map-overview-panel__title-row">
+        <span class="map-overview-panel__pin" aria-hidden="true">
+          <img src="/images/map/pin.svg" alt="" draggable="false" />
+        </span>
+        <p class="map-overview-panel__title">마포구 망원동</p>
+      </div>
 
-    <!--
-      Quick cards row (Figma 25:737 actual).
-        3 cards × 128×94, gap 10, padding-left/right 20
-    -->
-    <div class="map-overview-panel__quick-cards">
-      <div
-        v-for="card in MAP_QUICK_CARDS"
-        :key="card.id"
-        class="map-overview-panel__quick-card"
-        :style="{ background: card.bg }"
-      >
-        <div class="map-overview-panel__quick-card-top">
-          <template v-if="card.id === 'friends'">
-            <span
-              v-for="(avatar, idx) in card.avatars"
-              :key="idx"
-              class="map-overview-panel__quick-avatar"
-              :style="{ marginLeft: idx === 0 ? '0' : '-6.857px', zIndex: 10 - idx }"
-            >
-              <img :src="avatar" alt="" draggable="false" />
-            </span>
-          </template>
-          <img
-            v-else-if="card.icon"
-            :src="card.icon"
-            class="map-overview-panel__quick-icon"
-            alt=""
-            draggable="false"
-          />
+      <div class="map-overview-panel__quick-cards">
+        <div
+          v-for="card in MAP_QUICK_CARDS"
+          :key="card.id"
+          class="map-overview-panel__quick-card"
+          :style="{ background: card.bg }"
+        >
+          <div class="map-overview-panel__quick-card-top">
+            <template v-if="card.id === 'friends'">
+              <span
+                v-for="(avatar, idx) in card.avatars"
+                :key="idx"
+                class="map-overview-panel__quick-avatar"
+                :style="{ marginLeft: idx === 0 ? '0' : '-6.857px', zIndex: 10 - idx }"
+              >
+                <img :src="avatar" alt="" draggable="false" />
+              </span>
+            </template>
+            <img
+              v-else-if="card.icon"
+              :src="card.icon"
+              class="map-overview-panel__quick-icon"
+              alt=""
+              draggable="false"
+            />
+          </div>
+          <p class="map-overview-panel__quick-text">
+            <template v-if="card.id === 'friends'">
+              {{ card.text[0] }}<br>{{ card.text[1] }}
+            </template>
+            <template v-else-if="card.id === 'event'">
+              <span>{{ card.text[0] }}</span>{{ card.text[1]
+              }}<span class="map-overview-panel__quick-bold" :style="{ color: card.accent }">{{ card.text[2] }}</span>
+            </template>
+            <template v-else>
+              <span>{{ card.text[0] }}</span><br>{{ card.text[1]
+              }}<span class="map-overview-panel__quick-bold" :style="{ color: card.accent }">{{ card.text[2] }}</span>
+            </template>
+          </p>
         </div>
-        <p class="map-overview-panel__quick-text">
-          <template v-if="card.id === 'friends'">
-            {{ card.text[0] }}<br>{{ card.text[1] }}
-          </template>
-          <template v-else-if="card.id === 'event'">
-            <span>{{ card.text[0] }}</span>{{ card.text[1]
-            }}<span class="map-overview-panel__quick-bold" :style="{ color: card.accent }">{{ card.text[2] }}</span>
-          </template>
-          <template v-else>
-            <span>{{ card.text[0] }}</span><br>{{ card.text[1]
-            }}<span class="map-overview-panel__quick-bold" :style="{ color: card.accent }">{{ card.text[2] }}</span>
-          </template>
-        </p>
       </div>
     </div>
 
     <!--
-      Today event row (Figma 25:752 actual).
+      Today event row (Figma 44:1066 actual).
         - height 67px, gap 12, items center, justify between
         - date card  : 50w x 50h, radius 12, border rgba(0,0,0,0.1), padding 10
           - 27 (28px SemiBold #FF6940)
@@ -141,7 +139,7 @@ const emit = defineEmits<{
     </div>
 
     <!--
-      Recent visits header (Figma 25:766 actual).
+      Recent visits header (Figma 44:1080 actual).
         - h 21, justify between, items center
         - title '최근 방문지' 18px SemiBold #191919 tracking 0.36
         - '방문 기록 >' row 16px Medium #73787E tracking 0.32, gap 8
@@ -159,7 +157,7 @@ const emit = defineEmits<{
     </div>
 
     <!--
-      Recent visit cards (Figma 25:771 actual).
+      Recent visit cards (Figma 44:1085 actual).
         - flex row, gap 10, w full
         - 128×99 + 128×99 + 94×99, padding 12, radius 12,
           border rgba(0,0,0,0.05), gap inside 8
@@ -180,23 +178,29 @@ const emit = defineEmits<{
 
 <style scoped>
 /*
- * Figma 25:730 actual:
- *  - 390×388, top radius 24, white, shadow 0 -2 15 rgba(0,0,0,0.09)
+ * Figma 44:1044 actual (지도 - 메인 bottom sheet):
+ *  - top y 456.95 (≈ 457px) on 390×844 frame
+ *  - 390 wide, top radius 24, white, shadow 0 -2 15 rgba(0,0,0,0.09)
  *  - padding 13 top / 28 bottom / 20 x
- *  - gap 10 (위에서 아래로)
+ *  - 내부 section gap 20 (location header → quick cards), 10 (panel 내부)
  *
- * position: absolute, bottom 0 으로 viewport 에 붙인다.
+ * position: fixed + inset: 457 0 0 0 으로 AppShell (390×844) 기준 고정.
+ * - AppContent 의 padding-bottom 과 무관하게 panel 은 844 까지 펼쳐진다.
+ * - AppShell 이 drawer transform 으로 transform 을 가지므로
+ *   position: fixed 의 containing block 은 AppShell 이 된다.
+ * - 844 viewport 에서는 Figma 와 동일한 panel 영역 (top 457, bottom 0).
  */
 .map-overview-panel {
-  position: absolute;
+  position: fixed;
+  top: 457px;
   left: 0;
   right: 0;
   bottom: 0;
 
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  align-items: stretch;
+  gap: 20px;
 
   padding: 13px 20px calc(28px + env(safe-area-inset-bottom));
 
@@ -212,15 +216,25 @@ const emit = defineEmits<{
   cursor: default;
 
   box-sizing: border-box;
+
+  /*
+   * Figma initial viewport (844) 에서 panel 안에 모든 content 가 다 들어가지
+   * 않을 수 있어, 좁은 viewport / 작은 device 에서는 sheet 내부만
+   * 세로 스크롤되게 한다. panel 자체는 viewport/AppShell 에 고정.
+   */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /*
- * Handle (Figma 25:731 actual: 32×4, center)
+ * Handle (Figma 44:1045 actual: 32×4, center)
  */
 .map-overview-panel__handle {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  align-self: center;
 
   width: 32px;
   height: 4px;
@@ -234,19 +248,40 @@ const emit = defineEmits<{
 }
 
 /*
- * Title row (Figma 25:734 actual).
- *  - flex row, gap 4, padding-x 4 (실제 위치), items center
+ * Header section (Figma 44:1047 actual).
+ *  - bg white, flex-col, gap 20, pt 8, w 350 (centered)
+ *  - title row (44:1048) + quick cards (44:1051)
+ */
+.map-overview-panel__header-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+
+  width: 100%;
+  max-width: 350px;
+
+  padding-top: 8px;
+
+  flex-shrink: 0;
+
+  box-sizing: border-box;
+}
+
+/*
+ * Title row (Figma 44:1048 actual).
+ *  - flex row, gap 4, padding-x 4, items center, 좌정렬.
  *  - pin 14×15.685
  *  - title SemiBold 16 #191919
  */
 .map-overview-panel__title-row {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 4px;
 
   width: 100%;
-  padding: 8px 4px 0;
+  padding: 0 4px;
 
   box-sizing: border-box;
 }
@@ -276,14 +311,16 @@ const emit = defineEmits<{
   line-height: 1;
   color: #191919;
   letter-spacing: 0;
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
 }
 
 /*
- * Quick cards (Figma 25:737 actual).
- *  - flex row, gap 10, w 370 (panel 내부에서 padding 20씩 빼면 350)
+ * Quick cards (Figma 44:1051 actual).
+ *  - flex row, gap 10, w 370 (panel 내부 padding 20씩 빼면 350 → 370 이 살짝
+ *    넘쳐 3번째 카드의 일부가 잘려 보이는 게 정상)
  *  - card 128×94, radius 12, padding 12, justify-between
+ *  - flex-shrink: 0 으로 카드가 줄어들지 않게 한다.
  */
 .map-overview-panel__quick-cards {
   display: flex;
@@ -295,8 +332,7 @@ const emit = defineEmits<{
 }
 
 .map-overview-panel__quick-card {
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 0 0 128px;
 
   display: flex;
   flex-direction: column;
@@ -361,8 +397,8 @@ const emit = defineEmits<{
 }
 
 /*
- * Today event row (Figma 25:752 actual).
- *  - 67 height, justify-between, items center
+ * Today event row (Figma 44:1066 actual).
+ *  - 350 wide, 67 height, justify-between, items center
  *  - left : date card 50×50 + info column 182
  *  - right: chevron 5.333×40
  */
@@ -371,9 +407,14 @@ const emit = defineEmits<{
   align-items: center;
   justify-content: space-between;
 
+  align-self: center;
+
   width: 100%;
+  max-width: 350px;
   height: 67px;
   flex-shrink: 0;
+
+  box-sizing: border-box;
 }
 
 .map-overview-panel__event-left {
@@ -405,7 +446,7 @@ const emit = defineEmits<{
 
 .map-overview-panel__event-day {
   font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 600;
   line-height: 1;
   color: #FF6940;
@@ -414,11 +455,11 @@ const emit = defineEmits<{
 
 .map-overview-panel__event-month {
   font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1;
   color: #39AC92;
-  letter-spacing: -0.42px;
+  letter-spacing: -0.48px;
   margin-top: 2px;
 }
 
@@ -429,6 +470,7 @@ const emit = defineEmits<{
 
   flex: 1 1 auto;
   min-width: 0;
+  max-width: 182px;
 
   padding: 6px 0;
 }
@@ -493,17 +535,22 @@ const emit = defineEmits<{
 }
 
 /*
- * Recent visits header (Figma 25:766 actual).
- *  - h 21, justify-between
+ * Recent visits header (Figma 44:1080 actual).
+ *  - w 350, h 21, justify-between
  */
 .map-overview-panel__recent-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
+  align-self: center;
+
   width: 100%;
+  max-width: 350px;
   height: 21px;
   flex-shrink: 0;
+
+  box-sizing: border-box;
 }
 
 .map-overview-panel__recent-title {
@@ -558,9 +605,11 @@ const emit = defineEmits<{
 }
 
 /*
- * Recent visit cards (Figma 25:771 actual).
- *  - flex row, gap 10, w full
+ * Recent visit cards (Figma 44:1085 actual).
+ *  - flex row, gap 10, w 370 (panel 내부 padding 20씩 빼면 350 → 370 이 살짝
+ *    넘쳐 3번째 카드의 일부가 잘려 보이는 게 정상)
  *  - 128×99 + 128×99 + 94×99
+ *  - flex-shrink: 0 으로 카드가 줄어들지 않게 한다.
  */
 .map-overview-panel__recent-cards {
   display: flex;
@@ -572,8 +621,7 @@ const emit = defineEmits<{
 }
 
 .map-overview-panel__visit-card {
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 0 0 128px;
 
   display: flex;
   flex-direction: column;
