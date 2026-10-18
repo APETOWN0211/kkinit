@@ -18,22 +18,30 @@ defineProps<{
   marker: MapProfileMarker
 }>()
 
-function markerAvatarName(kind: MapProfileMarker['kind']) {
-  if (kind === 'duck') return 'duck'
-  if (kind === 'duck2') return 'duck' // Frame743 → 같은 duck 사진이 두 번 사용됨
-  return 'dino'
+function markerAsset(kind: MapProfileMarker['kind']): { name: string; folder: string } {
+  if (kind === 'dino') return { name: 'dino', folder: STORAGE_FOLDERS.map }
+  if (kind === 'kurumi') return { name: 'profile-kurumi', folder: STORAGE_FOLDERS.chat }
+  return { name: 'duck', folder: STORAGE_FOLDERS.map }
 }
 
 /*
  * Storage path 로 통일. helper 가 .webp / .png 매핑.
  *
- * `imagePath.map(...)` 는 storage path 만 반환 (spec #22).
+ * imagePath.map(...) 는 storage path 만 반환 (spec #22).
  * `<img :src>` 에는 public URL 이 필요하므로, 같은 helper 인 `getStorageImageUrl`
  * 로 감싸서 한 번에 public URL 로 만든다.
  */
 function markerAvatarPath(kind: MapProfileMarker['kind']): string {
-  const name = markerAvatarName(kind)
-  return getStorageImageUrl(imagePathFacade.map(`profile-${name}.webp`), STORAGE_FOLDERS.map)
+  // kurumi 는 chat 폴더에 .png 로 존재 (map 폴더에는 .webp 만 있음).
+  // 다른 kind 는 map 폴더의 .webp.
+  if (kind === 'kurumi') {
+    return getStorageImageUrl(
+      imagePathFacade.chat('profile-kurumi.png'),
+      STORAGE_FOLDERS.chat
+    )
+  }
+  const { name, folder } = markerAsset(kind)
+  return getStorageImageUrl(imagePathFacade.map(`profile-${name}.webp`), folder)
 }
 </script>
 

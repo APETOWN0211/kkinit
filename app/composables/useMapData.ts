@@ -120,7 +120,7 @@ export const MAP_PLACES: MapPlace[] = [
  *  - 44:1100 (top duck, Frame744)  : wrapper left 387.38 - 221.38 = 166, top 160.95 - 1.95 = 159
  *  - 44:1043 (bottom duck, Frame743): wrapper left 470.38 - 221.38 = 249, top 410.95 - 1.95 = 409
  */
-export type MapProfileMarkerKind = 'duck' | 'dino' | 'duck2'
+export type MapProfileMarkerKind = 'duck' | 'dino' | 'kurumi'
 
 export type MapProfileMarker = {
   id: string
@@ -131,8 +131,17 @@ export type MapProfileMarker = {
 }
 
 export const MAP_PROFILE_MARKERS: MapProfileMarker[] = [
-  { id: 'p1', kind: 'duck', x: 163, y: 156, size: 48 },
-  { id: 'p2', kind: 'duck2', x: 246, y: 406, size: 48 }
+  /*
+   * kind 변경 이력:
+   *  - p1 (위쪽): 'duck' → 'dino'   (티라노리 공룡 avatar)
+   *  - p2 (아래쪽): 'duck2' → 'kurumi' (쿠루미 avatar, chat 폴더)
+   *
+   * 이유: Figma original 에서는 두 marker 가 같은 duck avatar 였지만,
+   * mock 단계에서 두 marker 가 같은 profile image 로 표시되면 사용자가
+   * "두 명 다 같은 사람" 으로 오해함 → 위는 티라노리, 아래는 쿠루미로 분리.
+   */
+  { id: 'p1', kind: 'dino',   x: 163, y: 156, size: 48 },
+  { id: 'p2', kind: 'kurumi', x: 246, y: 406, size: 48 }
 ]
 
 /*

@@ -130,177 +130,23 @@ const conversations: Conversation[] = [
     ring: 'gray',
     lastMessage: '오케이, 그때 봐!',
     time: '3일 전'
-  },
-  {
-    id: 'c5',
-    type: 'direct',
-    name: '바람새',
-    avatar: getStorageImageUrl('profile-baramsae.png', STORAGE_FOLDERS.chat),
-    ring: 'none',
-    lastMessage: '식당 정보를 보냈어요.',
-    time: '일주일',
-    unreadCount: 2,
-    badgeColor: 'orange'
-  },
-  {
-    id: 'c6',
-    type: 'direct',
-    name: '파란하늘구름',
-    avatar: getStorageImageUrl('profile-paran.png', STORAGE_FOLDERS.chat),
-    ring: 'gray',
-    lastMessage: "'합정 야식 모임' 모임 가입 요청을 보냈어요.",
-    time: '2주 전'
-  },
-  {
-    id: 'c7',
-    type: 'direct',
-    name: '오민수',
-    avatar: getStorageImageUrl('profile-ominsu-3.png', STORAGE_FOLDERS.chat),
-    ring: 'gray',
-    lastMessage: '안녕하세요! 마포구에서 만두집을 운영중인',
-    time: '1달 전'
-  },
-  {
-    id: 'c8',
-    type: 'direct',
-    name: '오민수',
-    avatar: getStorageImageUrl('profile-ominsu-2.png', STORAGE_FOLDERS.chat),
-    ring: 'gray',
-    lastMessage: '안녕하세요! 마포구에서 만두집을 운영중인',
-    time: '1일 전'
-  },
-  {
-    id: 'c9',
-    type: 'direct',
-    name: '닉네임9',
-    avatar: getStorageImageUrl('/images/chat/profile-nickname9.png', 'feed'),
-    ring: 'orange-short',
-    lastMessage: '내일 같이 가요!',
-    time: '12:42'
-  },
-  {
-    id: 'c10',
-    type: 'group',
-    name: '마포구 맛집 탐방',
-    members: [
-      getStorageImageUrl('group-member-1.png', STORAGE_FOLDERS.chat),
-      getStorageImageUrl('group-member-2.png', STORAGE_FOLDERS.chat),
-      getStorageImageUrl('group-member-3.png', STORAGE_FOLDERS.chat)
-    ],
-    memberCount: 8,
-    sender: '바람새',
-    lastMessage: '여기 진짜 맛있어요 추천!',
-    time: '오늘',
-    unreadCount: 3,
-    badgeColor: 'teal'
-  },
-  {
-    id: 'c11',
-    type: 'direct',
-    name: '하늘바라기',
-    avatar: getStorageImageUrl('/images/chat/profile-sky.png', 'feed'),
-    ring: 'none',
-    lastMessage: '사진 잘 봤어요 :)',
-    time: '오늘'
-  },
-  {
-    id: 'c12',
-    type: 'direct',
-    name: '지우',
-    avatar: getStorageImageUrl('/images/chat/profile-jiwoo.png', 'feed'),
-    ring: 'gray',
-    lastMessage: '주말에 시간 되세요?',
-    time: '어제'
-  },
-  {
-    id: 'c13',
-    type: 'direct',
-    name: '햇살한점',
-    avatar: getStorageImageUrl('/images/chat/profile-sun.png', 'feed'),
-    ring: 'orange',
-    lastMessage: '답장 고마워요!',
-    time: '2일 전',
-    unreadCount: 1,
-    badgeColor: 'orange'
-  },
-  {
-    id: 'c14',
-    type: 'group',
-    name: '고양이 집사 모임',
-    members: [
-      getStorageImageUrl('group-member-2.png', STORAGE_FOLDERS.chat),
-      getStorageImageUrl('group-member-3.png', STORAGE_FOLDERS.chat),
-      getStorageImageUrl('/images/chat/group-member-4.png', 'feed')
-    ],
-    memberCount: 12,
-    sender: '냥냥이',
-    lastMessage: '새로운 사진 공유합니다 🐱',
-    time: '3일 전',
-    muted: true
-  },
-  {
-    id: 'c15',
-    type: 'direct',
-    name: '초록이',
-    avatar: getStorageImageUrl('/images/chat/profile-green.png', 'feed'),
-    ring: 'none',
-    lastMessage: '카페에서 만나요',
-    time: '4일 전'
-  },
-  {
-    id: 'c16',
-    type: 'direct',
-    name: '별빛루나',
-    avatar: getStorageImageUrl('/images/chat/profile-luna.png', 'feed'),
-    ring: 'orange-short',
-    lastMessage: '내일 일정 변경 가능할까요?',
-    time: '5일 전',
-    unreadCount: 4,
-    badgeColor: 'orange'
-  },
-  {
-    id: 'c17',
-    type: 'direct',
-    name: '달빛사냥꾼',
-    avatar: getStorageImageUrl('/images/chat/profile-moon.png', 'feed'),
-    ring: 'gray',
-    lastMessage: '알겠어요 :)',
-    time: '6일 전'
-  },
-  {
-    id: 'c18',
-    type: 'direct',
-    name: '코코넛',
-    avatar: getStorageImageUrl('/images/chat/profile-coco.png', 'feed'),
-    ring: 'none',
-    lastMessage: '재밌는 영상 보냈어요!',
-    time: '일주일 전'
-  },
-  {
-    id: 'c19',
-    type: 'group',
-    name: '주말 등산 모임',
-    members: [
-      getStorageImageUrl('group-member-1.png', STORAGE_FOLDERS.chat),
-      getStorageImageUrl('group-member-3.png', STORAGE_FOLDERS.chat),
-      getStorageImageUrl('/images/chat/group-member-4.png', 'feed')
-    ],
-    memberCount: 5,
-    sender: '산꾼',
-    lastMessage: '이번 주 토요일 북한산 어때요?',
-    time: '2주 전',
-    unreadCount: 1,
-    badgeColor: 'teal'
-  },
-  {
-    id: 'c20',
-    type: 'direct',
-    name: '맛집헌터',
-    avatar: getStorageImageUrl('/images/chat/profile-hunter.png', 'feed'),
-    ring: 'orange',
-    lastMessage: '신규 맛집 리뷰 올렸어요!',
-    time: '한달 전'
   }
+  /*
+   * NOTE: 더 아래의 mock conversation (c5..c20 — 바람새, 파란하늘구름,
+   * 추가 오민수들, 닉네임9, 마포구 맛집 탐방, 하늘바라기, 지우, 햇살한점,
+   * 고양이 집사 모임, 초록이, 별빛루나, 달빛사냥꾼, 코코넛, 주말 등산 모임,
+   * 맛집헌터) 은 모두 제거됨.
+   *
+   * 이유: /chat 의 mock conversation list 는 현재 다음 4 명만 표시:
+   *   1) 티라노리 (c1)
+   *   2) 쵸니월드 (c2)
+   *   3) 합정 야식 모임 (c3)
+   *   4) 오민수 (c4)
+   * "전체 / 안읽음 / 모임" 모든 filter 에서도 동일하게 4 개만 렌더.
+   *
+   * CSS (display:none, nth-child) 로 가리지 않고 data 자체를 제거했으므로
+   * filter 분기 (`filteredConversations`) 도 자동으로 줄어든 4 개만 반환한다.
+   */
 ]
 
 const unreadCount = computed(() =>

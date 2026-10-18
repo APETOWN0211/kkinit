@@ -49,9 +49,16 @@ const onBookmarkClick = (e: Event) => {
 }
 
 const bookmarkVariant = computed(() => {
-  if (props.restaurant.badge?.variant === 'green') return 'badge--green'
-  if (props.restaurant.badge?.variant === 'solo') return 'badge--solo'
-  return 'badge--orange'
+  /*
+   * BEM 클래스 prefix 를 붙여서 반환한다.
+   *   - data → CSS 매칭이 보장되도록 정확한 selector 이름 사용
+   *   - 기존에는 'badge--orange' (prefix 없음) 를 반환했는데
+   *     scoped CSS 는 '.restaurant-card__badge--orange' 만 정의하고 있어
+   *     매칭 실패 → background/색이 사라지고 label 텍스트만 보였음.
+   */
+  if (props.restaurant.badge?.variant === 'green') return 'restaurant-card__badge--green'
+  if (props.restaurant.badge?.variant === 'solo') return 'restaurant-card__badge--solo'
+  return 'restaurant-card__badge--orange'
 })
 </script>
 
