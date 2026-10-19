@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import mutedIcon from '~/assets/icons/chat/muted.svg?raw'
 import storyRingOrange from '~/assets/icons/chat/story-ring-orange.svg?raw'
 import storyRingOrangeShort from '~/assets/icons/chat/story-ring-orange-short.svg?raw'
 import storyRingGray from '~/assets/icons/chat/story-ring-gray.svg?raw'
 import GroupAvatar from '~/components/chat/GroupAvatar.vue'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
 /*
  * Default avatar fallback.
@@ -24,7 +26,7 @@ const onAvatarError = (e: Event) => {
 type RingKind = 'orange' | 'orange-short' | 'gray' | 'none'
 type BadgeColor = 'orange' | 'teal'
 
-interface ConversationItem {
+export interface ConversationItem {
   id: string
   type: 'direct' | 'group'
   name: string
@@ -47,9 +49,51 @@ interface ConversationItem {
   showDivider?: boolean
 }
 
-defineProps<{
+const props = defineProps<{
   item: ConversationItem
 }>()
+
+/*
+ * Chat list item navigation policy.
+ *
+ * 본 단계에서는 티라노리 대화만 /chat/[id] 로 진입 가능하고,
+ * 나머지 row (죠니월드, 합정 야식 모임, 오민수, 바람새, 파란하늘구름 등) 는
+ * 화면이 비어있거나 mock 이 없으므로 navigation 하지 않는다.
+ *
+ * 따라서 row id === 'tiranori' 일 때만 safeNavigate 를 호출하고,
+ * 그 외 id 는 click / keydown 모두 무시한다.
+ * press feedback (:active 의 어두운 배경) 은 CSS 가 그대로 제공.
+ */
+const NAVIGABLE_CHAT_IDS: ReadonlySet<string> = new Set(['tiranori'])
+
+const isNavigable = computed(() => NAVIGABLE_CHAT_IDS.has(props.item.id))
+
+/*
+ * Chat detail navigation.
+ *
+ * - 1:1 / group 모두 conversation id 가 곧 detail route 가 된다.
+ *   e.g. { id: 'c1', type: 'direct' } → /chat/c1
+ *
+ * - profile strip 의 avatar 클릭은 별개 동작이므로 (현재 no-op),
+ *   이 row 의 click target 은 row 전체 (article) 이다.
+ *   Figma 11:244 의 "채팅" list 화면은 press feedback 으로 어두워지는
+ *   인터랙션만 가지므로 navigation 만 추가하고 visual 은 유지.
+ */
+const { safeNavigate } = useSafeNavigation()
+
+const detailPath = computed(() => `/chat/${props.item.id}`)
+
+const onRowClick = () => {
+  if (!isNavigable.value) return
+  safeNavigate(detailPath.value)
+}
+
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return
+  e.preventDefault()
+  if (!isNavigable.value) return
+  safeNavigate(detailPath.value)
+}
 </script>
 
 <template>
@@ -59,6 +103,11 @@ defineProps<{
       'chat-row--group': item.type === 'group',
       'chat-row--divider': item.showDivider,
     }"
+    role="button"
+    tabindex="0"
+    :aria-label="`${item.name} 대화 열기`"
+    @click="onRowClick"
+    @keydown="onKeydown"
   >
     <!--
       Figma 11:309 등 모든 row 의 avatar 영역.
@@ -169,6 +218,14 @@ defineProps<{
   padding: 10px 20px;
   background: transparent;
   box-sizing: border-box;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 120ms ease;
+  user-select: none;
+}
+
+.chat-row:active {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 /*

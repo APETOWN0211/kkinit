@@ -23,9 +23,31 @@ import { useRouter } from 'vue-router'
  *     자동으로 인식된다.
  *   - dynamic route 도 router 가 처리하므로 정상 동작한다
  *     (예: /profile/123 — 해당 page 가 존재하면 이동).
+ *
+ * Chat detail 화이트리스트 (현재 단계):
+ *   - /chat/[id] 는 mock detail 이 'tiranori' 만 채워져 있어,
+ *     그 외 id 로의 이동은 빈 화면 / mock 누락 등의 문제를 일으킨다.
+ *   - 따라서 /chat/[id] 로의 navigation 은 id 가 'tiranori' 일 때만 허용한다.
+ *   - 그 외 (예: /chat/johnny, /chat/group-hapjeong-yasik) 는 무시한다.
+ *   - 새로운 detail mock 이 추가되면 NAVIGABLE_CHAT_IDS 에 id 를 추가하면 된다.
  */
+const NAVIGABLE_CHAT_IDS: ReadonlySet<string> = new Set(['tiranori'])
+
 export const useSafeNavigation = () => {
   const router = useRouter()
+
+  /**
+   * target 이 /chat/[id] 형태일 때, 화이트리스트에 포함된 id 인지 검증한다.
+   * 그 외 path 는 true 반환 (검사 통과).
+   */
+  const isChatDetailAllowed = (path: string): boolean => {
+    const cleaned = path.split('?')[0].split('#')[0]
+    const segments = cleaned.split('/').filter(Boolean)
+    if (segments.length < 2) return true
+    if (segments[0] !== 'chat') return true
+    // segments.length === 2 === /chat/[id]
+    return NAVIGABLE_CHAT_IDS.has(segments[1])
+  }
 
   /**
    * target 으로 안전하게 이동한다.
@@ -43,6 +65,15 @@ export const useSafeNavigation = () => {
      */
     const resolved = router.resolve(path)
     if (!resolved.matched || resolved.matched.length === 0) {
+      return false
+    }
+
+    /*
+     * /chat/[id] 화이트리스트 적용.
+     * mock detail 이 없는 id (예: johnny, group-hapjeong-yasik ...) 로의
+     * 이동은 차단한다.
+     */
+    if (!isChatDetailAllowed(path)) {
       return false
     }
 

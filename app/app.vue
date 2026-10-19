@@ -99,8 +99,18 @@ useHead({
 
 const mainTabRoutes = ['/', '/explore', '/map', '/chat']
 
+/*
+ * /chat 자체는 floating BottomNavigation 을 보여주지만,
+ * /chat/[id] (Figma 93:868 chat detail) 에서는
+ * Home / Explore / Map / Chat nav 가 화면에 보이지 않는다.
+ */
+const isChatDetailRoute = computed(() => {
+  // /chat/tiranori 등 /chat/... sub-route 전체 매칭.
+  return route.path.startsWith('/chat/')
+})
+
 const showBottomNavigation = computed(() =>
-  mainTabRoutes.includes(route.path)
+  mainTabRoutes.includes(route.path) && !isChatDetailRoute.value
 )
 
 /*

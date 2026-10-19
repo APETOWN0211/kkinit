@@ -69,6 +69,12 @@ const profiles: ProfileItem[] = [
 ]
 
 interface Conversation {
+  /*
+   * id = detail route slug.
+   * 1:1 의 경우 profile id 와 같은 string 을 사용해
+   *   /chat/tiranori, /chat/johnnyworld 등 readable URL 을 만든다.
+   * group 의 경우 별도 slug 사용.
+   */
   id: string
   type: 'direct' | 'group'
   name: string
@@ -86,7 +92,7 @@ interface Conversation {
 
 const conversations: Conversation[] = [
   {
-    id: 'c1',
+    id: 'tiranori',
     type: 'direct',
     name: '티라노리',
     avatar: getStorageImageUrl('profile-tiranori.png', STORAGE_FOLDERS.chat),
@@ -97,7 +103,7 @@ const conversations: Conversation[] = [
     badgeColor: 'orange'
   },
   {
-    id: 'c2',
+    id: 'johnny',
     type: 'direct',
     name: '죠니월드',
     avatar: getStorageImageUrl('profile-johnny-muted.png', STORAGE_FOLDERS.chat),
@@ -107,7 +113,7 @@ const conversations: Conversation[] = [
     muted: true
   },
   {
-    id: 'c3',
+    id: 'group-hapjeong-yasik',
     type: 'group',
     name: '합정 야식 모임',
     members: [
@@ -123,7 +129,7 @@ const conversations: Conversation[] = [
     badgeColor: 'teal'
   },
   {
-    id: 'c4',
+    id: 'ominsu',
     type: 'direct',
     name: '오민수',
     avatar: getStorageImageUrl('profile-ominsu-2.png', STORAGE_FOLDERS.chat),
@@ -132,7 +138,7 @@ const conversations: Conversation[] = [
     time: '3일 전'
   },
   {
-    id: 'c5',
+    id: 'baramsae',
     type: 'direct',
     name: '바람새',
     avatar: getStorageImageUrl('profile-baramsae.png', STORAGE_FOLDERS.chat),
@@ -143,7 +149,7 @@ const conversations: Conversation[] = [
     badgeColor: 'orange'
   },
   {
-    id: 'c6',
+    id: 'paran',
     type: 'direct',
     name: '파란하늘구름',
     avatar: getStorageImageUrl('profile-paran.png', STORAGE_FOLDERS.chat),
@@ -152,7 +158,7 @@ const conversations: Conversation[] = [
     time: '2주 전'
   },
   {
-    id: 'c7',
+    id: 'ominsu-2',
     type: 'direct',
     name: '오민수',
     avatar: getStorageImageUrl('profile-ominsu-3.png', STORAGE_FOLDERS.chat),
@@ -161,18 +167,18 @@ const conversations: Conversation[] = [
     time: '1달 전'
   }
   /*
-   * NOTE: c7 (두 번째 오민수) 아래의 mock conversation (c8..c20 — 추가 오민수,
+   * NOTE: ominsu-2 아래의 mock conversation (추가 오민수,
    * 닉네임9, 마포구 맛집 탐방, 하늘바라기, 지우, 햇살한점, 고양이 집사 모임,
    * 초록이, 별빛루나, 달빛사냥꾼, 코코넛, 주말 등산 모임, 맛집헌터) 은 모두 제거.
    *
    * 이유: /chat 의 mock conversation list 는 다음 7 건만 표시:
-   *   1) 티라노리 (c1)
-   *   2) 쵸니월드 (c2)
-   *   3) 합정 야식 모임 (c3)
-   *   4) 오민수 (c4)
-   *   5) 바람새 (c5)
-   *   6) 파란하늘구름 (c6)
-   *   7) 오민수 (c7) ← 두 번째 오민수 (여기까지 유지)
+   *   1) 티라노리 (tiranori)
+   *   2) 쵸니월드 (johnny)
+   *   3) 합정 야식 모임 (group-hapjeong-yasik)
+   *   4) 오민수 (ominsu)
+   *   5) 바람새 (baramsae)
+   *   6) 파란하늘구름 (paran)
+   *   7) 오민수 (ominsu-2) ← 두 번째 오민수 (여기까지 유지)
    * "전체 / 안읽음 / 모임" 모든 filter 에서도 동일하게 위 7 건만 렌더.
    *
    * CSS (display:none, nth-child) 로 가리지 않고 data 자체를 제거했으므로
